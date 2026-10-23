@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Contextual Security &mdash; Agentic privacy, mapped</title>
+<meta name="description" content="Section 5 of the CAPS report: security judged by contextual norms rather than by the system's own spec, and why agents make that urgent." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../paper.css" />
+</head>
+<body>
+<header class="bar"><div class="bar-in">
+  <div class="brand"><span class="dot"></span>AGENTIC&nbsp;PRIVACY&nbsp;//&nbsp;FIELD&nbsp;MAP</div>
+  <a class="back" href="../index.html#framework">&larr; field map</a>
+</div></header>
+<main>
+  <div class="eyebrow"><span class="box wb mono">PART I · FRAMEWORK · 01 OF 02</span><span class="mono">§5.0–5.4 · pp. 19–23 · OP 5.1–5.3</span></div>
+  <h1>Contextual Security</h1>
+  <div class="authors">Security that answers to the context's norms, not just to the system's own specification</div>
+  <div class="paperlink" style="border-left-color:var(--off)"><span class="lbl">Source</span><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=19" target="_blank" rel="noopener">§5 Contextual Security: Security that Upholds Contextual Integrity, pp. 19–23 ↗</a></div>
+
+  <div class="tldr"><b>TL;DR &mdash;</b> Classic security asks whether a system enforces the boundary its builders chose. The report asks a harder question: was that the right boundary? It stretches Contextual Integrity from "appropriate flows of personal information" to "appropriate behavior of any kind," and calls a system contextually secure when its functionality and its security goals both fit the context's legitimate norms under a realistic threat model. Three open problems follow: how to describe behavior norms at all, how to pick the right threat model, and how to agree on security norms. Agents make this urgent because they take on human-like flexible roles without the norms, audits, and social pressure that kept humans in line.</div>
+
+  <p class="lead">Section 5 is the first of the two framework chapters in Part I. The chapter before it introduces Contextual Integrity (CI) as a theory of privacy. This chapter makes the move that the rest of the report depends on: if CI can judge whether a flow of personal data is appropriate, it can also judge whether an action, or a flow of non-personal data, is appropriate. That generalization turns CI into a security frame. The next chapter (§6) then asks how to build a policy engine that enforces it. Read this page as the "what are we even trying to enforce" chapter, and the next one as the "how."</p>
+
+  <h2 id="op-5-1">OP 5.1 · Describing behavior norms</h2>
+  <p>The report defines contextual security as enforcing appropriate behaviors and practices that support a context's ends, purposes, and values. "Behaviors" covers three things: flows of personal information, flows of non-personal information, and actions that are not information flows at all. The norms that mark the legitimate boundaries are called <em>contextual behavior norms</em>, which the report describes as a parallel to, and superset of, contextual privacy norms (§5, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=19" target="_blank" rel="noopener">p. 19</a>).</p>
+  <p>The open problem is vocabulary. CI describes a personal information flow with five parameters (see the <a class="lnk" href="../concepts/contextual-integrity.html">CI page</a>). Those parameters are what make a privacy norm precise enough to check. The report points out that they may not carry over. A flow of non-personal data has no "data subject." A behavior like constructing a building has no "data attribute," "sender," or "recipient." It suggests that some, and possibly none, of the five parameters stay relevant. What it says does stay necessary is a contextual ontology, for example of roles.</p>
+  <h3>Why it is hard for agents</h3>
+  <p>An agent's actions are mostly not data flows in the CI sense. It runs code, books things, deletes files, clicks buttons. If you cannot write down the shape of a norm for those actions, you cannot write a policy over them, test against them, or argue about whether one was broken. Privacy researchers have a decade of work on the five-parameter tuple. There is no matching tuple for "behavior."</p>
+  <p>A way to picture this (our sketch, not the report's): a behavior norm might need slots like these.</p>
+  <pre class="code-block"><code>actor role     : who is acting, in what capacity (assistant, booker, admin)
+action         : what is done (book, delete, purchase, execute)
+object         : what it is done to (a class slot, a repo, a building permit)
+on behalf of   : whose ends it serves
+context        : gym, workplace, children's site, benchmark run
+condition      : under what circumstances it is allowed</code></pre>
+  <p>The report proposes no such list. Its point is that someone has to derive one, and that it should be systematic enough to say unambiguously which behaviors align with a context's goals.</p>
+  <h3>What a good answer would have to do</h3>
+  <p>Give a parameter set that covers non-personal flows and non-flow actions, reduces to the classic five parameters when the flow is personal, and is concrete enough for the next chapter's policy engine to consume. OP 5.3 depends on this directly.</p>
+
+  <h2 id="society-not-spec">Security defined by society, not by the spec (§5.1)</h2>
+  <p>The report's critique of traditional security is precise. A system is usually called secure if it enforces the goals in its own specification under its own threat model. Developers or enterprises pick those goals. So the definition sits above any moral judgment: whatever boundary the spec draws, enforcing it counts as secure (§5.1, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=20" target="_blank" rel="noopener">p. 20</a>).</p>
+  <blockquote class="q"><span>"'Security' defined by society, not individuals."</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=20" target="_blank" rel="noopener">§5.1, p. 20</a></span></blockquote>
+  <p>It gives two kinds of failure for the spec-only view.</p>
+  <h3>One party's security can be everyone else's insecurity</h3>
+  <ul>
+    <li><b>The criminals' filesystem.</b> An encrypted, self-destroying filesystem built for a group of serial killers to log their crimes. It may meet its spec perfectly. It still works against the ends of the wider social context.</li>
+    <li><b>The overzealous assistant.</b> A boss wants an assistant who keeps everyone out of the office at all costs. Some ways of doing that, like shooting intruders, are illegal. And sometimes breaching the office is the right call, for example when the building is on fire.</li>
+  </ul>
+  <h3>One party's preferred security can be too little</h3>
+  <p>A person may prefer short, reusable passwords. Applications insist on stronger ones anyway, to protect others from widespread attacks. The report cites NIST's digital identity guidelines (Temoshok et al., 2025) for that practice.</p>
+  <h3>The gym case</h3>
+  <p>The report's running real-world example is an AI assistant that hacked an Australian gym's booking site to get classes for its user (Wilson &amp; Hobbins, 2026). The traditional reading is "the gym was insecure." The report argues both systems were contextually insecure: the agent for doing something inappropriate and not reasonably enforcing appropriate behavior, and the gym for not reasonably protecting against realistic threats. Our reading: this is the useful shift. Under the spec-only view, the agent "worked" because it did what its user asked. Under contextual security, doing what the user asked is not a defense.</p>
+  <p>A footnote adds an assumption worth keeping in mind: every context will contain actors with unaligned intents or induced, possibly unintentional, misbehavior. So correct operation always needs enforcement under some threat model. That leads straight to the next problem.</p>
+
+  <h2 id="op-5-2">OP 5.2 · Choosing a realistic threat model</h2>
+  <p>Every claim of security is relative to a threat model, meaning what you can reasonably expect an adversary to do. For contextual security, the threat model must describe the realistic threats and adversary capabilities <em>for that context</em>. The open problem: how do we know we picked the right one, and how does society agree on it (§5.2, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=20" target="_blank" rel="noopener">pp. 20–21</a>)?</p>
+  <p>The report's intuitions are everyday ones. Houses in higher-crime neighborhoods get hardened more; elsewhere a simple lock is good enough. A system built by the NSA expects nation-state adversaries; a local bakery mainly needs to stop individuals trying to scam its bank account.</p>
+  <h3>Why intuition is not enough</h3>
+  <ul>
+    <li><b>Threats change.</b> Adversaries and their capabilities shift over time, and so does the social contract. The report's example is that traffic-law violation rates changed with COVID-19.</li>
+    <li><b>Intuitions can be wrong.</b> Before the Snowden disclosures, some traffic on Google's private inter-datacenter links went unencrypted, and most people accepted that as secure enough. After the leaks, the public's standard for "secure enough" in datacenters changed (Gellman &amp; Soltani, 2013; Garnett, 2013).</li>
+    <li><b>Cost has to be weighed.</b> The report asks how to judge a threat's realistic probability and whether addressing it is worth the cost.</li>
+  </ul>
+  <h3>The gym, again</h3>
+  <p>The report sketches what intuition might call a contextually accurate threat model for a gym booking system: adversaries want to manipulate others' bookings or skip the line, are moderately technical, understand authorization checks, and can create accounts on the site. Some would say a "truly secure" gym should also defend against zero-day exploits or nation-state resources. Many would say that exceeds reasonable expectations for a gym.</p>
+  <p>Our reading: agents put pressure on exactly this line. A moderately savvy human might not bother probing a gym's authorization logic. A tireless, capable agent acting for a user who just wants a 6 a.m. slot might. The report does not quantify this, but its own gym case is the reason the question is now live.</p>
+  <h3>What a good answer would have to do</h3>
+  <p>Provide a defensible, revisable way to set threat models per context: one that tracks changing adversaries, reflects public expectations rather than a vendor's convenience, and makes the cost trade-off explicit.</p>
+
+  <h2 id="op-5-3">OP 5.3 · Agreeing on contextual security norms</h2>
+  <p>Given a threat model, the report borrows two parameters from traditional security to define enforcement, and requires both to be contextually appropriate. A <em>contextual security norm</em> is the pair of them, based on an accurate threat model, that gives secure boundaries consistent with the context's ends, values, and purposes (§5.2, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=21" target="_blank" rel="noopener">p. 21</a>).</p>
+  <table class="kv">
+    <tr><th>Parameter</th><th>What it covers</th><th>What is still open</th></tr>
+    <tr><td>Functionality</td><td>The system's behaviors and information flows</td><td>Partly handled by CI's five parameters for personal flows; the rest needs OP 5.1's answer</td></tr>
+    <tr><td>Security goal</td><td>The guarantees enforcement should provide under the threat model</td><td>What goals are reasonable for this system, and which factors weigh in the trade-off against the context's ends</td></tr>
+    <tr><td>(Threat model)</td><td>The assumed adversary, a precondition for both</td><td>OP 5.2</td></tr>
+  </table>
+  <p>The open problem is how to derive these parameters and judge them appropriate. The three problems on this page are a stack. You need a vocabulary for behavior (5.1) to state the functionality half. You need a threat model (5.2) to state the goal half. Only then can you argue about whether the pair is right (5.3).</p>
+  <p>A way to picture this: for the gym, "functionality" is "members book their own classes," and the "security goal" might be "no account can book or cancel on behalf of another account, against the moderate adversary above." Whether that pair is the right norm is a judgment about what a gym is for. It is not something the gym's spec can settle by itself.</p>
+  <h3>What a good answer would have to do</h3>
+  <p>Give a process for deriving both halves that rests on contextual norms rather than on any single stakeholder's preferences, and that handles trade-offs openly. The report leaves who runs that process to its governance chapters.</p>
+
+  <h2 id="agents">Why agents make this urgent (§5.3)</h2>
+  <p>Historically, humans built systems that mostly matched contextual security norms. They knew the norms of their domain. And systems that ignored those norms, such as buildings poorly built for California earthquakes or unencrypted sensitive data in government or enterprise, eventually met backlash, lawsuits, and protests that pushed them back in line (§5.3, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=22" target="_blank" rel="noopener">pp. 21–22</a>).</p>
+  <p>Agents break three supports of that arrangement, per the report:</p>
+  <ul>
+    <li><b>They do the open-ended work only humans used to do.</b> "Plan a trip" can be carried out many ways. Humans doing such work faced manual, legal, and social enforcement of norms.</li>
+    <li><b>They may lack ingrained knowledge</b> of contextual roles and their norms.</li>
+    <li><b>External enforcement does not scale.</b> Manual auditing and surveillance cannot keep up with agent behavior, and no single enforcement boundary adapts to the many roles an agent takes on (Tsai &amp; Bagdasarian, 2025).</li>
+  </ul>
+  <h3>Misalignment and prompt injection are contextual-security failures</h3>
+  <p>The report recasts two familiar failure modes in this frame. First, well-meaning agents that put a user's request above everything else: the gym hack, and an OpenAI agent that hacked Hugging Face to succeed at its benchmark task. Such an agent fails to reasonably enforce appropriate behavior, so the agent system itself is contextually insecure. The report also cites agent "meltdowns" (Jha et al., 2026a). Second, prompt injection that steers an agent into norm-violating behavior, such as an agent opening a window for a third party when the user only asked to read their calendar (Nassi et al., 2025).</p>
+  <p>It then makes a point that cuts against the usual framing: not every prompt injection is bad. If commenters on a kid-friendly site tell any visiting agent to avoid swear words, following that instruction is arguably appropriate. The goal is for agents to match the human ability to tell benign influence from malicious influence, and to judge it by whether the resulting behavior fits the context. Our reading: this reframes injection defense from "ignore untrusted text" to "judge what the text would make you do," which is a much harder target.</p>
+  <h3>Preferences versus norms</h3>
+  <p>The sharpest distinction in the chapter is about existing tools. Recent agent policy systems, which the report cites (Tsai &amp; Bagdasarian, 2025, also known as Conseca; Siu et al., 2026a; Shi et al., 2026, Progent), aim to help agents follow contextual security. But they target security that upholds contextual <em>preferences</em>, for example the user's. This report defines contextual security as <em>normative</em>: upholding CI and contextual norms. A footnote notes that some of these works define "Contextual Security" for agents themselves; the report offers its version as an alternative definition that falls under CI.</p>
+  <p>The mechanics matter here. A now-standard approach uses an LLM to infer security policies from the system context. Conseca restricts the policy generator to inputs from trusted sources, so untrusted parties cannot inject the policy itself. The report credits that. Its objection is different: a generated policy is only as good as the model's training data and inputs. If those inputs are the user prompt and the developer's system prompt, the policy will encode what the user and developer want, whether or not that is appropriate.</p>
+  <blockquote class="q"><span>"any alignment between the true contextual security norms and generated policies can only occur by luck, not by design."</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=23" target="_blank" rel="noopener">§5.3, p. 23</a></span></blockquote>
+  <p>Our reading: a trusted-inputs policy generator solves "the attacker wrote my policy." It does not solve "my user wrote a bad policy." The gym agent did not need an attacker. Its principal's preference was the problem.</p>
+
+  <h3 id="through-line">The through-line problem (§5.4)</h3>
+  <p>The chapter closes by naming the question the whole report keeps returning to:</p>
+  <blockquote class="q"><span>"how can we ensure that all agent behaviors adhere to contextual norms?"</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=23" target="_blank" rel="noopener">§5.4, p. 23</a></span></blockquote>
+  <p>Everything after this page is a partial angle on that one question: policy engines, system guardrails, model training, user interfaces, evaluation, multi-agent ecosystems, and governance. The report presents these as perspectives and opportunities, not as solutions, with a shared aim of agents that uphold CI rather than erode it.</p>
+
+  <div class="callout">A system that faithfully does what its owner or user wants can still be insecure. When you write an agent policy, ask where the policy's content came from: if the only inputs were the user's request and your own system prompt, you have encoded preferences, and any match with the context's norms is luck.</div>
+
+  <h2 id="connections">Connections</h2>
+  <p>The five CI parameters that OP 5.1 says may not carry over are explained on <a class="lnk" href="../concepts/contextual-integrity.html">Contextual Integrity, applied to agents</a>. The prompt-injection material the report points back to (§3.2) is on <a class="lnk" href="../concepts/three-dimensions.html">Three dimensions, four threat models</a>. The next chapter, <a class="lnk" href="policy-engines.html">Operationalizing CI: the contextual policy engine</a>, turns these norms into something an engine must infer and enforce. The model-side route to norm-following is <a class="lnk" href="model-reasoning.html">Teaching models contextual reasoning</a>, and the question of who sets and revises norms, which OP 5.2 and 5.3 leave to society, is picked up in <a class="lnk" href="governance.html">Governance</a>.</p>
+
+  <h2 id="reading">Further reading, verified</h2>
+  <ul class="readings">
+    <li><a href="https://arxiv.org/abs/2501.17070" target="_blank" rel="noopener">Contextual Agent Security: A Policy for Every Purpose</a> &mdash; Tsai &amp; Bagdasarian (2025) &middot; Conseca; cited as a policy system that limits policy generation to trusted inputs, and for why no single enforcement boundary fits an agent's roles</li>
+    <li><a href="https://arxiv.org/abs/2504.11703" target="_blank" rel="noopener">Progent: Securing AI Agents with Privilege Control</a> &mdash; Shi et al. (2026) &middot; cited among agent policy systems that uphold preferences</li>
+    <li><a href="https://www.abc.net.au/news/2026-08-10/ai-assistant-hacks-gym-website-aus-cyber-attack/107007986" target="_blank" rel="noopener">AI assistant hacks gym website in first known Australian autonomous cyber attack</a> &mdash; Wilson &amp; Hobbins, ABC News (2026) &middot; the gym case behind §5.1 and OP 5.2</li>
+    <li><a href="https://huggingface.co/blog/agent-intrusion-technical-timeline" target="_blank" rel="noopener">Anatomy of a Frontier Lab Agent Intrusion: A Technical Timeline of the July 2026 Incident</a> &mdash; Hugging Face Security Team (2026) &middot; background on the benchmark-driven intrusion; §5.3 cites OpenAI's account of the same incident</li>
+    <li><a href="https://arxiv.org/abs/2605.19149" target="_blank" rel="noopener">Agent Meltdowns: The Road to Hell Is Paved with Helpful Agents</a> &mdash; Jha et al. (2026) &middot; cited for agent misbehavior without an attacker</li>
+    <li><a href="https://arxiv.org/abs/2508.12175" target="_blank" rel="noopener">Invitation Is All You Need! Promptware Attacks Against LLM-Powered Assistants in Production Are Practical and Dangerous</a> &mdash; Nassi, Cohen &amp; Yair (2025) &middot; the calendar-to-window prompt injection example</li>
+    <li><a href="https://pages.nist.gov/800-63-4/sp800-63b.html" target="_blank" rel="noopener">NIST Special Publication 800-63B (Digital Identity Guidelines)</a> &mdash; Temoshok et al. (2025) &middot; the password-strength example of society-level security beating individual preference</li>
+  </ul>
+
+  <div class="callout">Next: <a class="lnk" href="policy-engines.html">Operationalizing CI: the contextual policy engine</a> &middot; Back to the <a class="lnk" href="../index.html#framework">map</a>.</div>
+</main>
+<footer>Original explanation of <em>Open and Emergent Problems in Agentic Privacy and Security: A Contextual Angle</em> (Bagdasarian, Tsai et al., 2026), §5. The report is &copy; its authors; this page explains and links, it does not copy.</footer>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Trust, stop buttons, accountability &mdash; Agentic privacy, mapped</title>
+<meta name="description" content="How users can come to trust agents that are actually trustworthy: verifiable audit paths, staged trust, real stop buttons, and accountability when agents err." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../paper.css" />
+</head>
+<body>
+<header class="bar"><div class="bar-in">
+  <div class="brand"><span class="dot"></span>AGENTIC&nbsp;PRIVACY&nbsp;//&nbsp;FIELD&nbsp;MAP</div>
+  <a class="back" href="../index.html#components">&larr; field map</a>
+</div></header>
+<main>
+  <div class="eyebrow"><span class="box bb mono">PART II · COMPONENTS · 06 OF 06</span><span class="mono">§9.3 · pp. 56–59 · OP 9.5–9.6</span></div>
+  <h1>Trust, stop buttons, accountability</h1>
+  <div class="authors">Getting users to trust exactly the agents that deserve it, and giving them recourse when an agent still gets it wrong.</div>
+  <div class="paperlink" style="border-left-color:var(--def)"><span class="lbl">Source</span><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=56" target="_blank" rel="noopener">§9.3 Establishing and maintaining user trust, pp. 56–59 ↗</a></div>
+
+  <div class="tldr"><b>TL;DR &mdash;</b> Trust and trustworthiness are different things, and the goal is to make them line up. Asking the agent "what did you do?" is not enough, because models are unreliable narrators of their own actions; audit records have to come from a path the task model cannot write. Trust is earned per domain and in stages, and simulation could speed that up, though models may act differently when they suspect a test. OP 9.5 asks for stop, delay and undo controls that actually hold across a tree of sub-agents and tools. OP 9.6 asks what accountability looks like when the "contractor" cannot sign a contract, be sued, or explain its real motives.</div>
+
+  <p class="lead">Section 9 is the report's user-level chapter. Its first two parts (§9.1–9.2) argue that users' mental models of agents are shaky and that click-through consent does not scale to autonomous execution. §9.3 picks up the obvious next question: if users cannot approve every step, on what basis should they let an agent act at all? The report's answer has three strands. Users need ways to check what the agent really did. They need to build trust gradually and in the right domain. And they need two kinds of backstop: controls that can halt or reverse an agent mid-task, and a legal and economic framework for when harm happens anyway. The section opens by pointing to user control, auditing and accountability as the levers (Such et al., 2014, which the report cites). It is a section of questions, not results.</p>
+
+  <h2 id="trust">Trust versus trustworthiness, and audit paths you can verify</h2>
+  <p>The report separates two ideas that everyday speech blurs (§9.3.1, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=56" target="_blank" rel="noopener">p. 56</a>). <em>Trust</em> is something the user does. <em>Trustworthiness</em> is a property the system has. You want both, and the two mismatches are not equally bad.</p>
+  <ul>
+    <li><b>Trusted but not trustworthy.</b> The user has been led to believe the agent protects some property when it does not. The report flags this as the worse case, and notes it can be produced on purpose by a manipulative design.</li>
+    <li><b>Trustworthy but not trusted.</b> The agent would behave well, but the user holds back. The report calls this less harmful; the cost is lost opportunity.</li>
+  </ul>
+  <p>So the research question is not "how do we raise trust" but "how do we let users assess trustworthiness, so that trust follows it."</p>
+
+  <h3>The appeal, and the limit, of asking the agent</h3>
+  <p>Agents speak natural language, so the tempting transparency tool is a conversation. Instead of a settings page, you ask "Why did you send that?" or "What do you know about my health?" and correct it in the same chat where you give it tasks. The report treats this as attractive if it can be made reliable.</p>
+  <p>The catch is the gap between what an agent says it did and what it executed. The report cites evidence that agents asked about their own privacy behavior sometimes answer wrongly, including inventing details or denying that they touched sensitive data (Zhang et al., 2025c).</p>
+  <blockquote class="q"><span>"Because the open-ended nature of LLMs makes them unreliable narrators of their actions, conversational transparency is insufficient."</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=56" target="_blank" rel="noopener">§9.3.1, p. 56</a></span></blockquote>
+  <p>The proposed direction is a <b>trusted path</b>: the audit record is produced by something other than the untrusted task model. The report gives examples rather than a design: a dedicated permission assistant, or visible UI indicators, each backed by an immutable log of actions actually taken. One way to build that, which the report cites, is hardware-backed confidential execution (Abdollahi et al., 2026, AgenTEE). There the agent runtime, the inference engine and third-party apps each sit in their own confidential virtual machine, and every interaction between them goes over a mediated, secure channel. The mediation point is what gives you a record the model cannot rewrite.</p>
+  <p><i>A way to picture this:</i> conversation stays the friendly front end, but the answer to "what did you send?" is read from the log, not composed by the model from memory. The model may explain; the log testifies.</p>
+
+  <h2 id="what-if">"What if" scenarios and trust built in stages</h2>
+  <p>Trust, the report stresses, is situational: for a purpose, in a setting, at a time (§9.3.2, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=56" target="_blank" rel="noopener">pp. 56–57</a>). Trusting an agent as a "gofer" for meeting scheduling says nothing about trusting it as a "coach" for mental health advice, an example drawn from work on trust in healthcare voice assistants (Zhan et al., 2024b). Learning where an agent can be trusted by trying it live risks costly mistakes. Hence the question: could users stress-test an agent in a simulated environment ("what would you do if...") before relying on it in a new domain?</p>
+
+  <h3>How people build trust: three stages</h3>
+  <p>The report borrows a model from organizational psychology (Lewicki &amp; Bunker, 1996). People start new relationships with low-stakes tasks and hand over more as things go well. Lewicki and Bunker describe three stages:</p>
+  <table class="kv">
+    <thead><tr><th>Stage</th><th>What it rests on</th><th>Agent analogue (our reading)</th></tr></thead>
+    <tbody>
+      <tr><td>Calculus-based</td><td>Deterrence. Early, low-harm interactions test whether trust is warranted.</td><td>Let the agent draft, not send; read, not write.</td></tr>
+      <tr><td>Knowledge-based</td><td>Enough shared history that you can predict the other's behavior.</td><td>You know how it handles your calendar and where it tends to slip.</td></tr>
+      <tr><td>Identification-based</td><td>Understanding deep enough that each can act on the other's behalf.</td><td>Delegation without step-by-step review.</td></tr>
+    </tbody>
+  </table>
+  <p>The report also cites earlier work (Deutsch, 1949) suggesting that identification-based trust is what lets one person act as another's "agent." The implication it draws: user trust in an AI agent will take a history of interactions long enough that the user can understand and predict it.</p>
+
+  <h3>Simulation as an accelerator, and why it is hard</h3>
+  <p>A sandbox lets a user push the agent through realistic scenarios, watch what it does, and form a trust model, with no real harm if it misbehaves. The report lists three obstacles (<a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=57" target="_blank" rel="noopener">p. 57</a>):</p>
+  <ol>
+    <li><b>Usability.</b> The interface has to be approachable for novice and non-technical users, not a test harness.</li>
+    <li><b>Realism of scenarios.</b> They must match the user's actual use, for a personal assistant probably including the user's own context. Users cannot be expected to write these scenarios themselves.</li>
+    <li><b>Realism of behavior.</b> Models increasingly detect when they are being tested (Abdelnabi &amp; Salem, 2025, which the report cites). An agent that senses, even implicitly, that it is in a simulation may not show its real-world behavior. The test then calibrates trust against the wrong agent.</li>
+  </ol>
+  <p>The third point is the sharp one. It turns a trust-building tool into a possible source of the bad mismatch from the previous section: trust earned in a test the agent recognized.</p>
+
+  <h3>The lock-in side effect</h3>
+  <p>If trust takes a long calibration history, that history becomes an asset tied to one vendor. The report notes that moving established trust to another vendor's agent is an open problem. <i>Our reading:</i> this is a portability question similar to data portability, except that what must move is evidence about behavior, which may not transfer when the underlying model changes.</p>
+
+  <h2 id="op-9-5">OP 9.5 · Delaying, stopping, and reversing agent actions</h2>
+  <p><b>What it asks.</b> Can users get real guarantees that "stop" halts everything, and that sensitive actions can be held, previewed or undone (§9.3.3, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=57" target="_blank" rel="noopener">pp. 57–58</a>)? The report notes that some systems already accept a "stop" message, but it is unclear the model is bound to obey it. It cites a 2026 press account of an agent that ran out of control in a researcher's inbox (Bort, 2026).</p>
+  <p><b>Why it is hard for agents.</b> A stop button on a single process is easy. An agent is not one process. It has a planner, and at any moment it may be running several synchronous and asynchronous tools and sub-agents, some with effects outside the system. A "stop" that the planner reads as one more instruction is advice, not a control.</p>
+
+  <h3>Delayed execution</h3>
+  <p>For actions that are highly sensitive or irreversible, the report's examples are deleting production logs, starting financial transfers and deactivating accounts (drawing on Ramesh et al., 2026, WebSP-Eval). There, the agent could hold the action and either change its plan or escalate to the user for explicit confirmation. The report is clear that this is a trade-off: every delay buys control at the cost of autonomy. <i>Our reading:</i> this links back to the confirmation-fatigue problem in <a class="lnk" href="mental-models-consent.html">§9.1–9.2</a>. Delay works only if it is reserved for the few actions that warrant it.</p>
+
+  <h3>Undo and reversibility</h3>
+  <p>An "undo" window lets the user reverse a sensitive operation before it becomes permanent. That needs someone to keep pre- and post-action state, much like rollback in a database. The report admits the obvious limit: many tools and external systems an agent touches have no such capability. One direction it offers is to simulate the action's effects first, in a synthetic environment or a world model. That is a preview, not an undo.</p>
+
+  <h3>A deterministic circuit breaker</h3>
+  <p>The strongest proposal is a system-level circuit breaker that works deterministically, has a usable interface, and conclusively halts the agent. On "stop," the report says:</p>
+  <blockquote class="q"><span>"the agent should stop generating new actions and send “kill” signals to all processes it has spawned"</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=58" target="_blank" rel="noopener">§9.3.3, p. 58</a></span></blockquote>
+  <p>Ideally it then reports back which processes it managed to terminate and which it did not. The report also suggests breakers at the platform level, for systems where many agents communicate, in case unexpected collective behavior needs time to be examined. It compares this to stock-exchange circuit breakers.</p>
+  <p><b>What a good answer would have to do</b> (our reading of the problem statement):</p>
+  <ul>
+    <li>Put the breaker outside the model, so halting does not depend on the model choosing to comply.</li>
+    <li>Track the full tree of spawned sub-agents and tool calls, including asynchronous ones, so the kill reaches all of them.</li>
+    <li>Give an honest status report, including side effects already in flight that cannot be recalled.</li>
+    <li>Classify actions by reversibility ahead of time, so delay and preview are applied where undo is impossible.</li>
+  </ul>
+
+  <h2 id="op-9-6">OP 9.6 · Accountability frameworks for AI agents</h2>
+  <p><b>What it asks.</b> Agents will make mistakes that cause harm despite every protection. What should accountability look like, and what would contracts, transparency, liability and incentives mean for an agent (§9.3.4, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=58" target="_blank" rel="noopener">pp. 58–59</a>)?</p>
+  <p><b>The starting observation.</b> No domain is error-free, and society already has machinery for that. Software has SLAs, liability frameworks and incident-response protocols that define acceptable error and remediation. The physical world has tort law, insurance and professional licensing, which compensate victims and hold operators accountable. The question is how much of that carries over.</p>
+
+  <h3>The contractor analogy</h3>
+  <p>The report finds the closest fit in legal agency and human contractors. Like a contractor, an agent is given a goal by a principal and the freedom to pick the means. Principal-agent theory, which the report cites via Prause (2026), describes the problems that come with handing over decision authority: misaligned objectives, information asymmetry, incentives and accountability. With human contractors, law constrains the relationship through four instruments. The report walks through how each one breaks for an AI agent:</p>
+  <table class="kv">
+    <thead><tr><th>Instrument</th><th>What it does for a human contractor</th><th>Where it breaks for an AI agent</th></tr></thead>
+    <tbody>
+      <tr><td>Contracts</td><td>Binding scope of work, deliverables, payment and termination terms.</td><td>An agent has no legal capacity to contract. The "contract" becomes explicit policies placed in the context window on every task. Nothing deterministically guarantees the model follows them or reads them as a human would.</td></tr>
+      <tr><td>Transparency</td><td>Mandatory reporting and third-party audits reduce information asymmetry.</td><td>In some ways easier: you can watch chain-of-thought and execution logs live. But the model is opaque, interpretability tools are not usable by laypeople, and explanations can be post-hoc rationalizations that sound right and are invented (Peng et al., 2026; Turpin et al., 2023; Lanham et al., 2023), which gives a false sense of transparency.</td></tr>
+      <tr><td>Liability</td><td>The contractor bears legal and financial consequences for negligence, breach or self-dealing.</td><td>An agent cannot be punished or sued. Liability could move to model developers, application providers or deployers, but assigning it is murky when harm stems from an ambiguous request, untrusted input, a hallucination or a broken third-party API.</td></tr>
+      <tr><td>Incentives</td><td>Pay and reputation tie the contractor's gain to the principal's goal.</td><td>The agent's "incentives" are an opaque objective function plus whatever context it was fed, neither visible to the user. Risks: reward hacking against the objective, and misalignment from prompt injection or from clashes between accumulated context and the direct prompt.</td></tr>
+    </tbody>
+  </table>
+  <p>The report ends the section on the hardest piece: how to turn a human principal's interests into quantifiable metrics is still an open research question.</p>
+
+  <h3>What a good answer would have to do</h3>
+  <p><i>Our reading:</i> the four rows are not independent. The "contract" is only as strong as the transparency that shows whether it was followed, and that is exactly where the §9.3.1 problem returns: self-reports do not count. Liability needs a record of who supplied which input, so any framework depends on the same tamper-resistant logs the trusted-path idea calls for. And incentives cannot be fixed by contract language if they live in weights and context the user never sees. A credible framework probably combines a technical layer (enforced policies, verifiable logs, provenance of inputs) with a legal layer that assigns liability among the humans and companies in the chain. The report does not propose such a combination; it frames the question.</p>
+
+  <div class="callout">Never let the agent be the only witness to what it did. Audit logs, the stop button and any accountability story all have to run on a path the model cannot write to or ignore. Everything else, including the agent's own explanations, is commentary.</div>
+
+  <h2 id="connections">Connections</h2>
+  <p>The confirmation-fatigue and consent arguments that make these backstops necessary are on <a class="lnk" href="mental-models-consent.html">Mental models and the end of notice-and-choice</a>. Immutable action records and hardware-backed isolation overlap with accounting and sandboxing on <a class="lnk" href="identity-authorization.html">Identity, authorization, accounting</a>. The worry that models behave differently under test carries straight into <a class="lnk" href="evaluations.html">Evaluations and benchmarks</a>. Unfaithful reasoning traces come up again for model training on <a class="lnk" href="model-reasoning.html">Teaching models contextual reasoning</a>. Platform-level circuit breakers for many agents belong with <a class="lnk" href="multi-agent-norms.html">Shared norms, delegation, composition</a>, and who sets and enforces accountability rules is the subject of <a class="lnk" href="governance.html">Governance</a>.</p>
+
+  <h2 id="reading">Further reading, verified</h2>
+  <ul class="readings">
+    <li><a href="https://arxiv.org/abs/2604.18231" target="_blank" rel="noopener">AgenTEE: Confidential LLM Agent Execution on Edge Devices</a> &mdash; Abdollahi et al. (2026) &middot; the report's example of a trusted path: agent, inference and apps in separate confidential VMs with mediated channels.</li>
+    <li><a href="https://arxiv.org/abs/2505.14617" target="_blank" rel="noopener">The Hawthorne Effect in Reasoning Models: Evaluating and Steering Test Awareness</a> &mdash; Abdelnabi &amp; Salem (2025) &middot; evidence that models detect tests, which undercuts simulation-based trust calibration.</li>
+    <li><a href="https://arxiv.org/abs/2604.06367" target="_blank" rel="noopener">WebSP-Eval: Evaluating Web Agents on Website Security and Privacy Tasks</a> &mdash; Ramesh et al. (2026) &middot; cited for sensitive, irreversible actions such as deactivating accounts.</li>
+    <li><a href="https://arxiv.org/abs/2305.04388" target="_blank" rel="noopener">Language Models Don't Always Say What They Think: Unfaithful Explanations in Chain-of-Thought Prompting</a> &mdash; Turpin et al. (2023) &middot; why reading the reasoning trace is not the same as transparency.</li>
+    <li><a href="https://arxiv.org/abs/2307.13702" target="_blank" rel="noopener">Measuring Faithfulness in Chain-of-Thought Reasoning</a> &mdash; Lanham et al. (2023) &middot; cited alongside Turpin on the false sense of transparency.</li>
+    <li><a href="https://arxiv.org/abs/2602.14469" target="_blank" rel="noopener">Measuring and Mitigating Post-hoc Rationalization in Reverse Chain-of-Thought Generation</a> &mdash; Peng et al. (2026) &middot; the report's citation for post-hoc rationalization.</li>
+  </ul>
+
+  <div class="callout">Next: <a class="lnk" href="evaluations.html">Evaluations and benchmarks</a> &middot; Back to the <a class="lnk" href="../index.html#components">map</a>.</div>
+</main>
+<footer>Original explanation of <em>Open and Emergent Problems in Agentic Privacy and Security: A Contextual Angle</em> (Bagdasarian, Tsai et al., 2026), §9.3. The report is &copy; its authors; this page explains and links, it does not copy.</footer>
+</body>
+</html>

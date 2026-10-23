@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PII, minimization, deletion, anonymity &mdash; Agentic privacy, mapped</title>
+<meta name="description" content="Why redaction, data minimization, deletion and anonymity, the four classic privacy tools, all need rework once an agent reasons, remembers and acts." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../paper.css" />
+</head>
+<body>
+<header class="bar"><div class="bar-in">
+  <div class="brand"><span class="dot"></span>AGENTIC&nbsp;PRIVACY&nbsp;//&nbsp;FIELD&nbsp;MAP</div>
+  <a class="back" href="../index.html#components">&larr; field map</a>
+</div></header>
+<main>
+  <div class="eyebrow"><span class="box bb mono">PART II · COMPONENTS · 02 OF 06</span><span class="mono">§7.4 · pp. 35–39 · OP 7.6–7.9</span></div>
+  <h1>PII, minimization, deletion, anonymity</h1>
+  <div class="authors">The four classic privacy tools, and what breaks in each when the software reasons, remembers and acts</div>
+  <div class="paperlink" style="border-left-color:var(--def)"><span class="lbl">Source</span><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=35" target="_blank" rel="noopener">§7.4 Privacy, pp. 35–39 ↗</a></div>
+
+  <div class="tldr"><b>TL;DR &mdash;</b> Web and app systems have long protected personal data with four tools: detect and replace PII, collect only what a task needs, delete on request, and let people act anonymously. Each tool assumed data sat in known fields and moved along known paths. An agent breaks that assumption: personal data ends up in its reasoning trace, its memory, the arguments it sends to tools, and even the timing of its network traffic. The report turns each tool into an open problem (OP 7.6–7.9) and treats privacy as a property of the whole agent architecture, not a filter at the edge.</div>
+
+  <p class="lead">Section 7 of the report covers the systems layer: the guardrails the execution environment can impose whatever the model does. The section before this one (§7.1–7.3) covers who the agent is and what it may touch. This section covers what happens to the <em>data</em>. The report keeps the four tools the field already has and asks how each must change for agents (§7.4). The common thread is that a static rule written before the task starts cannot see what the agent will reason about, remember, or send.</p>
+
+  <blockquote class="q"><span>"recasts privacy as a dynamic architectural challenge rather than a simple static filter."</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=35" target="_blank" rel="noopener">§7.4, p. 35</a></span></blockquote>
+
+  <p>Two framing points from the opening of §7.4 carry through the page. First, the report suggests that replacement, minimization and deletion may need to run across the whole execution lifecycle, from the first reasoning step to the last tool call, citing a systematization of data minimization in ML (Staab et al., 2026). Second, anonymity gets harder because agents undermine <em>unlinkability</em>: they can create new side channels, and they hold delegated user credentials that they use on their own initiative.</p>
+
+  <h2 id="op-7-6">OP 7.6 · Evolving PII detection and replacement</h2>
+  <p>The question: how do you strip personal identifiers from what an agent sees and produces without making it worse at the job, and how do you cover the places a scanner never used to look? The report raises three sub-questions: replacing PII while keeping the context the model needs, preventing leaks through chain of thought and long-term memory, and building something like a network firewall that works on meaning rather than packets (<a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=36" target="_blank" rel="noopener">§7.4, p. 36</a>).</p>
+
+  <h3>Why blunt redaction hurts agents</h3>
+  <p>In a conventional app, a name sits in a database column. Masking it changes nothing about how the code runs. An agent's logic, by contrast, <em>is</em> the text. The report's example is a task like emailing the CEO about the Q3 budget. Redact "CEO" and the agent no longer knows who the recipient is or what tone to use. So the direction the report describes is replacement that keeps context: swap the identifier for something the model can still reason with.</p>
+  <p>A way to picture this: replacing "Dana Ruiz" with "[PERSON_1]" breaks the task, while replacing it with "[the company's chief executive, PERSON_1]" keeps the role the model needs and hides the identity. Deciding which attributes to keep is itself a judgment about context, which is why this problem is hard to solve with patterns alone.</p>
+
+  <h3>Two leak paths that pattern scanners miss</h3>
+  <table class="kv">
+    <tr><td>Chain-of-thought leakage</td><td>A structural risk. Raw personal data gets written into the reasoning scratchpad or into logs of intermediate tool arguments. The final answer can look clean while a trail of PII persists in what the agent recorded on the way.</td></tr>
+    <tr><td>Inference-based re-identification</td><td>A probabilistic risk tied to long-term memory or RAG. No single stored item identifies the user, but details scattered across memory stores can be combined, for example a rare medical condition plus a job title, to reconstruct who someone is or infer sensitive traits. The report points to Lermen et al. (2026) as a demonstration.</td></tr>
+  </table>
+  <p>The second risk is the one that changes the design. A scanner checks one string at a time. Re-identification is a property of a <em>collection</em> of strings, possibly written weeks apart. Our reading: this pushes detection toward something that reasons over the memory store as a whole, not something that checks each write.</p>
+
+  <h3>What the report points to</h3>
+  <p>The third sub-question names "privacy firewalls" (Abdelnabi et al., 2026, which the report cites) as an example of a monitor that would understand user intent and the privacy consequences of actions, and watch all data flows. It is listed as a direction. The report does not claim such firewalls solve the problem.</p>
+  <p>A good answer would have to do three things: keep task utility while hiding identity, cover reasoning traces and memory as well as outputs, and catch re-identification from combinations, not only direct identifiers. The report also asks whether this can be done at the semantic level rather than by matching patterns.</p>
+
+  <h2 id="op-7-7">OP 7.7 · Achieving data minimization</h2>
+  <p>Data minimization means using only the data the task needs (the report cites Ganesh et al., 2025, for the principle). Least privilege is the obvious starting point. The report argues it does not transfer cleanly to software that reasons over natural language, and it splits the gap into three named sub-problems, then adds a fourth complication at the network layer (<a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=36" target="_blank" rel="noopener">§7.4, pp. 36–37</a>).</p>
+
+  <h3>1. The semantic boundary problem</h3>
+  <p>What is "necessary" for a task written in plain English? Older systems could say "this form needs field A and B." An agent has to decide which details of a conversation or a document matter and which are a liability. The report also asks whether trained, specialized LLMs are the right tool to draw that line.</p>
+  <p>What exists, as the report presents it:</p>
+  <ul>
+    <li>Earlier work in standard prediction settings found that the necessity boundary can be individual: a model often needs only a subset of one user's features to keep its utility (Tran &amp; Fioretto, 2023).</li>
+    <li>The "Dual LLM" pattern (Willison, 2023): a privileged model works only on trusted input, and a quarantined model handles untrusted content.</li>
+    <li>AirGapAgent (Bagdasarian et al., 2024), which splits the job in two. One step decides which data is needed, using only trusted context. A separate step carries out the task and talks to the outside world. So the part exposed to untrusted input never sees the full data.</li>
+    <li>Zhou et al. (2026b) define the optimal disclosure as the least revealing version of a prompt that still gets the task done. They report that strong frontier models leave a lot of room for minimization, but that the same models are not reliable at predicting what the minimized prompt should be.</li>
+  </ul>
+  <p>That last result matters. Our reading: you cannot simply ask the model "what do you need?" and trust the answer. Using an LLM to draw the boundary is an open question, not a settled method.</p>
+
+  <h3>2. Model context contamination</h3>
+  <p>This is minimization failing <em>inside</em> the agent. Most agents keep one flat context window for everything. If the agent parses someone's medical records for one sub-task and then runs a public web search for another, the medical data is still sitting in the context the search step reasons over. Giving a simple tool call the user's whole history violates the necessity principle.</p>
+  <p>Traditional software avoids this with tight interfaces and process isolation, so each part sees only what it is handed (the report cites Barth, 2011, here). Agents usually lack those walls. One ongoing approach enforces a fixed shape for information flow, such as the hub-and-spoke design in IsolateGPT (Wu et al., 2025). The report says more work is needed on <em>dynamic</em> topologies that let the needed flows through and block malicious ones.</p>
+  <p>The problem also outlives a single session. For self-evolving agents, information or rules specific to one context can be written into persistent memory, controller instructions, or reusable tools, and later applied where they no longer belong (Das et al., 2026, as cited). Memory and context leakage is the subject of the sibling <a class="lnk" href="https://idvorkin-ai-tools.github.io/cimemories-field-map/" target="_blank" rel="noopener">CIMemories field map</a>, if you want a worked benchmark.</p>
+
+  <h3>3. Tool over-privilege</h3>
+  <p>Agents often send external APIs more state than they need, because nobody knows up front what the task will require (Carrillo et al., 2026, as cited). Agent-to-tool interfaces tend to be loose, so agents run with wider permissions than necessary. The report links this to its authorization problems in §7.1–7.3. Existing systems such as GAAP (Stanley et al., 2026) and MiniScope (Zhu et al., 2025) can enforce permissions at different granularities that follow user preferences. The catch, as the report notes, is that they put a burden on the user. The open problem asks for minimal privilege <em>without</em> knowing the requirements in advance and <em>without</em> making the user configure it.</p>
+
+  <h3 id="traffic-metadata">4. The encrypted-traffic complication</h3>
+  <p>Minimization is usually discussed at the level of prompts, tool inputs and API scopes. The report adds a layer below that: the network. Work it cites (Jeong et al., 2026b) shows that a passive observer can learn a lot about a local research agent's prompts and the user's traits from visited IPs, domains and timing alone, with the content fully encrypted. Other cited studies (Wang et al., 2026; Kang et al., 2026) show that browsing agents leave distinctive fingerprints in browser behavior, HTTP/TLS features and interaction patterns. These let a site or intermediary tell an agent from a human, and even identify which agent framework produced the traffic.</p>
+  <blockquote class="q"><span>"an agent may carefully redact sensitive fields while still leaking the user's task, interests, or identity through the shape of its encrypted traffic."</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=37" target="_blank" rel="noopener">§7.4, p. 37</a></span></blockquote>
+  <p>The report poses this as a question rather than a recommendation: should agent systems also minimize, pad, aggregate or otherwise obscure the network traces their planning and execution produce? A way to picture why it matters: an agent that researches one rare disease visits a small, telling set of sites in a burst. The sequence of destinations says what the task is even if every byte is encrypted.</p>
+
+  <h2 id="op-7-8">OP 7.8 · From data deletion to functional data revocation</h2>
+  <p>The question: what does "delete my data" mean once the data has been digested? In ordinary storage, data is literal and in one place, so deleting the row deletes the data. Agents copy what they learn into embeddings and summaries across several memory tiers, and they do it nondeterministically. Delete the source and a derived version can live on. The report calls these "ghost" representations (<a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=37" target="_blank" rel="noopener">§7.4, pp. 37–38</a>).</p>
+  <p>The report's example is short: an agent reads a private email, summarizes it, and saves the summary in a vector database for retrieval. Deleting the email leaves the summary, and the summary still says what the email said.</p>
+
+  <h3>The shift the report proposes</h3>
+  <p>Functional revocation, described as an emerging concept, moves the goal from "erase the record" to "stop the AI from using the information." The report asks whether deletion can govern the agent's semantic connectivity, so that forgotten information cannot be retrieved, reasoned over, or leaked through derived outputs.</p>
+  <blockquote class="q"><span>"Should the approach of physical data management shift to one of semantic governance?"</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=38" target="_blank" rel="noopener">§7.4, p. 38</a></span></blockquote>
+
+  <h3>What exists</h3>
+  <p>The report sees two lines of work. One targets data that has made it into model weights: machine unlearning (it cites Eldan &amp; Russinovich, 2023) and activation steering (Turner et al., 2023). The other targets copies spread through the wider system, for example a "privacy kill-switch" (Prakash et al., 2026, as cited) that sends a delete signal to the context window, long-term memory, downstream agents and backend storage.</p>
+  <p>The report is candid about the state of things. It says it is unknown whether full deletion is achievable in practice, and what agent ecosystems would have to change to support it. Our reading: a kill-switch only reaches the places it knows about, and the ghost problem is exactly the copies nobody tracked. Any real answer probably needs provenance, so each summary or embedding remembers which sources it came from and can be revoked along with them.</p>
+
+  <h2 id="op-7-9">OP 7.9 · Protecting user anonymity in an agentic world</h2>
+  <p>The question has two halves. How do you keep users anonymous when their agents may disclose identity at scale with no human checking each disclosure? And how do you square that with accountability, which depends on strong identity (<a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=38" target="_blank" rel="noopener">§7.4, pp. 38–39</a>)?</p>
+
+  <h3>What already exists without agents</h3>
+  <table class="kv">
+    <tr><td>Full anonymity</td><td>Tools like Tor and Signal aim for it. The report notes they can fall short in practice.</td></tr>
+    <tr><td>Selective disclosure</td><td>Digital identity frameworks show only the attributes a given check needs. The report's examples are the EU Digital Identity Wallet and the mobile driver's license (mDL). A way to picture it: prove you are over 21 without revealing your birth date or address.</td></tr>
+    <tr><td>Anonymous authentication</td><td>Cryptographic schemes that convey one narrow fact and nothing else. The report's example is Privacy Pass, an IETF effort, which it notes is used by reCAPTCHA among others.</td></tr>
+  </table>
+
+  <h3>What agents change</h3>
+  <p>The report gives three reasons agents make this harder:</p>
+  <ul>
+    <li><b>A bigger footprint.</b> Several agents acting for one person across the web leave far more traces than the person would.</li>
+    <li><b>The disclosure decision moves to the agent.</b> Selective disclosure today relies on fixed policies or the user's own choice. If the agent decides which attributes to present, an attacker who manipulates the agent can extract credentials. The report ties this to contextual authorization and to minimization: ideally the system lets the agent share a fine-grained attribute only under the right conditions and for the right purpose, while keeping the agent useful.</li>
+    <li><b>Semantic re-identification.</b> Restricting predefined attributes is not enough when an agent works over unstructured text. The report cites work showing LLMs can carry out large-scale linkage attacks, both when told to (Lermen et al., 2026) and as an unintended side effect (Ko et al., 2026), and can run fully automated re-identification (Li, 2026; Li et al., 2026b). That research reports non-negligible success from the model's built-in knowledge alone, and higher success and better-calibrated confidence once agentic tool use is added. The report's phrase for the effect is that tool use democratizes re-identification.</li>
+  </ul>
+  <p>The conclusion the report draws: besides protecting direct identifiers and specific attributes at the protocol level, the field should learn to <em>measure</em> and protect anonymity at the semantic level. It does not say how; that is the open part.</p>
+
+  <h3>Overlay proxies</h3>
+  <p>A second direction treats agent anonymity as a networking problem. ProxyGPT (Pham et al., 2025), which the report cites, was built for chatbots: volunteer proxies submit requests through their own browser sessions on behalf of users, to services that would otherwise tie each query to a logged-in account. The report suggests an agent version, where selected interactions go through intermediaries that separate the user's real identity from the account or session the service sees. Audits, prompt guards and incentives would limit proxy misbehavior.</p>
+  <p>The appeal is that this sits on top of existing services that require identity, so those services need not redesign their login systems. The report also names the hard part: hide the user from the service, limit what proxies can learn or change, and still keep enough accountability to stop misuse at scale.</p>
+
+  <h3>Anonymity versus accountability</h3>
+  <p>The report closes the section on this tension. Agents raise the need for anonymity, for the reasons above, and also raise the need for accountability, because fraud and abuse can now run at scale. It offers cryptographic digital credentials as a possible starting point, since they span a range of anonymity, verifiability and traceability properties. In the report's framing, such credentials could separate user and agent identities, protect users during agent transactions, and still allow fraud to be detected and actions linked to the right identity. It presents this as a place to begin designing trade-offs, not as a solved design.</p>
+
+  <div class="callout">Treat every place an agent writes data as a disclosure surface: the reasoning trace, the memory store, the tool arguments, the summaries it saves, and the pattern of its network traffic. A redaction filter on the final output covers only one of them.</div>
+
+  <h2 id="connections">Connections</h2>
+  <p>The report points tool over-privilege and agent-made disclosure decisions back to authorization: see <a class="lnk" href="identity-authorization.html">Identity, authorization, accounting</a>. Agent fingerprinting and traffic leakage connect to the side-channel problems in <a class="lnk" href="agent-channels.html">Protocols, attestation, side channels</a>. Measuring semantic anonymity and re-identification is an evaluation problem; see <a class="lnk" href="evaluations.html">Evaluations and benchmarks</a>. Deciding what is "necessary" for a task is the kind of contextual judgment discussed in <a class="lnk" href="policy-engines.html">the contextual policy engine</a> and <a class="lnk" href="model-reasoning.html">Teaching models contextual reasoning</a>. The accountability half of OP 7.9 continues in <a class="lnk" href="trust-recourse.html">Trust, stop buttons, accountability</a>.</p>
+
+  <h2 id="reading">Further reading, verified</h2>
+  <ul class="readings">
+    <li><a href="https://arxiv.org/abs/2405.05175" target="_blank" rel="noopener">AirGapAgent: Protecting Privacy-Conscious Conversational Agents</a> &mdash; Bagdasarian et al. (2024) &middot; the report's example of separating data selection from task execution (OP 7.7).</li>
+    <li><a href="https://simonwillison.net/2023/Apr/25/dual-llm-pattern/" target="_blank" rel="noopener">The Dual LLM pattern for building AI assistants that can resist prompt injection</a> &mdash; Willison (2023) &middot; the privileged/quarantined model split the report cites for the semantic boundary problem.</li>
+    <li><a href="https://arxiv.org/abs/2403.04960" target="_blank" rel="noopener">IsolateGPT: An Execution Isolation Architecture for LLM-Based Agentic Systems</a> &mdash; Wu et al. (2025) &middot; the hub-and-spoke information-flow topology cited for context contamination.</li>
+    <li><a href="https://arxiv.org/abs/2512.11147" target="_blank" rel="noopener">MiniScope: Authorizing Agents with Least-Privilege Permissions</a> &mdash; Zhu et al. (2025) &middot; cited for fine-grained tool permissions (the reference list gives an earlier title for the same arXiv entry).</li>
+    <li><a href="https://arxiv.org/abs/2502.01822" target="_blank" rel="noopener">Firewalls to Secure Dynamic LLM Agentic Networks</a> &mdash; Abdelnabi et al. (2026) &middot; the "privacy firewalls" the report names in OP 7.6.</li>
+    <li><a href="https://arxiv.org/abs/2310.02238" target="_blank" rel="noopener">Who's Harry Potter? Approximate Unlearning in LLMs</a> &mdash; Eldan &amp; Russinovich (2023) &middot; cited as an unlearning approach for data in model weights (OP 7.8).</li>
+    <li><a href="https://arxiv.org/abs/2407.08792" target="_blank" rel="noopener">ProxyGPT: Enabling User Anonymity in LLM Chatbots via (Un)Trustworthy Volunteer Proxies</a> &mdash; Pham et al. (2025) &middot; the overlay-proxy design the report extends to agents (OP 7.9).</li>
+    <li><a href="https://datatracker.ietf.org/wg/privacypass/about/" target="_blank" rel="noopener">Privacy Pass (privacypass) Working Group</a> &mdash; IETF &middot; the report's example of anonymous authentication.</li>
+  </ul>
+
+  <div class="callout">Next: <a class="lnk" href="last-mile-developer.html">AI as the last-mile developer</a> &middot; Back to the <a class="lnk" href="../index.html#components">map</a>.</div>
+</main>
+<footer>Original explanation of <em>Open and Emergent Problems in Agentic Privacy and Security: A Contextual Angle</em> (Bagdasarian, Tsai et al., 2026), §7.4. The report is &copy; its authors; this page explains and links, it does not copy.</footer>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Agentic privacy, mapped — contextual integrity and the 51 open problems</title>
+<meta name="description" content="A field map of the CAPS workshop report on agentic privacy and security: contextual integrity applied to AI agents, the three challenge dimensions, and all 51 open problems, one area per page." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="paper.css" />
+<style>
+  main{max-width:960px}
+  .hero{padding:24px 0 8px}
+  .hero h1{font-size:clamp(32px,5.5vw,52px);line-height:1.05;margin:10px 0 14px;letter-spacing:-.01em}
+  .hero .sub{font-size:18px;color:var(--ink-dim);max-width:760px;line-height:1.55}
+  .answer{margin:28px 0 6px;padding:20px 24px;border-left:3px solid var(--off);background:var(--panel);
+    border-radius:0 12px 12px 0;color:var(--ink-mid);font-size:16.5px;line-height:1.6;max-width:780px}
+  .answer b{color:var(--ink)}
+  .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:26px 0 8px}
+  .fact{border:1px solid var(--line-soft);border-radius:8px;padding:12px 14px}
+  .fact .k{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim)}
+  .fact .v{font-size:17px;font-weight:600;margin-top:4px}
+  section{padding:56px 0;border-bottom:1px solid var(--line-soft);scroll-margin-top:64px}
+  section:last-of-type{border-bottom:none}
+  .arc-head{display:flex;align-items:baseline;gap:14px;margin:0 0 6px;flex-wrap:wrap}
+  .arc-head .idx{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;color:var(--ink-dim)}
+  .arc-head h2{margin:0;font-size:26px}
+  .arc-sub{color:var(--ink-dim);margin:0 0 22px;max-width:720px}
+  .row{display:grid;grid-template-columns:44px 1fr;gap:14px;padding:16px 0;border-top:1px solid var(--line-soft);align-items:start}
+  .row:first-of-type{border-top:none}
+  .row .num{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ink-dim);padding-top:3px}
+  .row .name{font-weight:600;font-size:17px;line-height:1.3}
+  .row .name a{color:var(--ink)}
+  .row .meta{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-dim);margin:4px 0 6px;display:flex;flex-wrap:wrap;gap:10px}
+  .row .desc{color:var(--ink-dim);font-size:14.5px;line-height:1.55}
+  .amber .row .name a:hover{color:var(--off)} .cyan .row .name a:hover{color:var(--def)}
+  .check{width:16px;height:16px;border:1px solid var(--ink-dim);border-radius:4px;display:inline-block;vertical-align:-3px;margin-right:6px;cursor:pointer;background:transparent}
+  .check.on{background:var(--off);border-color:var(--off)}
+  .cyan .check.on{background:var(--def);border-color:var(--def)}
+  .links{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+  .links a{display:block;border:1px solid var(--line-soft);border-radius:8px;padding:12px 14px;color:var(--ink);text-decoration:none}
+  .links a:hover{border-color:var(--def)}
+  .links a b{display:block;font-size:15px;margin-bottom:3px}
+  .links a span{font-size:13px;color:var(--ink-dim)}
+  .progress{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-dim);margin-top:8px}
+  .dims{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:18px 0 4px}
+  .dim{border:1px solid var(--line-soft);border-radius:10px;padding:14px 16px;background:var(--panel)}
+  .dim .k{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;color:var(--off);text-transform:uppercase}
+  .dim b{display:block;font-size:16px;margin:4px 0 6px}
+  .dim p{font-size:14px;color:var(--ink-dim);margin:0;line-height:1.55}
+  .ops td:first-child{white-space:nowrap}
+  .ops td a{color:var(--ink)}
+  .ops td a:hover{color:var(--def)}
+  @media (max-width:560px){.row{grid-template-columns:34px 1fr;gap:10px}}
+</style>
+</head>
+<body>
+<header class="bar"><div class="bar-in">
+  <div class="brand"><span class="dot"></span>AGENTIC&nbsp;PRIVACY&nbsp;//&nbsp;FIELD&nbsp;MAP</div>
+  <a class="back" href="https://idvorkin-ai-tools.github.io/">&larr; all maps</a>
+</div></header>
+<main>
+  <div class="hero">
+    <div class="eyebrow"><span class="box wb mono">BAGDASARIAN, TSAI ET AL. &middot; CAPS WORKSHOP REPORT &middot; 2026</span><span class="mono">116 pages &middot; 14 sections &middot; 51 open problems &middot; 17 pages here</span></div>
+    <h1>Agentic privacy, mapped</h1>
+    <p class="sub">A long workshop report from the Google Contextual Agent Privacy and Security (CAPS) Workshop, New York City, November 2025, argues that the usual toolkit of least privilege, consent prompts and static filters breaks once software plans its own steps. Its replacement is an old idea from privacy philosophy: an agent should do what is <em>appropriate in context</em>. This map walks the framework, then every open problem the authors list, one area per page.</p>
+
+    <div class="answer">
+      <b>The one-sentence version:</b> an agent needs broad access to be useful, and broad access is exactly what security engineering tells you not to grant, so the report proposes replacing "who may see what" with "which flows and actions fit the norms of this context". It calls that <b>Contextual Integrity</b> for information and <b>Contextual Security</b> for every other action, then spends most of its pages on what nobody yet knows how to build: norms a machine can look up, policies compiled from natural language, credentials that live exactly as long as a task, consent that does not fatigue, benchmarks that run for years, and governance that decides whose norms win.
+    </div>
+
+    <div class="facts">
+      <div class="fact"><div class="k">Short on time</div><div class="v"><a class="lnk" href="guide/ten-minutes.html">read it in 10 minutes</a></div></div>
+      <div class="fact"><div class="k">Building agents</div><div class="v"><a class="lnk" href="guide/for-builders.html">what to do Monday</a></div></div>
+      <div class="fact"><div class="k">Every problem</div><div class="v"><a class="lnk" href="#all-problems">all 51, indexed</a></div></div>
+      <div class="fact"><div class="k">The words</div><div class="v"><a class="lnk" href="guide/glossary.html">glossary</a></div></div>
+    </div>
+    <p class="progress" id="progress">Tick a page when you have read it; this browser remembers.</p>
+  </div>
+
+  <section id="lens" class="amber">
+    <div class="arc-head"><span class="idx">01 &middot; THE LENS</span><h2>Why "appropriate in context" and not "allowed or denied"</h2></div>
+    <p class="arc-sub">The executive summary blames three properties of agents for breaking conventional security and privacy engineering. Part I then brings in Helen Nissenbaum's theory of Contextual Integrity as the yardstick for what "acting appropriately" means.</p>
+    <div class="dims">
+      <div class="dim"><div class="k">Dimension 1</div><b>Unstructured interfaces, ambiguous input</b><p>Instructions and data arrive as natural language and images, so expected behavior is hard to define and adversarial text (prompt injection) looks like any other input.</p></div>
+      <div class="dim"><div class="k">Dimension 2</div><b>Probabilistic, dynamic control flow</b><p>Plans and code are generated at run time with "jagged" model performance, so the execution path is new each time and resists ordinary testing.</p></div>
+      <div class="dim"><div class="k">Dimension 3</div><b>Autonomy and delegation</b><p>Long tasks, sub-agents and abstract goals outrun oversight that leans on confirmation prompts, which ends in consent fatigue.</p></div>
+    </div>
+    <div class="row"><div class="num"><span class="check" data-p="c01"></span>01</div><div><div class="name"><a href="concepts/contextual-integrity.html">Contextual Integrity, applied to agents</a></div><div class="meta"><span>&sect;1, &sect;2, &sect;4, App. A&ndash;C</span><span>the five-parameter CI tuple</span><span>four meanings of "context"</span></div><div class="desc">Privacy as appropriate flow, not secrecy or control. Sender, recipient, subject, information type and transmission principle; why norms are legitimate only when they serve a context's purposes; where personal preferences fit; and the report's definition of a trustworthy agent: utility, privacy, security, under benign and adversarial conditions.</div></div></div>
+    <div class="row"><div class="num"><span class="check" data-p="c02"></span>02</div><div><div class="name"><a href="concepts/three-dimensions.html">Three dimensions, four threat models</a></div><div class="meta"><span>Exec. summary, &sect;1, &sect;3</span><span>capability vs. control</span></div><div class="desc">The three properties that break least privilege, read against the four threat models of &sect;3: malicious users, a malicious environment (indirect prompt injection), a poisoned model, and no adversary at all, where agents still over-share, melt down and reward-hack. Plus the paper's reframing of prompt injection as a flip of judgment that can go either way.</div></div></div>
+  </section>
+
+  <section id="framework" class="amber">
+    <div class="arc-head"><span class="idx">02 &middot; PART I &middot; THE FRAMEWORK</span><h2>From a theory of privacy to a machine that enforces it</h2></div>
+    <p class="arc-sub">Part I closes with two moves: extend Contextual Integrity from information flows to all behavior, and decompose "operationalize CI" into five steps an agent would have to perform. Ten open problems live here.</p>
+    <div class="row"><div class="num"><span class="check" data-p="p01"></span>03</div><div><div class="name"><a href="problems/contextual-security.html">Contextual Security</a></div><div class="meta"><span>&sect;5</span><span>OP 5.1&ndash;5.3</span><span>security defined by society, not the spec</span></div><div class="desc">Why a system that perfectly enforces its own specification can still be insecure in context, from the gym-booking agent to the serial killers' self-destructing filesystem. Threat models that fit the setting, and security norms as a pair of functionality and security goal.</div></div></div>
+    <div class="row"><div class="num"><span class="check" data-p="p02"></span>04</div><div><div class="name"><a href="problems/policy-engines.html">Operationalizing CI: the contextual policy engine</a></div><div class="meta"><span>&sect;6</span><span>OP 6.1&ndash;6.7</span><span>five reasoning steps</span></div><div class="desc">Identify flows, locate norms, judge, resolve uncertainty, enforce. Why no oracle model exists, how a policy generator plus a runtime enforcer splits the job, why untrusted text must not reach the generator, and how preferences, values and requirements rank when they collide.</div></div></div>
+  </section>
+
+  <section id="components" class="cyan">
+    <div class="arc-head"><span class="idx">03 &middot; PART II &middot; COMPONENTS</span><h2>System, model, user</h2></div>
+    <p class="arc-sub">Part II asks what each layer can contribute: guardrails in the execution environment, contextual reasoning in the model, and oversight from a user whose attention is finite. Twenty-one open problems.</p>
+    <div class="row"><div class="num"><span class="check" data-p="p03"></span>05</div><div><div class="name"><a href="problems/identity-authorization.html">Identity, authorization, accounting</a></div><div class="meta"><span>&sect;7.1&ndash;7.3</span><span>OP 7.1&ndash;7.5</span><span>system level</span></div><div class="desc">An agent is neither a human nor a deterministic program, so identity, OAuth scopes and audit logs all wobble. Telling agents from people, tracing a sub-agent's action back to a user, purpose-bound and task-lived credentials, and artifacts that bind an action to the intent behind it.</div></div></div>
+    <div class="row"><div class="num"><span class="check" data-p="p04"></span>06</div><div><div class="name"><a href="problems/data-privacy.html">PII, minimization, deletion, anonymity</a></div><div class="meta"><span>&sect;7.4</span><span>OP 7.6&ndash;7.9</span><span>system level</span></div><div class="desc">Redaction that keeps meaning, leaks through chain of thought and memory, three faces of data minimization, encrypted-traffic fingerprints, "ghost" representations that survive deletion, and the tension between anonymity and accountability.</div></div></div>
+    <div class="row"><div class="num"><span class="check" data-p="p05"></span>07</div><div><div class="name"><a href="problems/last-mile-developer.html">AI as the last-mile developer</a></div><div class="meta"><span>&sect;7.5</span><span>OP 7.10&ndash;7.11</span><span>exec(*)</span></div><div class="desc">The report's sharpest systems argument: replace each LLM call with a nondeterministic choice and see what the code still guarantees. An email-to-calendar app stays bounded; a general planner becomes <span class="mono">exec(*)</span>. How much agentic-ness a task needs, and how to bring testing and review back.</div></div></div>
+    <div class="row"><div class="num"><span class="check" data-p="p06"></span>08</div><div><div class="name"><a href="problems/model-reasoning.html">Teaching models contextual reasoning</a></div><div class="meta"><span>&sect;8</span><span>OP 8.1&ndash;8.4</span><span>model level</span></div><div class="desc">RL gyms and on-policy distillation for CI reasoning, the knowing-doing gap, when to ask a clarifying question, stale assumptions months later, scaling and verifier trade-offs, and interpretability for how models use private data.</div></div></div>
+    <div class="row"><div class="num"><span class="check" data-p="p07"></span>09</div><div><div class="name"><a href="problems/mental-models-consent.html">Mental models and the end of notice-and-choice</a></div><div class="meta"><span>&sect;9.1&ndash;9.2</span><span>OP 9.1&ndash;9.4</span><span>user level</span></div><div class="desc">Why users misread agents, what merged contexts and "infinite memory" do to bystanders, four ways static consent fails, and a shift to risk-scaled, mixed-initiative control with policies users can author and edit.</div></div></div>
+    <div class="row"><div class="num"><span class="check" data-p="p08"></span>10</div><div><div class="name"><a href="problems/trust-recourse.html">Trust, stop buttons, accountability</a></div><div class="meta"><span>&sect;9.3</span><span>OP 9.5&ndash;9.6</span><span>user level</span></div><div class="desc">Trust versus trustworthiness, audit paths the task model cannot rewrite, "what if" simulation before delegation, delayed execution, undo windows and circuit breakers, and what contracts, transparency, liability and incentives mean when the contractor is a model.</div></div></div>
+  </section>
+
+  <section id="ecosystem" class="cyan">
+    <div class="arc-head"><span class="idx">04 &middot; PART III &middot; ECOSYSTEM</span><h2>Evaluation, multi-agent systems, governance</h2></div>
+    <p class="arc-sub">Part III leaves the single agent: how to measure success, what happens when agents talk to agents, and who decides the norms. Twenty open problems.</p>
+    <div class="row"><div class="num"><span class="check" data-p="p09"></span>11</div><div><div class="name"><a href="problems/evaluations.html">Evaluations and benchmarks</a></div><div class="meta"><span>&sect;10, App. D</span><span>OP 10.1&ndash;10.7</span><span>16 CI benchmarks reviewed</span></div><div class="desc">Why agent benchmarks mislead, the open question behind saturated red-teaming, the missing large-scale user studies, and "CI for life": memory over years, cumulative leakage, a privacy-utility balance that moves, and benchmarks that survive a change of harness.</div></div></div>
+    <div class="row"><div class="num"><span class="check" data-p="p10"></span>12</div><div><div class="name"><a href="problems/multi-agent-norms.html">Shared norms, delegation, composition</a></div><div class="meta"><span>&sect;11.1&ndash;11.2</span><span>OP 11.1&ndash;11.5</span><span>multi-agent</span></div><div class="desc">A contextual handshake between strangers, collusion and norm drift, constraints that evaporate after hop one, swarms of thousands, and disclosures that are each fine until someone sees both.</div></div></div>
+    <div class="row"><div class="num"><span class="check" data-p="p11"></span>13</div><div><div class="name"><a href="problems/agent-channels.html">Protocols, attestation, side channels</a></div><div class="meta"><span>&sect;11.3&ndash;11.4</span><span>OP 11.6&ndash;11.9</span><span>multi-agent</span></div><div class="desc">Free-form language over MCP and A2A, firewalled task-scoped protocols, why remote attestation of code does not attest behavior, how expressive an inter-agent language should be, timing leaks, and simulated societies for training and evaluation.</div></div></div>
+    <div class="row"><div class="num"><span class="check" data-p="p12"></span>14</div><div><div class="name"><a href="problems/governance.html">Governance: whose norms, and who checks</a></div><div class="meta"><span>&sect;12&ndash;13</span><span>OP 12.1&ndash;12.4</span><span>norm repository</span></div><div class="desc">Preconditions for a norm-respecting ecosystem, liability placed where capability sits (the credit-card and ADA precedents), three ways to source norms, conflicting jurisdictions, and compliance records produced at the moment an agent acts.</div></div></div>
+  </section>
+
+  <section id="guides" class="amber">
+    <div class="arc-head"><span class="idx">05 &middot; GUIDES</span><h2>Three ways in</h2></div>
+    <div class="row"><div class="num"><span class="check" data-p="g01"></span>15</div><div><div class="name"><a href="guide/ten-minutes.html">Read it in 10 minutes</a></div><div class="meta"><span>the whole report, compressed</span></div><div class="desc">The argument end to end: definitions, the three dimensions, the five reasoning steps, the seven headline problem areas, and what the report does not claim.</div></div></div>
+    <div class="row"><div class="num"><span class="check" data-p="g02"></span>16</div><div><div class="name"><a href="guide/for-builders.html">For builders</a></div><div class="meta"><span>what the report implies for an agent you ship</span></div><div class="desc">The patterns the report points to that exist today, such as a separate policy engine, trusted-only policy inputs and task-scoped credentials, each tied to the section and open problem it comes from, with the caveats the authors attach.</div></div></div>
+    <div class="row"><div class="num"><span class="check" data-p="g03"></span>17</div><div><div class="name"><a href="guide/glossary.html">Glossary</a></div><div class="meta"><span>App. A&ndash;B plus the report's own coinages</span></div><div class="desc">CI terms as the report standardizes them (context, norm, CI tuple, transmission principle, the CI heuristic) and the new vocabulary: contextual security, contextual policy engine, intent-binding artifact, functional revocation, contextual handshake.</div></div></div>
+  </section>
+
+  <section id="all-problems">
+    <div class="arc-head"><span class="idx">06 &middot; INDEX</span><h2>All 51 open problems</h2></div>
+    <p class="arc-sub">The report's own list (&sect;14), each linked to the page that explains it. Section numbers and page numbers match the report; the <span class="mono">p.</span> column opens the PDF at that page.</p>
+    <div class="scroll"><table class="kv ops">
+      <tr><th>OP</th><th>Problem</th><th>p.</th></tr>
+      <tr><td class="mono">5.1</td><td><a href="problems/contextual-security.html#op-5-1">Identifying contextual behavior norms</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=19">19</a></td></tr>
+      <tr><td class="mono">5.2</td><td><a href="problems/contextual-security.html#op-5-2">Determining reasonable and accurate threat models</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=20">20</a></td></tr>
+      <tr><td class="mono">5.3</td><td><a href="problems/contextual-security.html#op-5-3">Agreeing upon contextual security norms</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=21">21</a></td></tr>
+      <tr><td class="mono">6.1</td><td><a href="problems/policy-engines.html#op-6-1">Balancing reliance on users vs. AI models</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=23">23</a></td></tr>
+      <tr><td class="mono">6.2</td><td><a href="problems/policy-engines.html#op-6-2">AI models that understand contextual norms</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=24">24</a></td></tr>
+      <tr><td class="mono">6.3</td><td><a href="problems/policy-engines.html#op-6-3">Representing contextual norms</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=25">25</a></td></tr>
+      <tr><td class="mono">6.4</td><td><a href="problems/policy-engines.html#op-6-4">Formal policies that capture norms expressed in natural language</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=26">26</a></td></tr>
+      <tr><td class="mono">6.5</td><td><a href="problems/policy-engines.html#op-6-5">Preventing harmful context from affecting policy generation</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=27">27</a></td></tr>
+      <tr><td class="mono">6.6</td><td><a href="problems/policy-engines.html#op-6-6">Establishing precedence between conflicting policies</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=28">28</a></td></tr>
+      <tr><td class="mono">6.7</td><td><a href="problems/policy-engines.html#op-6-7">Practical enforcement mechanisms to ensure appropriate behavior</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=29">29</a></td></tr>
+      <tr><td class="mono">7.1</td><td><a href="problems/identity-authorization.html#op-7-1">Distinguishing agents from humans</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=31">31</a></td></tr>
+      <tr><td class="mono">7.2</td><td><a href="problems/identity-authorization.html#op-7-2">Tracing agents back to users</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=32">32</a></td></tr>
+      <tr><td class="mono">7.3</td><td><a href="problems/identity-authorization.html#op-7-3">Enabling context-aware authorization</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=33">33</a></td></tr>
+      <tr><td class="mono">7.4</td><td><a href="problems/identity-authorization.html#op-7-4">Managing the authorization lifecycle</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=34">34</a></td></tr>
+      <tr><td class="mono">7.5</td><td><a href="problems/identity-authorization.html#op-7-5">Ensuring that an agent's action is intended by the user</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=35">35</a></td></tr>
+      <tr><td class="mono">7.6</td><td><a href="problems/data-privacy.html#op-7-6">Evolving PII detection and replacement</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=36">36</a></td></tr>
+      <tr><td class="mono">7.7</td><td><a href="problems/data-privacy.html#op-7-7">Achieving data minimization</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=36">36</a></td></tr>
+      <tr><td class="mono">7.8</td><td><a href="problems/data-privacy.html#op-7-8">Moving from data deletion to functional data revocation</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=37">37</a></td></tr>
+      <tr><td class="mono">7.9</td><td><a href="problems/data-privacy.html#op-7-9">Protecting user anonymity in an agentic world</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=38">38</a></td></tr>
+      <tr><td class="mono">7.10</td><td><a href="problems/last-mile-developer.html#op-7-10">Closing the gap between developer intent and application specification</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=41">41</a></td></tr>
+      <tr><td class="mono">7.11</td><td><a href="problems/last-mile-developer.html#op-7-11">Making agent execution as robust as traditional software</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=43">43</a></td></tr>
+      <tr><td class="mono">8.1</td><td><a href="problems/model-reasoning.html#op-8-1">Teaching models privacy and security reasoning</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=44">44</a></td></tr>
+      <tr><td class="mono">8.2</td><td><a href="problems/model-reasoning.html#op-8-2">Handling uncertainty and ambiguity in unstructured domains</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=46">46</a></td></tr>
+      <tr><td class="mono">8.3</td><td><a href="problems/model-reasoning.html#op-8-3">Detecting stale assumptions in changing contexts</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=47">47</a></td></tr>
+      <tr><td class="mono">8.4</td><td><a href="problems/model-reasoning.html#op-8-4">Interpretable use of private information</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=49">49</a></td></tr>
+      <tr><td class="mono">9.1</td><td><a href="problems/mental-models-consent.html#op-9-1">Supporting user mental models for AI agents</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=50">50</a></td></tr>
+      <tr><td class="mono">9.2</td><td><a href="problems/mental-models-consent.html#op-9-2">Thinking beyond notice and choice for AI agents</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=53">53</a></td></tr>
+      <tr><td class="mono">9.3</td><td><a href="problems/mental-models-consent.html#op-9-3">Determining appropriateness of AI agent actions</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=53">53</a></td></tr>
+      <tr><td class="mono">9.4</td><td><a href="problems/mental-models-consent.html#op-9-4">Enabling user supervision over automation</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=55">55</a></td></tr>
+      <tr><td class="mono">9.5</td><td><a href="problems/trust-recourse.html#op-9-5">Delaying, stopping, and reversing AI agent actions</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=58">58</a></td></tr>
+      <tr><td class="mono">9.6</td><td><a href="problems/trust-recourse.html#op-9-6">Accountability frameworks for AI agents</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=58">58</a></td></tr>
+      <tr><td class="mono">10.1</td><td><a href="problems/evaluations.html#op-10-1">Advancing automated red-teaming on saturated benchmarks</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=61">61</a></td></tr>
+      <tr><td class="mono">10.2</td><td><a href="problems/evaluations.html#op-10-2">Designing and implementing large-scale studies</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=62">62</a></td></tr>
+      <tr><td class="mono">10.3</td><td><a href="problems/evaluations.html#op-10-3">Evaluating how agents persist and use historical system context</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=63">63</a></td></tr>
+      <tr><td class="mono">10.4</td><td><a href="problems/evaluations.html#op-10-4">Evaluating leakage in aggregated data flows</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=64">64</a></td></tr>
+      <tr><td class="mono">10.5</td><td><a href="problems/evaluations.html#op-10-5">Benchmarking dynamic privacy-utility trade-offs</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=64">64</a></td></tr>
+      <tr><td class="mono">10.6</td><td><a href="problems/evaluations.html#op-10-6">Evaluations that carry across environments</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=64">64</a></td></tr>
+      <tr><td class="mono">10.7</td><td><a href="problems/evaluations.html#op-10-7">Evaluations of agents in evolving environments</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=65">65</a></td></tr>
+      <tr><td class="mono">11.1</td><td><a href="problems/multi-agent-norms.html#op-11-1">Establishing shared contextual norms</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=66">66</a></td></tr>
+      <tr><td class="mono">11.2</td><td><a href="problems/multi-agent-norms.html#op-11-2">Preventing collusion and drifting norms between agents</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=66">66</a></td></tr>
+      <tr><td class="mono">11.3</td><td><a href="problems/multi-agent-norms.html#op-11-3">Preserving constraints during delegation or parallel execution</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=67">67</a></td></tr>
+      <tr><td class="mono">11.4</td><td><a href="problems/multi-agent-norms.html#op-11-4">Orchestrating large agentic swarms and enforcing normative behavior</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=68">68</a></td></tr>
+      <tr><td class="mono">11.5</td><td><a href="problems/multi-agent-norms.html#op-11-5">Ensuring composed behaviors across agents uphold privacy and security</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=68">68</a></td></tr>
+      <tr><td class="mono">11.6</td><td><a href="problems/agent-channels.html#op-11-6">Developing secure and robust multi-agent communication protocols</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=69">69</a></td></tr>
+      <tr><td class="mono">11.7</td><td><a href="problems/agent-channels.html#op-11-7">Building trust across agent boundaries with attestation</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=69">69</a></td></tr>
+      <tr><td class="mono">11.8</td><td><a href="problems/agent-channels.html#op-11-8">Balancing security and utility in multi-agent communications</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=70">70</a></td></tr>
+      <tr><td class="mono">11.9</td><td><a href="problems/agent-channels.html#op-11-9">Building realistic multi-agent environments for Contextual Integrity</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=71">71</a></td></tr>
+      <tr><td class="mono">12.1</td><td><a href="problems/governance.html#op-12-1">Achieving environments conducive to contextual privacy and security</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=72">72</a></td></tr>
+      <tr><td class="mono">12.2</td><td><a href="problems/governance.html#op-12-2">Determining CI norms</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=73">73</a></td></tr>
+      <tr><td class="mono">12.3</td><td><a href="problems/governance.html#op-12-3">Institutional and legal governance: resolving conflicting norms</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=74">74</a></td></tr>
+      <tr><td class="mono">12.4</td><td><a href="problems/governance.html#op-12-4">Incentivizing and verifying normative compliance</a></td><td class="mono"><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=74">74</a></td></tr>
+    </table></div>
+  </section>
+
+  <section id="refs">
+    <div class="arc-head"><span class="idx">07</span><h2>Source and related reading</h2></div>
+    <div class="links">
+      <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf" target="_blank" rel="noopener"><b>The report (PDF, 116 pages)</b><span>Bagdasarian, Tsai et al., <em>Open and Emergent Problems in Agentic Privacy and Security: A Contextual Angle</em>, 66 authors from 25 affiliations</span></a>
+      <a href="https://research.google/pubs/open-and-emergent-problems-in-agentic-privacy-and-security-a-contextual-angle/" target="_blank" rel="noopener"><b>Google Research publication page</b><span>The canonical listing for the report. No arXiv version could be found as of 2026-10-23.</span></a>
+      <a href="https://research.google/blog/open-and-emergent-problems-in-agentic-privacy-and-security-a-contextual-angle/" target="_blank" rel="noopener"><b>Announcement post</b><span>Google Research blog, 2026-10-05, by two of the workshop organizers</span></a>
+      <a href="https://privaci.info/glossary" target="_blank" rel="noopener"><b>The full CI glossary</b><span>The up-to-date version of the report's Appendix A, maintained by the Contextual Integrity community</span></a>
+      <a href="https://idvorkin-ai-tools.github.io/cimemories-field-map/" target="_blank" rel="noopener"><b>Related: CIMemories, mapped</b><span>A sibling field map of the CIMemories benchmark, which tests contextual integrity in LLM memory. The report reviews it among the 16 CI benchmarks in Appendix D.</span></a>
+    </div>
+  </section>
+</main>
+<footer>
+  An unofficial field map of <em>Open and Emergent Problems in Agentic Privacy and Security: A Contextual Angle</em> (Bagdasarian, Tsai et al., CAPS Workshop report, 2026), compiled 2026-10-23 from the 116-page PDF on the Google Research publication page. Section and open-problem numbers are the report's own. The report is &copy; its authors; this map explains and links, it does not copy. Part of <a href="https://idvorkin-ai-tools.github.io/">the field maps</a>.
+</footer>
+<script>
+(function(){
+  var boxes = document.querySelectorAll('.check');
+  var key = 'agentic-privacy-fieldmap-read';
+  var state = {};
+  try { state = JSON.parse(localStorage.getItem(key) || '{}'); } catch(e) { state = {}; }
+  function save(){ try { localStorage.setItem(key, JSON.stringify(state)); } catch(e){} }
+  function paint(){
+    var done = 0;
+    boxes.forEach(function(b){
+      if (state[b.dataset.p]) { b.classList.add('on'); done++; } else { b.classList.remove('on'); }
+    });
+    var el = document.getElementById('progress');
+    if (el) el.textContent = done === 0
+      ? 'Tick a page when you have read it; this browser remembers.'
+      : done + ' of ' + boxes.length + ' pages read.';
+  }
+  boxes.forEach(function(b){
+    b.setAttribute('role','button');
+    b.setAttribute('tabindex','0');
+    b.addEventListener('click', function(e){ e.preventDefault(); state[b.dataset.p] = !state[b.dataset.p]; save(); paint(); });
+    b.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); b.click(); } });
+  });
+  paint();
+})();
+</script>
+</body>
+</html>

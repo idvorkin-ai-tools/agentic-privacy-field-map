@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Evaluations and benchmarks &mdash; Agentic privacy, mapped</title>
+<meta name="description" content="Why measuring an agent's privacy and security is hard, what 16 Contextual Integrity benchmarks cover and miss, and the seven open evaluation problems." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../paper.css" />
+</head>
+<body>
+<header class="bar"><div class="bar-in">
+  <div class="brand"><span class="dot"></span>AGENTIC&nbsp;PRIVACY&nbsp;//&nbsp;FIELD&nbsp;MAP</div>
+  <a class="back" href="../index.html#ecosystem">&larr; field map</a>
+</div></header>
+<main>
+  <div class="eyebrow"><span class="box bb mono">PART III · ECOSYSTEM · 01 OF 04</span><span class="mono">§10 · pp. 60–65 · App. D pp. 106–116 · OP 10.1–10.7</span></div>
+  <h1>Evaluations and benchmarks</h1>
+  <div class="authors">How do you score an agent on "behaved appropriately" when the context keeps moving?</div>
+  <div class="paperlink" style="border-left-color:var(--def)"><span class="lbl">Source</span><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=60" target="_blank" rel="noopener">§10 Evaluations and Benchmarking, pp. 60–65; Appendix D, pp. 106–116 ↗</a></div>
+
+  <div class="tldr"><b>TL;DR &mdash;</b> Benchmarks are how the field knows whether anything works, and agents strain every part of them: sandboxes are too clean, one early mistake sinks a whole trajectory, test sets leak into training, LLM judges are unreliable, models may notice they are being tested, and synthetic data biases the result. The report reviews 16 Contextual Integrity (CI) benchmarks and finds three shared gaps: transmission principles and ambiguity are simplified, personas and labels are mostly synthetic, and each test is a single-session snapshot. Its seven open problems ask why automated red-teaming stopped finding attacks, how to run large real-user studies, and how to evaluate an agent over years: memory, cumulative leakage, shifting privacy-utility trade-offs, portability across harnesses, and adapting when norms change.</div>
+
+  <p class="lead">Part II of the report looked at the pieces of an agent: the policy engine, the system guardrails, the model's reasoning, the user interface. Part III steps back to deployment, and its first question is measurement (§10). Every earlier open problem ends in some version of "and then we need to show it works." This section says the tools for showing that are weak in general for frontier agents (§10.1), surveys what CI-specific benchmarks exist (§10.2 and Appendix D), and then lays out what is missing: real-user studies (§10.3) and evaluation over long time horizons (§10.4). The report's summary of open problems frames the goal as measuring whether complex behavior is appropriate, continuously and across long tasks (§1.2).</p>
+
+  <h2 id="difficulties">Six general difficulties</h2>
+  <p>Before getting to privacy, §10.1 lists six reasons benchmarking frontier agents is hard at all (<a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=60" target="_blank" rel="noopener">pp. 60–61</a>). None is new on its own. The point is that they pile up for agents.</p>
+  <table class="kv">
+    <tr><th>Difficulty</th><th>What goes wrong</th></tr>
+    <tr><td>Construct validity</td><td>Sandboxes such as AgentDojo, which the report cites, strip out real-world mess. An agent tuned to the sandbox can fail badly on ambiguous human instructions, system errors and partial information. Agents also behave inconsistently on identical inputs and are sensitive to how the same information is represented.</td></tr>
+    <tr><td>Trajectories and compounding errors</td><td>One wrong tool call early in a plan can end the run before the property you wanted to test is ever exercised. Single-run pass/fail scores ignore wasteful paths, run-to-run variance, unsafe intermediate steps and good reasoning.</td></tr>
+    <tr><td>Data contamination</td><td>Public test sets get scraped into pre-training data, so scores can reflect memorization rather than reasoning.</td></tr>
+    <tr><td>Unreliable metrics</td><td>Exact-match grading is too rigid for open-ended trajectories, so people use LLM judges. Those judges show position bias, prefer verbose answers, disagree with themselves across runs and diverge from experts. Using one LLM to grade another risks a loop of unreliability.</td></tr>
+    <tr><td>Evaluation awareness</td><td>Models may act differently when they infer they are being tested. Prompt formatting, synthetic scenarios and harness structure can all be cues.</td></tr>
+    <tr><td>Synthetic data biases</td><td>Synthetic test sets inflate scores and favor systems that resemble the generator. The report cites work showing that membership inference attacks behave like machine-text detectors and flag synthetic data as training data regardless of source. It also notes that smaller models favor their own generated data, and that synthetic data works worse as evaluation material on complex tasks.</td></tr>
+  </table>
+  <p>The fifth item names the tension the whole section keeps returning to:</p>
+  <blockquote class="q"><span>"benchmarks must be sufficiently controlled to yield reproducible measurements, yet sufficiently realistic to avoid cuing the model into a distinct “evaluation mode.”"</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=61" target="_blank" rel="noopener">§10.1, p. 61</a></span></blockquote>
+  <p>Our reading: for privacy this tension is worse than for coding or math. A privacy test usually has to stage a sensitive situation, and staged sensitive situations are exactly what a test-aware model is likely to recognize.</p>
+
+  <h2 id="benchmarks">What 16 CI benchmarks cover</h2>
+  <p>Appendix D is the most concrete part of this section. The report first builds an analysis framework of ten features (§D.1, Table 1, <a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=106" target="_blank" rel="noopener">pp. 106–108</a>), then scores 16 benchmarks on all of them (§D.2, Table 2, pp. 108–116). The features read like a checklist for anyone building such a benchmark:</p>
+  <ul>
+    <li><b>Contextualization</b> (none / simple / rich): does the scenario give purpose, roles or detailed personas, so the same data can mean different things in different scenarios?</li>
+    <li><b>Transmission principles</b> (none / simple / complex): only "is this necessary or appropriate," or conditions such as an NDA, doctor-patient confidentiality, a subpoena, a commercial exchange or reciprocity?</li>
+    <li><b>Ambiguity</b> (no / implicit / explicit): can a flow be fine in one context and wrong in another, and is that designed in or only found later?</li>
+    <li><b>Norms</b>: legal, societal, organizational, other, or not specified.</li>
+    <li><b>Realism</b>: synthetic, grounded in real data, real, other, or not specified.</li>
+    <li><b>Annotation</b>: none, synthetic, non-expert raters, expert raters.</li>
+    <li><b>Explanation</b>: do labels come with a justification that a model's reasoning can be checked against?</li>
+    <li><b>Metrics</b>: leakage and/or utility, scored deterministically, heuristically or by an LLM judge.</li>
+    <li><b>Granularity</b>: is there a taxonomy for fine-grained error analysis?</li>
+    <li><b>Modality</b>: text, image, video, audio, multi-turn, tool use.</li>
+  </ul>
+  <p>Below are five of those columns for all 16 benchmarks, taken from Table 2 (pp. 115–116).</p>
+  <table class="kv">
+    <tr><th>Benchmark</th><th>Context.</th><th>Transm. principles</th><th>Ambiguity</th><th>Realism</th><th>Modality</th></tr>
+    <tr><td>ConfAIde (Mireshghallah et al., 2024)</td><td>Simple</td><td>Simple</td><td>No</td><td>Grounded</td><td>Text; multi-turn</td></tr>
+    <tr><td>AirGapAgent (Bagdasarian et al., 2024)</td><td>Rich</td><td>Simple</td><td>No</td><td>Grounded</td><td>Text</td></tr>
+    <tr><td>Form-filling agents (Ghalebikesabi et al., 2025)</td><td>Rich</td><td>Simple</td><td>Explicit</td><td>Grounded</td><td>Text</td></tr>
+    <tr><td>CI-Bench (Cheng et al., 2024)</td><td>Simple</td><td>Complex</td><td>Implicit</td><td>Grounded</td><td>Text; multi-turn</td></tr>
+    <tr><td>LLM-CI (Shvartzshnaider &amp; Duddu, 2025)</td><td>Simple</td><td>Complex</td><td>Implicit</td><td>Synthetic; grounded</td><td>Text</td></tr>
+    <tr><td>PrivacyLens (Shao et al., 2024)</td><td>Rich</td><td>Simple</td><td>Explicit</td><td>Grounded</td><td>Text; multi-turn; tool use</td></tr>
+    <tr><td>PrivacyLens-Live (Wang et al., 2025)</td><td>Rich</td><td>Simple</td><td>No</td><td>Grounded</td><td>Text; multi-turn; tool use</td></tr>
+    <tr><td>AgentDAM (Zharmagambetov et al., 2025)</td><td>Simple</td><td>Simple</td><td>Explicit</td><td>Grounded</td><td>Text; image; multi-turn; tool use</td></tr>
+    <tr><td>PrivaCI-Bench (Li et al., 2025)</td><td>Rich</td><td>Complex</td><td>No</td><td>Real; synthetic</td><td>Text</td></tr>
+    <tr><td>PrivacyLens+ (Yi et al., 2025)</td><td>Rich</td><td>Simple</td><td>Explicit</td><td>Grounded</td><td>Text</td></tr>
+    <tr><td>ConfAIde+ (Yi et al., 2025)</td><td>Rich</td><td>Complex</td><td>Explicit</td><td>Synthetic</td><td>Text</td></tr>
+    <tr><td>CIMemories (Mireshghallah et al., 2026)</td><td>Simple</td><td>Simple</td><td>No</td><td>Synthetic</td><td>Text</td></tr>
+    <tr><td>PrivacyBench (Mukhopadhyay et al., 2025)</td><td>Rich</td><td>Simple</td><td>Explicit</td><td>Synthetic</td><td>Text; multi-turn; tool use</td></tr>
+    <tr><td>MPCI-Bench (Wang &amp; Zhang, 2026)</td><td>Rich</td><td>Complex</td><td>Explicit</td><td>Grounded</td><td>Text; image; tool use</td></tr>
+    <tr><td>SPILLage (Roh et al., 2026)</td><td>Rich</td><td>Simple</td><td>No</td><td>Synthetic</td><td>Text; image; multi-turn; tool use</td></tr>
+    <tr><td>ConVerse (Gomaa et al., 2026)</td><td>Rich</td><td>Complex</td><td>Explicit</td><td>Synthetic</td><td>Text; multi-turn; tool use</td></tr>
+  </table>
+  <p>A few things stand out in the prose of §D.2. Only PrivaCI-Bench uses real data, drawn from court judgments, regulatory enforcement trackers and published privacy policies; the report suggests real data is rare because of the risk of handling sensitive human data. No benchmark covers video or audio. Image appears only in AgentDAM, MPCI-Bench and SPILLage. Where expert raters appear, they are often the benchmark's own authors, and the report says plainly that calling them independent experts is debatable. Benchmarks also differ in what they treat as a norm: ConfAIde and CIMemories draw societal norms from literature and surveys, PrivaCI-Bench from law, ConVerse from the task itself.</p>
+  <p>CIMemories, the memory benchmark in row 12, has its own explainer: the <a class="lnk" href="https://idvorkin-ai-tools.github.io/cimemories-field-map/" target="_blank" rel="noopener">CIMemories field map</a>. The table shows where it sits among the 16: simple context, simple transmission principles, no designed ambiguity, synthetic data, text only.</p>
+
+  <h3 id="three-limitations">The three limitations (§10.2)</h3>
+  <p>The report boils the appendix down to three gaps across current benchmarks (<a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=62" target="_blank" rel="noopener">§10.2, p. 62</a>):</p>
+  <ol>
+    <li><b>Transmission principles and ambiguity are simplified.</b> Apart from the Camber framework (the work behind PrivacyLens+ and ConfAIde+), the report says most benchmarks filter out ambiguous edge cases to keep the ground truth deterministic.</li>
+    <li><b>Personas and annotations are synthetic.</b> User profiles come from frontier LLMs, or crowd raters judge fictional vignettes. Neither is a real person working with a real agent.</li>
+    <li><b>CI parameters are static, single-session snapshots.</b> Even the multi-turn agent benchmarks the report names (PrivacyLens-Live, AgentDAM, PrivacyBench) stop at one task or at most ten conversational turns. None tracks persistent context, cumulative leakage or norms that shift over years.</li>
+  </ol>
+  <p>Our reading: limitation 1 is phrased more strongly than Table 2 alone suggests. By our count the table marks 8 of the 16 as explicit ambiguity and 2 as implicit. The two fit together if "explicit" often means a designed trap with one right answer, while Camber is the work that makes underspecified context its central subject. The table also lists AirGapAgent as "No" ambiguity while the D.2 prose describes its ambiguity as implicit. Treat individual cells as the authors' coding, not settled fact.</p>
+
+  <h2 id="op-10-1">OP 10.1 · Why red-teaming stopped finding attacks</h2>
+  <p><b>The question.</b> Automated red-teaming against leading models now finds few or no new attacks. Is that because the models really are robust, because the test environments are too simple, because the models know they are being tested, or because the attack methods have fallen behind? (<a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=61" target="_blank" rel="noopener">§10.1, p. 61</a>)</p>
+  <p><b>Background.</b> The report recalls that strong adaptive attacks have always been how empirical defenses get tested. In the adversarial-examples era they regularly broke proposed defenses. Between 2024 and 2026, it says, setting up strong automated attacks inside agent environments became standard practice. Then:</p>
+  <blockquote class="q"><span>"This standard practice started to be marginalized in mid-2026: frontier labs like Anthropic deprecated automated red-teaming, citing limited benefits in discovering new ways to break the agent"</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=61" target="_blank" rel="noopener">§10.1, pp. 61–62</a>, citing Anthropic (2026c)</span></blockquote>
+  <p>The citation, Anthropic (2026c), is the "Introducing Claude Sonnet 5" announcement (June 2026) in the reference list. The report then offers two readings: the apparent claim that new models understand Contextual Security well enough to withstand the strongest automated attacks, and the alternative that rising test-awareness explains the silence. It says which is correct is an open question. Our check: on the announcement page as we fetched it, we did not find an explicit statement deprecating automated red-teaming, so read this as the report's characterization of that source.</p>
+  <p><b>Why it matters for agents.</b> If the null result means robustness, pre-deployment forecasts are fine. If it means the tests are blind, every safety claim that rests on them is weaker than it looks. The report says the answer will matter a great deal for forecasting a model's Contextual Security before it ships.</p>
+  <p><b>What a good answer needs.</b> A way to tell these four explanations apart, for example by varying environment realism and evaluation cues while holding the attack fixed. That is our illustration, not a method the report proposes.</p>
+
+  <h2 id="op-10-2">OP 10.2 · Large-scale studies of real users</h2>
+  <p><b>The gap.</b> No comprehensive study yet measures how people perceive agents doing real tasks on their behalf (<a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=62" target="_blank" rel="noopener">§10.3, p. 62</a>). Real traces are rare, environments change fast, and perhaps only a subset of daily use runs outside robust sandboxes and without monitored tool use. So current studies rely on fictional scenarios, privacy seeds and common-sense judgments.</p>
+  <p><b>The questions OP 10.2 lists</b> (pp. 62–63):</p>
+  <ul>
+    <li><b>Focus.</b> Concentrate on settings with conflicting norms, misunderstandings and ambiguity.</li>
+    <li><b>Ground truth.</b> How to handle disagreement between users, cultural differences, users unsure of their own preferences, the privacy paradox, and users who do not understand the risks. How to combine observed behavior with self-reports.</li>
+    <li><b>Study design.</b> Capture human-agent vs agent-agent interaction, solo vs multi-person use, and different time scales, while balancing ecological validity, control and ethics.</li>
+    <li><b>Simulation.</b> Can synthetic users and attackers stand in for real ones without losing real uncertainty?</li>
+    <li><b>Necessity.</b> What do user studies add over shadow and A/B testing?</li>
+  </ul>
+  <p><b>What the report points to.</b> HCI has answered many of these in non-agent settings through interviews and controlled experiments; the report cites Martin &amp; Nissenbaum (2017). The open direction is how those findings transfer, and how to build human-centered privacy research, with real and simulated users, that scales and replicates fast enough to keep up.</p>
+
+  <h2 id="op-10-3">OP 10.3 · Evaluating long-term memory</h2>
+  <p>§10.4 opens the long-horizon theme. CI's strength is that norms, actors and contexts change over time, yet benchmarks test frozen snapshots.</p>
+  <blockquote class="q"><span>"As frontier agents transition into lifelong assistants, this dynamism is no longer a theoretical edge case but an aspect that demands adequate evaluation."</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=63" target="_blank" rel="noopener">§10.4, p. 63</a></span></blockquote>
+  <p><b>The question.</b> When an agent loads history from years of sessions, does it avoid surfacing "stale" information that conflicts with the user's current preferences or current norms? (The report points to §8.3.)</p>
+  <p><b>Why it is hard.</b> There is no unified long-term memory mechanism, and the field moves fast. A benchmark tied to one memory design is obsolete when the design changes.</p>
+  <p><b>What the report proposes as directions.</b> Benchmarks that test context-aware, time-aware storage and retrieval; that check whether inappropriate data is filtered <em>before</em> it enters the context window; and that treat personal memory as versioned, subject to revision, decay and re-contextualization. Above all, datasets in modular, interoperable formats that encode time relationships between CI parameters and stay independent of any agent's memory architecture.</p>
+
+  <h2 id="op-10-4">OP 10.4 · Leakage that accumulates</h2>
+  <p><b>The question.</b> Benchmarks check one run at a time. Nobody can yet measure how privacy loss spreads across many interactions over an agent's life (<a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=64" target="_blank" rel="noopener">§10.4, p. 64</a>).</p>
+  <p><b>Two settings.</b> Non-adversarial: each run respects the norm, but the sum does not. Adversarial: an attacker never tries a single exfiltration and instead rebuilds identity or secrets from long observation of agent traces, as in linkage or attribute inference.</p>
+  <p><b>What exists.</b> The report cites SEABench (Das et al., 2026), which runs self-evolving agents through sequences where earlier interactions change persistent state and later tasks check whether that state is still safe. It calls this a useful starting point. Still missing: realistic methods and standard metrics for how much privacy each interaction costs, and for the "rate of leakage" across flows.</p>
+  <p><b>A direction the authors suggest.</b> A benchmark where the attacker assembles a "shadow profile" from hundreds of non-sensitive interactions, including inferential leaps where the agent confirms something the user never meant to share. Defenses to test against it could include abstraction layers, added noise and anonymization.</p>
+
+  <h2 id="op-10-5">OP 10.5 · Privacy-utility trade-offs that move over time</h2>
+  <p><b>The question.</b> Benchmarks assume that what is sensitive today stays sensitive. CI says otherwise, and the report gives a vivid case: a traumatic event from youth may need strict filtering in early adulthood and later become a "bonding story" the person wants told (<a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=64" target="_blank" rel="noopener">p. 64</a>). Needs also differ by life stage, a teenager's need for forgetting versus a professional's need for archiving.</p>
+  <p><b>Why it is hard.</b> Both errors cost something. Over-protecting old data makes a sterile agent without personal depth. Under-protecting it can cause reputational or psychological harm. The report says there is no standard way to find the right balance as it moves over a 10- or 20-year horizon, and current models have no framework for adjusting retrieval as the user's identity changes.</p>
+  <p><b>Direction.</b> Datasets with "contextual metadata" that let a test check whether an agent notices a topic moving from off-limits to shareable, across simulated decades of a user's life. The report notes this means moving from objective accuracy toward subjective alignment, which is harder to score.</p>
+
+  <h2 id="op-10-6">OP 10.6 · Evaluations that carry across environments</h2>
+  <p><b>The question.</b> CI benchmarks are welded to their harness: a QA format with tiered vignettes, a particular chat-and-email interface, a particular web-form schema (<a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=64" target="_blank" rel="noopener">pp. 64–65</a>). Change the agent framework or the benchmark's infrastructure and the measurement can silently break, though the privacy question has not changed. It is hard to separate <em>what</em> is tested (CI compliance) from <em>how</em> it is run. So benchmarks get rebuilt from scratch and always lag the deployed system.</p>
+  <p><b>Why it is hard for agents.</b> Redeployment changes the CI parameter space itself. New tools bring new senders and recipients, new environments bring new information types, and new protocols bring new transmission principles. Long multi-step plans across environments grow the space of possible violations combinatorially. Self-evolving agents may even change their own tools or how they summarize their context (the report cites Kontonis et al., 2026).</p>
+  <p><b>What a good answer would do.</b> Our reading: express a scenario in terms of CI parameters and expected flows, and keep harness adapters separate, the way OP 10.3 asks memory datasets to stay independent of memory architecture.</p>
+
+  <h2 id="op-10-7">OP 10.7 · Agents in evolving environments</h2>
+  <p><b>The question.</b> No benchmark tests whether an agent notices that the world changed and goes back to fix earlier sharing decisions (<a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=65" target="_blank" rel="noopener">p. 65</a>). The report's triggers include shifts in political climate, company policy or positioning. Its example responses include deleting user profiles, filing right-to-be-forgotten requests and opting out of data-sharing practices.</p>
+  <p><b>Why it matters.</b> A persistent agent that manages data on a user's behalf is responsible not only for each decision when it is made but for whether past decisions are still appropriate. The report says no benchmarks for this exist yet, and calls them critical.</p>
+  <p><b>Two scenarios it sketches.</b> (1) The transmission principle changes: a company that received the user's data adopts a new sharing policy after a new agreement, a new government policy or an acquisition. (2) The recipient changes: a government's political leaning shifts, and sharing political views, sexual orientation or finances with government bodies now carries a different risk.</p>
+
+  <div class="callout">If you ship an agent, a passing privacy benchmark tells you about one session in one harness with synthetic people. The report's open problems are about everything outside that: years of memory, leakage that adds up, norms that change after the data has left, and the chance the model knew it was being tested.</div>
+
+  <h2 id="connections">Connections</h2>
+  <p>OP 10.3 and 10.5 point back to the report's treatment of stale and re-contextualized memory in <a class="lnk" href="model-reasoning.html">Teaching models contextual reasoning</a> (§8.3). Test awareness, central to OP 10.1, also undermines trust calibration in <a class="lnk" href="trust-recourse.html">Trust, stop buttons, accountability</a>. OP 10.1 is about measuring <a class="lnk" href="contextual-security.html">Contextual Security</a>. The deletion and right-to-be-forgotten actions in OP 10.7 are the subject of <a class="lnk" href="data-privacy.html">PII, minimization, deletion, anonymity</a>, and the question of where norms come from and how they change is taken up in <a class="lnk" href="governance.html">Governance</a>.</p>
+
+  <h2 id="reading">Further reading, verified</h2>
+  <ul class="readings">
+    <li><a href="https://arxiv.org/abs/2310.17884" target="_blank" rel="noopener">Can LLMs Keep a Secret? Testing Privacy Implications of Language Models via Contextual Integrity Theory</a> &mdash; Mireshghallah et al. (2024) &middot; ConfAIde, the first row of Table 2.</li>
+    <li><a href="https://arxiv.org/abs/2409.00138" target="_blank" rel="noopener">PrivacyLens: Evaluating Privacy Norm Awareness of Language Models in Action</a> &mdash; Shao et al. (2024) &middot; the vignette-to-trajectory benchmark the report singles out for its broad norm coverage and metric suite.</li>
+    <li><a href="https://arxiv.org/abs/2409.13903" target="_blank" rel="noopener">CI-Bench: Benchmarking Contextual Integrity of AI Assistants on Synthetic Data</a> &mdash; Cheng et al. (2024) &middot; reviewed in App. D; errors broken down by functional stage.</li>
+    <li><a href="https://arxiv.org/abs/2405.05175" target="_blank" rel="noopener">AirGapAgent: Protecting Privacy-Conscious Conversational Agents</a> &mdash; Bagdasarian et al. (2024) &middot; reviewed in App. D; separates context-preserving from context-hijacking adversaries.</li>
+    <li><a href="https://arxiv.org/abs/2602.13516" target="_blank" rel="noopener">SPILLage: Agentic Oversharing on the Web</a> &mdash; Roh et al. (2026) &middot; one of the two benchmarks the report calls most comprehensive multi-modal agent testing.</li>
+    <li><a href="https://arxiv.org/abs/2601.08235" target="_blank" rel="noopener">MPCI-Bench: A Benchmark for Multimodal Pairwise Contextual Integrity Evaluation of Language Model Agents</a> &mdash; Wang &amp; Zhang (2026) &middot; the same image tested in conflicting contexts.</li>
+    <li><a href="https://arxiv.org/abs/2406.13352" target="_blank" rel="noopener">AgentDojo: A Dynamic Environment to Evaluate Prompt Injection Attacks and Defenses for LLM Agents</a> &mdash; Debenedetti et al. (2024) &middot; the report's example of a constrained simulated environment (§10.1).</li>
+    <li><a href="https://arxiv.org/abs/2501.11786" target="_blank" rel="noopener">Synthetic Data Can Mislead Evaluations: Membership Inference as Machine Text Detection</a> &mdash; Naseh &amp; Mireshghallah (2025) &middot; cited for why synthetic evaluations can mislead.</li>
+  </ul>
+
+  <div class="callout">Next: <a class="lnk" href="multi-agent-norms.html">Shared norms, delegation, composition</a> &middot; Back to the <a class="lnk" href="../index.html#ecosystem">map</a>.</div>
+</main>
+<footer>Original explanation of <em>Open and Emergent Problems in Agentic Privacy and Security: A Contextual Angle</em> (Bagdasarian, Tsai et al., 2026), §10 and Appendix D. The report is &copy; its authors; this page explains and links, it does not copy.</footer>
+</body>
+</html>

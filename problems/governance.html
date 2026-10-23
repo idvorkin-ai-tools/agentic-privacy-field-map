@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Governance: whose norms, and who checks &mdash; Agentic privacy, mapped</title>
+<meta name="description" content="Who carries the burden, where agents' norms come from, what to do when jurisdictions disagree, and how to check compliance at machine speed." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../paper.css" />
+</head>
+<body>
+<header class="bar"><div class="bar-in">
+  <div class="brand"><span class="dot"></span>AGENTIC&nbsp;PRIVACY&nbsp;//&nbsp;FIELD&nbsp;MAP</div>
+  <a class="back" href="../index.html#ecosystem">&larr; field map</a>
+</div></header>
+<main>
+  <div class="eyebrow"><span class="box bb mono">PART III · ECOSYSTEM · 04 OF 04</span><span class="mono">§12–13 · pp. 72–76 · OP 12.1–12.4</span></div>
+  <h1>Governance: whose norms, and who checks</h1>
+  <div class="authors">Who should carry the burden, where an agent's norms come from, what happens when jurisdictions disagree, and how anyone can verify that the norms were followed.</div>
+  <div class="paperlink" style="border-left-color:var(--def)"><span class="lbl">Source</span><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=72" target="_blank" rel="noopener">§12 Governance of Agentic Privacy and Security, §13 Conclusion, pp. 72–76 ↗</a></div>
+
+  <div class="tldr"><b>TL;DR &mdash;</b> Everything earlier in the report assumes there are contextual norms for an agent to follow. §12 asks where those norms come from, who has to make them stick, and how anyone checks. Its design principle is to put obligations on whoever is best placed to manage the risk, and to specify outcomes rather than technology, as consumer-credit and accessibility law did. Norms could be set top-down, discovered empirically and kept in a public norm repository, or worked out on the fly by AI applying the CI heuristic. Because after-the-fact enforcement is too slow for agents, the report wants a compliance record produced at the moment the agent acts.</div>
+
+  <p class="lead">This is the last chapter of Part III and the last substantive section of the report. Parts I and II built a contextual approach to agent privacy and security: Contextual Integrity (CI) as the theory, policy engines and system guardrails as the machinery (§6–7), models that reason about context (§8), and users who stay in control (§9). Part III then looked at evaluation (§10) and multi-agent settings (§11). §12 steps outside the system. Even a perfect policy engine needs someone to supply its norms, settle conflicts between them, and hold someone accountable when they are broken. The report says plainly that proposing specific policies is out of scope (§12, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=72" target="_blank" rel="noopener">p. 72</a>). What it lists are the open problems that any policy would have to solve, under three questions: what preconditions are needed, how norms get sourced and reconciled (§12.1), and how they get enforced and by whom (§12.2).</p>
+
+  <h2 id="op-12-1">OP 12.1 · An environment where contextual privacy can take hold</h2>
+  <p>The first open problem is about preconditions. Before arguing over which norms are right, you need an ecosystem where developers care about norms at all, and where the legal and institutional concepts can handle what agents do. The report breaks this into four aims that depend on one another (§12, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=72" target="_blank" rel="noopener">p. 72</a>).</p>
+
+  <h3>The four sub-aims</h3>
+  <table class="kv">
+    <tr><th>Aim</th><th>The question, in plain terms</th></tr>
+    <tr><td>1. Incentives</td><td>How do you get agent developers to learn existing contextual norms and follow them, instead of bolting on privacy and security at the end as a compliance chore?</td></tr>
+    <tr><td>2. Reasonable expectations, widened</td><td>The legal idea of a "reasonable expectation of privacy" grew up around governments and private individuals. Agents sit in many more relationships than that. How should the idea stretch to cover them?</td></tr>
+    <tr><td>3. Absorbing domain wisdom</td><td>How do you build processes and systems flexible enough to take in what experts in a field (medicine, education, finance) know about that field's ends, purposes and values, and to connect particular data flows or state changes to those ends?</td></tr>
+    <tr><td>4. Two hard cases</td><td>How do you define contextual roles for new kinds of actor, such as tech companies and the agents themselves? And how do you judge an action that helps one context while harming another?</td></tr>
+  </table>
+  <p>Our reading of why this is harder for agents: Aim 4 is the sharp one. CI analysis usually starts by naming who is sending, who is receiving and in what role. A physician and a patient have well-understood roles. An agent that reads your email, drafts a reply and pings a vendor has no settled role, and neither does the company running it. Aim 3 is about scale. Norms in a domain are often implicit, so a system that cannot take in expert judgment will default to whatever its builders guessed.</p>
+
+  <h3>Who carries the burden: capability, vantage point, exposure</h3>
+  <p>Before getting to what the norms should be, the report asks a prior design question: how should responsibility be spread across the agent ecosystem so that these preconditions can actually develop? Its answer is one organizing principle.</p>
+  <blockquote class="q"><span>"obligations ought to be assigned to actors in line with their capability, vantage point, and exposure to manage the risk."</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=72" target="_blank" rel="noopener">§12, p. 72</a></span></blockquote>
+  <p>Two things follow from this, according to the report. Users can trust and adopt the technology because the harm no longer lands on them by default. And the responsible party keeps the freedom to choose <em>how</em> it meets the obligation. The report backs this with two historical precedents.</p>
+  <ul>
+    <li><b>Credit cards and the Fair Credit Billing Act (1974).</b> Early on, people were afraid of unlimited liability for card fraud, and that fear held back adoption. In the report's account, the Act capped consumer exposure at 50 USD and moved the remaining cost of fraud to card issuers. The point was public trust. Because issuers now paid for fraud, they invested heavily in detecting and preventing it, and no law had to say which technology to use (pp. 72–73).</li>
+    <li><b>Accessibility and the Americans with Disabilities Act (1990).</b> Building codes set performance floors: a structure must bear a given load, a public space must be accessible. They do not dictate materials or layouts. The duty falls on whoever controls the design decisions, not on the people who have to live with the result (p. 73).</li>
+  </ul>
+  <p>The shared pattern, as the report puts it, is that putting responsibility on capable actors produced investment, trust and adoption without mandating the technical form of the solution. It suggests, carefully ("could guide"), that a similar logic could work for agents.</p>
+  <p>Our reading: for agents, the actor with capability and vantage point is usually the platform or developer. They can see the whole tool chain, log every flow and change the model. The user sees one chat window. The precedents argue for making the platform own the outcome ("no inappropriate flow of your health data") rather than writing a rule like "use prompt-injection filter X," which would be out of date within a year. The report does not say who exactly should carry which obligation. That allocation is part of what is open.</p>
+  <p>The report also gives a working definition. Agentic governance means the rules, practices, processes and technical tools that shape how agents are built and deployed. A CI-specific version looks at how those rules govern, and create incentives for, appropriate information flows and behaviors.</p>
+
+  <h2 id="op-12-2">OP 12.2 · Determining the norms</h2>
+  <p>In CI, a norm is a settled accommodation of a context's values, ends and purposes. It is what a community has come to treat as an appropriate flow in some social domain. OP 12.2 asks two things (§12.1, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=73" target="_blank" rel="noopener">p. 73</a>). First, how should the norms agents follow be sourced? Second, what governance mechanisms can formally update a norm that has stopped serving its context? The report offers at least three routes for the first question. It does not pick one, and in practice they would likely be combined.</p>
+
+  <h3>Route 1: a top-down baseline</h3>
+  <p>Companies and governments set minimum standards, the way building codes and accessibility rules set floors for the built environment. Platform providers and regulators would state minimum requirements for how agentic systems handle information flows, or carry out state changes, in a given context.</p>
+  <p>The report adds a transparency problem specific to agents. When an agent acts for a user and touches a third party's data, the vendor may or may not receive that data, depending on how the system is built. A vendor running the agent inside a trusted execution environment, or on the user's device, need not see the data at all. The third party usually cannot tell which setup it is dealing with. A baseline has to address that. A way to picture this: an airline's booking API serves an agent and has no idea whether the passenger details it returns go only to the traveler's phone or also into the vendor's logs.</p>
+
+  <h3>Route 2: empirical discovery, and a public norm repository</h3>
+  <p>The second route is to study the norms people in specific domains actually hold: what they expect, rely on and consider appropriate. The report insists this is not open-ended social science. To be useful for governance it has to look forward, track the technologies that are coming, and focus on the settings agents are about to enter.</p>
+  <p>The concrete proposal is a <b>public norm repository</b>: a structured catalog of context-specific information norms that agents could query and respect. The report sees it as shared infrastructure for two audiences, developers building norm-aware systems and regulators who want policy grounded in evidence. It comes back in §12.2 as an audit benchmark (see <a class="lnk" href="#op-12-4">OP 12.4</a>).</p>
+  <p>Our reading: the repository is the governance counterpart of the policy engine in §6. The engine needs a source of norms to evaluate a flow against, and the repository is one candidate. The hard parts the report leaves open include who curates it, how entries are versioned when a norm changes (the second half of OP 12.2), and how an entry is turned into something machine-checkable.</p>
+
+  <h3>The Katz parallel</h3>
+  <p>The report notes that norm-sourcing is as much an empirical question as a doctrinal one, and that the law already does a version of it. The Fourth Amendment's "reasonable expectation of privacy" test, set out in <em>Katz v. United States</em> (1967), asks which expectations society accepts as reasonable. CI asks something structurally similar: which flows do people treat as appropriate in this context? The difference is scope. The Katz test was built around government versus private actors. Agents mediate far more relationships: user and service provider, user and third party, and the several principals whose interests meet in one agentic interaction (pp. 73–74). This is sub-aim 2 of OP 12.1, now framed as a sourcing problem.</p>
+
+  <h3>Route 3: AI that performs the CI heuristic</h3>
+  <p>The third route treats norms as neither stipulated nor empirically given. Agents would apply CI's decision heuristic themselves and make carefully contextualized decisions on the fly about which norms, established or not, serve a context's ends, purposes and values (p. 74). The report points to Benthall &amp; Cummings (2026) for this idea. Agents would consider fixed or architectural features of their system context and also observe user behavior, as in Criado &amp; Such (2015), which the report cites. Sometimes agents may have to communicate with each other to set norms dynamically. The report thinks this could matter most when agents serving different principals meet in a fast-changing environment, where nobody can wait for norms to settle into institutional or empirical fact. Agents may have to anticipate what users or policymakers will come to see as legitimate.</p>
+  <p>Our reading: this is the boldest of the three, and it pulls in everything §8 says is still unsolved about model reasoning. An agent that invents a norm in the moment needs exactly the capability the report elsewhere calls an open problem. That is presumably why it is listed as an option, not a recommendation.</p>
+  <table class="kv">
+    <tr><th>Route</th><th>Norms come from</th><th>Strength</th><th>Open gap</th></tr>
+    <tr><td>Top-down baseline</td><td>Regulators, platform providers</td><td>Clear floors, enforceable</td><td>Coarse; must handle the vendor-visibility problem</td></tr>
+    <tr><td>Empirical + repository</td><td>Studied practice in each domain</td><td>Grounded in real expectations; queryable</td><td>Curation, coverage, keeping it current</td></tr>
+    <tr><td>AI performs the heuristic</td><td>Agent reasoning at run time</td><td>Covers novel, fast-moving settings</td><td>Depends on unsolved model capabilities (§8)</td></tr>
+  </table>
+  <p class="mono">The table is our summary of §12.1; the strength and gap columns are our reading.</p>
+
+  <h2 id="op-12-3">OP 12.3 · When norms conflict across jurisdictions</h2>
+  <p>Even once norms have been found, they may disagree. Agents cross cultural, geographic and organizational boundaries by design, so the compliance landscape is badly fragmented. The report's example is an agent that, in one session, books travel, manages health records and negotiates contracts, and so falls under several jurisdictions' data-protection regimes whose requirements differ and sometimes conflict (§12.1, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=74" target="_blank" rel="noopener">p. 74</a>).</p>
+  <blockquote class="q"><span>"For developers of agentic systems, this is not an edge case but a routine feature of how agents operate."</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=74" target="_blank" rel="noopener">§12.1, p. 74</a></span></blockquote>
+  <p>Our reading of why this is harder for agents: a traditional app has a known deployment region, a legal team, and a release cycle in which compliance is checked. An agent's jurisdictional exposure changes mid-task, with every tool call, and nobody reviews each step.</p>
+  <p>The report gives two directions, both labeled as worth exploring:</p>
+  <ul>
+    <li><b>Map the rules systematically.</b> Build a map of local regulatory requirements and privacy and security norms. That map would be a prerequisite for "dynamic legal and cultural alignment," where an agent adjusts how it handles information and behaves according to the jurisdiction and context it is in at any given moment.</li>
+    <li><b>Teach agents conflict-of-laws.</b> Private international law already has principles for deciding whose law applies when several overlap. The report suggests training agents on them, citing Kohl (2007), Berman (2012) and Svantesson (2017).</li>
+  </ul>
+  <p>Our reading: the first direction is a jurisdiction-aware cousin of the norm repository. The second asks the model to do legal reasoning that human lawyers find hard, so it inherits the same reliability concerns as Route 3 above. Neither direction says what an agent should do when the conflict cannot be resolved. A conservative default, such as following the strictest regime or stopping to ask, would be one answer. The report does not propose one.</p>
+
+  <h2 id="op-12-4">OP 12.4 · Incentivizing and verifying compliance</h2>
+  <p>§6 covered how agents can enforce norms on themselves at run time. §12.2 asks a separate question that is just as important: how do we check, at scale, that agents actually followed contextual norms, and hold the right actors accountable when they did not (§12.2, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=74" target="_blank" rel="noopener">p. 74</a>)?</p>
+
+  <h3>Who enforces norms today</h3>
+  <p>No single authority enforces contextual norms. The report lists four forces, each with its own tools, which usually work together:</p>
+  <table class="kv">
+    <tr><th>Actor</th><th>Mechanism</th></tr>
+    <tr><td>Courts</td><td>Adjudication and liability</td></tr>
+    <tr><td>Regulators</td><td>Statutory compliance and penalties</td></tr>
+    <tr><td>Companies</td><td>Internal policy and platform governance</td></tr>
+    <tr><td>Professional bodies (including domain experts)</td><td>Standards and sanctions</td></tr>
+  </table>
+  <p>The report groups these into two categories: institutional and legal governance, and governance through technology.</p>
+
+  <h3>Why ex-post enforcement is too slow</h3>
+  <blockquote class="q"><span>"Institutional and legal mechanisms are necessary but not sufficient."</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=75" target="_blank" rel="noopener">§12.2, p. 75</a></span></blockquote>
+  <p>The report gives two reasons. First, speed: agents act faster and more autonomously than traditional after-the-fact regulation can follow. By the time a court rules or a regulator investigates, the flow has already happened and the harm may be irreversible. Second, enforcement itself moves private information. Investigating usually means reporting personal data to an investigating or enforcing party, and that flow has its own norms, which can be broken. The report's analogy is evidence gathered without a warrant leading to a mistrial. Its conclusion is that enforcement cannot depend entirely on after-the-fact correction and has to be built into the systems.</p>
+  <p>The norm repository from OP 12.2 does double duty here. Agents can query it at run time, and auditors can use it afterward as a benchmark for an agent's information-handling decisions. Because investigation and enforcement may themselves happen at machine speed and in new situations, the report also sees a need for agents that can evaluate CI norms on the fly when static guidance runs out.</p>
+
+  <h3>Compliance records produced at the moment of action</h3>
+  <p>The section's most concrete idea is this. Formal models of context and normative reasoning do more than tune agent behavior at run time. They also produce a record of which norms were applied to a given flow, and why. The report argues that this inspectable record turns governance through technology from a design technique into an accountability mechanism. Decisions become auditable one by one, and also in cross-agent interactions where responsibility is otherwise hard to trace. Afterward you can determine which norms were applied, by whom, and whether they were appropriate. Enforcement and the auditable compliance record would both happen when the agent acts, instead of being reconstructed months later in a regulatory investigation (p. 75). The report closes the section by keeping law in the loop: legal and regulatory mechanisms are still essential for setting the norms and for accountability when systems fail.</p>
+  <pre class="code-block"><code># A way to picture one record (our illustration, not a format from the report)
+flow:      user.lab_results -&gt; insurer_agent
+context:   healthcare / claims
+norm:      "share diagnosis codes needed for the claim; withhold full results"
+source:    norm-repository entry, version N
+decision:  allow (codes only); redact remainder
+decided_by: policy engine on behalf of user's agent
+time:      at action, before the send</code></pre>
+  <p>Our reading: for this record to count as accountability it has to be trustworthy. The point §9.3 makes about agents being unreliable narrators of their own actions applies here. A record the task model writes about itself is weak evidence. It is stronger when the policy engine or a separate trusted path writes it, which ties OP 12.4 back to the audit and accounting problems in §7 and §9.</p>
+
+  <h2 id="conclusion">§13 · Conclusion</h2>
+  <p>The conclusion is short and adds no new problems (§13, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=76" target="_blank" rel="noopener">p. 76</a>). It retraces the arc. The report starts with a perspective on agentic privacy and security grounded in Contextual Integrity. It then raises open questions at each component level: system-level enforcement abstractions, model-level capabilities, and user interaction. It ends with problems that appear once agents are deployed into complex environments: evaluation, multi-agent interaction, and the governance of behavioral norms covered on this page. The closing request is the same as the executive summary's: that researchers across academia, government and industry work together on contextual foundations for a safe, secure, privacy-respecting agent ecosystem. The report is a list of questions, not answers, and it says so.</p>
+
+  <div class="callout">The governance chapter's practical point is that a norm only becomes accountability if it can be checked when the agent acts. Builders should log which norm justified each sensitive flow, have something other than the task model write that log, and design for obligations that specify outcomes rather than mechanisms.</div>
+
+  <h2 id="connections">Connections</h2>
+  <p>§12.2 explicitly builds on <a class="lnk" href="policy-engines.html">the contextual policy engine</a> (§6): run-time self-enforcement is the engine's job, and the norm repository is a natural source for it. The decision heuristic behind Route 3 is explained in <a class="lnk" href="../concepts/contextual-integrity.html">Contextual Integrity, applied to agents</a>, and the model-side limits it runs into are in <a class="lnk" href="model-reasoning.html">Teaching models contextual reasoning</a>. Agents negotiating norms with other agents, and responsibility that is hard to trace across them, continue <a class="lnk" href="multi-agent-norms.html#op-11-1">Shared norms, delegation, composition</a>. For audit trails a model cannot rewrite, see <a class="lnk" href="trust-recourse.html">Trust, stop buttons, accountability</a> and the accounting problems in <a class="lnk" href="identity-authorization.html">Identity, authorization, accounting</a>.</p>
+
+  <h2 id="reading">Further reading, verified</h2>
+  <ul class="readings">
+    <li><a href="https://doi.org/10.1515/9780804772891" target="_blank" rel="noopener">Privacy in Context: Technology, Policy, and the Integrity of Social Life</a> &mdash; Nissenbaum (2009) &middot; the CI source text; the report cites it for extending reasonable-expectation reasoning to the relationships agents mediate.</li>
+    <li><a href="https://www.law.cornell.edu/supremecourt/text/389/347" target="_blank" rel="noopener">Katz v. United States, 389 U.S. 347</a> &mdash; U.S. Supreme Court (1967) &middot; the origin of the "reasonable expectation of privacy" test the report compares CI norm-sourcing to.</li>
+    <li><a href="https://doi.org/10.1016/j.ins.2015.07.013" target="_blank" rel="noopener">Implicit Contextual Integrity in Online Social Networks</a> &mdash; Criado &amp; Such (2015) &middot; cited for agents inferring norms from observed user behavior.</li>
+    <li><a href="https://doi.org/10.1561/3300000016" target="_blank" rel="noopener">Contextual Integrity through the Lens of Computer Science</a> &mdash; Benthall, Gürses &amp; Nissenbaum (2017) &middot; the report's reference survey of how CI has been applied in computing.</li>
+    <li><a href="https://doi.org/10.1093/oso/9780198795674.001.0001" target="_blank" rel="noopener">Solving the Internet Jurisdiction Puzzle</a> &mdash; Svantesson (2017) &middot; one of three conflict-of-laws works cited for agents in overlapping jurisdictions.</li>
+    <li><a href="https://www.ada.gov/" target="_blank" rel="noopener">The Americans with Disabilities Act (ADA.gov)</a> &mdash; U.S. Department of Justice &middot; the statute behind the report's performance-floor precedent (the report cites Burgdorf, 1991 and Murdoch &amp; Jawer, 1992 for its analysis).</li>
+  </ul>
+
+  <div class="callout">Next: <a class="lnk" href="../guide/ten-minutes.html">Read it in 10 minutes</a> &middot; Back to the <a class="lnk" href="../index.html#ecosystem">map</a>.</div>
+</main>
+<footer>Original explanation of <em>Open and Emergent Problems in Agentic Privacy and Security: A Contextual Angle</em> (Bagdasarian, Tsai et al., 2026), §12–13. The report is &copy; its authors; this page explains and links, it does not copy.</footer>
+</body>
+</html>

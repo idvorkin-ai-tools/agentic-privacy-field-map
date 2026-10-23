@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mental models and the end of notice-and-choice &mdash; Agentic privacy, mapped</title>
+<meta name="description" content="Why users misjudge what agents do, why one-time Allow buttons cannot carry consent for agents, and what dynamic, policy-based control would need." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../paper.css" />
+</head>
+<body>
+<header class="bar"><div class="bar-in">
+  <div class="brand"><span class="dot"></span>AGENTIC&nbsp;PRIVACY&nbsp;//&nbsp;FIELD&nbsp;MAP</div>
+  <a class="back" href="../index.html#components">&larr; field map</a>
+</div></header>
+<main>
+  <div class="eyebrow"><span class="box bb mono">PART II · COMPONENTS · 05 OF 06</span><span class="mono">§9 intro, §9.1–9.2 · pp. 50–56 · OP 9.1–9.4</span></div>
+  <h1>Mental models and the end of notice-and-choice</h1>
+  <div class="authors">Users cannot predict what an agent will do, so a one-time "Allow" cannot mean what it used to.</div>
+  <div class="paperlink" style="border-left-color:var(--def)"><span class="lbl">Source</span><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=50" target="_blank" rel="noopener">§9 User-Level Issues, §9.1–9.2, pp. 50–56 ↗</a></div>
+
+  <div class="tldr"><b>TL;DR &mdash;</b> People carry a picture of how software works: you press a button, a fixed sequence runs, and the risk comes from bad apps. Agents break that picture in five ways, from unpredictable plans to memory that quietly builds a profile. The consent machinery built on that picture (notice, a dialog, Allow or Deny) was already shaky before agents, and agents break it in four specific ways. The report's direction is to move from static permission to dynamic control: interrupt the user only when the stakes warrant it, steer the rest with user policies, and keep those policies editable. It ends on a legal gap: when an agent clicks "Buy Now," the click no longer proves a human meant it.</div>
+
+  <p class="lead">Part II of the report splits the problem into three levels: the system around the agent, the model inside it, and the user in front of it (§1.2). This page is the user level. The two earlier component pages ask how to fence and steer the agent; this one asks what the person is supposed to understand and decide. The report frames §9 as three needs: accurate mental models, a shift from static consent to dynamic and contextual control, and user trust (<a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=50" target="_blank" rel="noopener">§9, p. 50</a>). The first two are covered here. Trust, stop buttons and accountability (§9.3) have their own page. The premise is blunt: if agents could do every task flawlessly and provably, users could step out of the loop. They cannot, so the open question is what role the user should play and what role they want.</p>
+
+  <h2 id="op-9-1">OP 9.1 · How users picture agents, and how to keep that picture current</h2>
+  <p>The problem asks two things. First, how do people's ideas about privacy and security differ when the thing in front of them is an agent rather than an app or a website? Second, what mechanisms would help them form a correct picture, and then correct and refresh it as the agent changes (<a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=50" target="_blank" rel="noopener">OP 9.1, p. 50</a>)? The second half matters as much as the first. A mental model is not formed once; it goes stale as the agent's model, memory and tools change underneath it.</p>
+  <p>The report gives five reasons the old picture fails, one per subsection.</p>
+
+  <h3>1. The workflow is open-ended and brittle (§9.1.1)</h3>
+  <p>A script or a program runs a fixed sequence. An agent picks its steps at run time from the current context, so the user cannot know ahead of time which tools it will call or which data it will touch (also noted in §7.5). Worse, the plan is "jagged": the language model that writes it is sensitive to small input changes, so the same task can produce different plans for different users or on different days. That inconsistency hides errors. When the agent does something unexpected, the user cannot tell whether it made a mistake or simply took another route (<a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=51" target="_blank" rel="noopener">§9.1.1, p. 51</a>).</p>
+
+  <h3>2. The interface is social, and the parties multiply (§9.1.2)</h3>
+  <p>Agents talk in natural language, so people treat them like people. The report says this leads users to apply social privacy reasoning (what would I tell a friend?) instead of the institutional expectations they bring to software, which produces misplaced trust and riskier sharing. It also gives the agent a kind of influence over beliefs that a settings page never had, and the report notes that attackers could exploit this to manipulate users through their own agent.</p>
+  <p>The second shift is in who is involved. Classic systems have a known set of parties, often authorized through something like OAuth 2.0, which the report cites. An agent can talk to other people and other agents on the user's behalf, which makes the interaction many-to-many, with a different level of trust for each party. It also processes collaborative data, such as shared email threads, meeting transcripts and other people's documents, so the person typing the prompt is no longer the only data subject. The key line here is about authentication:</p>
+  <blockquote class="q"><span>"authenticated channels do not imply governable behavior."</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=51" target="_blank" rel="noopener">§9.1.2, p. 51</a></span></blockquote>
+  <p>Our reading: a login tells you who is on the other end, not what will be said. Because the agent writes each exchange on the fly, and stochastically, knowing that a channel is authenticated says little about which information will cross it.</p>
+
+  <h3>3. Risk can come from a trusted agent (§9.1.3)</h3>
+  <p>Users have learned that danger comes from malicious software running on a trusted platform. An agent can hurt them without being compromised at all, just by making a mistake while doing a sensitive task. The report's example is an agent that flips a social media account from private to public. The other new risk is merged contexts. A multi-tool plan can cross personal, work and social domains, and stray events or ambiguous data can pull those contexts together, so something from a private setting ends up in a public one. The report links this to the model-level question of reasoning under ambiguity (§8.2).</p>
+
+  <h3>4. The agent changes over time (§9.1.4)</h3>
+  <p>Two things drift. Memory builds a profile of the user, often without direct supervision, which leaves a large footprint the user cannot easily see, and which may not match their actual preferences. The underlying model also changes. The report cites research showing that different models and prompting methods leak private information at different rates, while users tend to treat "the AI" as one thing. A new model release, or a cheaper downgrade, can change behavior without the user noticing. Its suggestion, framed as something that "could help," is to surface these differences to users (<a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=52" target="_blank" rel="noopener">§9.1.4, p. 52</a>).</p>
+
+  <h3>5. Merged contexts, infinite memory and bystanders (§9.1.5)</h3>
+  <p>This subsection gathers four failures that make the earlier ones concrete.</p>
+  <ul>
+    <li><b>Bridged silos.</b> The report's example: an agent that ties a personal dinner request to a work calendar can reveal medical dietary restrictions to an employer. Each context had its own norms, and the agent ran them together.</li>
+    <li><b>Infinite memory.</b> An instruction given years ago can outlive the life it was written for. After a marriage or a child, old permissions may no longer fit. The report's ideal is an agent that abstains or asks for fresh context (also §8.3).</li>
+    <li><b>Bystanders.</b> When an agent scans a user's messages and photos, it handles data about friends, family and colleagues who never used the system. The user is in effect making a consent decision on their behalf.</li>
+    <li><b>Fluency mistaken for discretion.</b> People assume a fluent agent understands unwritten rules, such as not mentioning a job search to the boss. The report says the system treats input as raw data unless told otherwise, so users may lower their guard and share more than they would with a tool they saw as a tool.</li>
+  </ul>
+  <p>What a good answer to OP 9.1 would have to do, in our reading: measure how agent mental models actually differ from app models (the report poses this as a question, not a finding), and design ways to update the user's picture when the agent's model, memory or behavior shifts, not just at first use. For memory specifically, the sibling <a class="lnk" href="https://idvorkin-ai-tools.github.io/cimemories-field-map/" target="_blank" rel="noopener">CIMemories field map</a> covers a benchmark on how agents misuse remembered facts across contexts.</p>
+
+  <h2 id="op-9-2">OP 9.2 · Thinking past notice and choice</h2>
+  <p>Notice and choice is the familiar model: a service tells you what it does with your data and gives you options. The report reminds us that it was in trouble well before agents (<a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=52" target="_blank" rel="noopener">§9.2, p. 52</a>). Data practices got too complex to follow. Empirical work doubts that privacy notices leave readers better informed, and philosophical work doubts that consent in these settings means much. The concrete evidence it cites spans Windows User Account Control prompts, iOS and Android app permissions, cookie dialogs and browser permission prompts: across all of them, asking too often undermines the very goal of informing users and giving them control.</p>
+  <p>Agents make this worse. They are unpredictable and act faster than a person can follow. The report concludes that if consent is not reliably tied to what people actually want, notice and consent becomes not just impractical but "normatively unmoored," meaning it loses its claim to legitimacy, not just its usability.</p>
+
+  <h3>Why Contextual Integrity goes further</h3>
+  <p>Contextual Integrity (CI) is the report's lens throughout. Here the report makes a sharper point: CI's challenge to notice and choice is not only that consent dialogs work badly. CI also questions whether individuals should be the ones making fine-grained decisions about personal data at all (<a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=53" target="_blank" rel="noopener">§9.2, p. 53</a>). Two reasons are given. One person's privacy choices can affect others (the report cites Viljoen, 2021; Barocas &amp; Levy, 2020; Barocas &amp; Nissenbaum, 2014). And collective, social and contextual values deserve weight and may override what a single person prefers. So CI leans on substantive norms rather than on possibly uninformed individual clicks.</p>
+  <p>OP 9.2 then asks: if notice and choice was questionable for ordinary software, it is unlikely to work for agents, so what frameworks give users agency and transparency without overwhelming them or gutting the agent's usefulness? Note the two-sided constraint. A design that drowns the user fails, and so does one that makes the agent useless.</p>
+
+  <h2 id="op-9-3">OP 9.3 · Appropriateness when many people are affected</h2>
+  <p>If an agent follows CI, it has to judge whether each action is appropriate, whether that means asking for consent or following a rule. That judgment needs a view of everyone the action touches, not only the person who asked (<a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=53" target="_blank" rel="noopener">§9.2.1, p. 53</a>). OP 9.3 asks how appropriateness can be determined when users, bystanders and other third parties are all in the picture.</p>
+  <h3>Stakeholders and bystanders</h3>
+  <p>The report is careful that this is not new. It cites earlier work showing that camera-based augmented reality headsets affect people nearby and that home IoT devices can play a role in domestic abuse. Its claim is that agents amplify the issue. Two of its examples:</p>
+  <ul>
+    <li>A user asks the agent to email someone. If the email carries adversarial content picked up elsewhere, such as a prompt injection, the recipient is now exposed. The harm lands on a third party.</li>
+    <li>An agent with access to a wearable camera or microphone can capture and share images or conversations of people who never agreed to anything.</li>
+  </ul>
+  <p>As a design habit, the report points to Butler et al. (2025), who urge designers to check regularly that they have accounted for everyone their system affects. It then asks, as an open question, whether agents could consider stakeholders beyond the "default persona" of the imagined typical user (a term from Sim et al.), including at-risk and vulnerable groups.</p>
+  <p>A way to picture this: today's permission check has one principal, the account holder. A good answer to OP 9.3 would need a check with several principals, some of whom are not present, cannot be asked, and may have interests that conflict with the user's.</p>
+
+  <h2 id="static-consent">Where consent still matters, and four ways it breaks</h2>
+  <p>CI does not throw consent out. In CI terms, "with consent" can be the transmission principle that makes a given flow appropriate (the report points back to §4). So the report asks how to make consent work inside an agent, and lists four failures of static consent (<a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=54" target="_blank" rel="noopener">§9.2.2, p. 54</a>):</p>
+  <table class="kv">
+    <tr><th>Failure</th><th>What goes wrong</th><th>The report's example</th></tr>
+    <tr><td>Foreseeability</td><td>You cannot agree to steps nobody knows yet. Fixed features already strained this; agents that choose their own steps break it, since neither user nor developer can fully predict the path.</td><td>An agent infers your location from receipts and calendar invites. "Manage my schedule" may license combinations, like private email cross-referenced with public social media, that no one foresaw.</td></tr>
+    <tr><td>Inference</td><td>Consent covers the raw inputs, but agents combine inputs with other knowledge to produce new insights the consent never mentioned.</td><td>Health conditions or socioeconomic status inferred from grocery purchase history.</td></tr>
+    <tr><td>Binary grants</td><td>Allow/Deny cannot express conditions. Squashing a conditional instruction into one button either cripples the agent or hands it too much authority.</td><td>"Buy plane tickets," but the user would want to reconsider if the price is too high or the layover too short.</td></tr>
+    <tr><td>Volume and fatigue</td><td>Agents spawn many sub-tasks. Asking at each one kills the point of background work and trains users to click "accept" without thinking. Asking rarely and broadly grants too much.</td><td>Confirming every email read or routine reply draft.</td></tr>
+  </table>
+  <blockquote class="q"><span>"signing a blank check for future behaviors and data combinations"</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=54" target="_blank" rel="noopener">§9.2.2, p. 54</a></span></blockquote>
+  <p>Our reading: the last row is a trap with no good setting. Frequent, narrow prompts produce fatigue and rubber-stamping; rare, broad prompts produce over-broad authority. Tuning the frequency alone cannot escape it, which is why the report moves to changing what is asked and when.</p>
+
+  <h2 id="dynamic-control">From static permission to dynamic control</h2>
+  <p>Where consent is what legitimates an action, the report suggests using the agent's own automation to decide how closely it should be supervised. The goal is to replace all-or-nothing grants with a spectrum of control set by identifiable factors (<a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=54" target="_blank" rel="noopener">§9.2.3, p. 54</a>). Three directions follow, all presented as approaches to explore.</p>
+  <h3>Risk-scaled mixed initiative</h3>
+  <p>The agent asks targeted questions when intent is unclear, such as which "Sarah" to email or what tone a message should take. That ties consent to the present context instead of an instruction from months ago. Other actions need no confirmation at all. The idea is a mixed-initiative agent that adjusts its autonomy to the risk, treating the user's attention as a scarce resource and spending it only where an error would justify a human stepping in. The report's three tiers:</p>
+  <ul>
+    <li>Low stakes, like organizing a playlist: proceed automatically.</li>
+    <li>High stakes, like a financial transfer: require explicit confirmation.</li>
+    <li>Risk to third parties: possibly block outright. Here something other than the user's consent wins.</li>
+  </ul>
+  <p>The report cites the Janus permission-management playground (Brigham et al., 2027) as a platform for experimenting with how much to involve the user.</p>
+  <h3>Generative interfaces</h3>
+  <p>When a just-in-time prompt is unavoidable, the agent could build an interface for that specific request rather than reuse one generic dialog. The report suggests showing the request as an information flow: who is involved, what type of data, what could go wrong. The level of detail could vary from sketches and block diagrams to concrete vignettes, like a guest trying to open a camera feed late at night. The aim is lower cognitive load per decision (<a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=55" target="_blank" rel="noopener">§9.2.3, p. 55</a>).</p>
+  <h3>Personal preferences and permission prediction</h3>
+  <p>There is a tension the report names directly: CI doubts individuals' entitlement to fine-grained decisions, yet personal preferences can still be one layer in a hierarchy of policies, alongside legal rules, institutional policies, social norms and developer guidance. Prior work on automated permission assistants decided requests from a user's past choices, similar users' choices and context. For agents, the report describes preliminary work showing that prior decisions predict future ones with high accuracy (it cites Flemings et al., 2026 and Fawaz et al., 2026, and gives no figure). Agents could also read implicit grants from the prompt itself: "send my current location to Alice" implies GPS and contacts access for that one task.</p>
+  
+  <h2 id="op-9-4">OP 9.4 · Letting users supervise automation through policies</h2>
+  <p>Agents move faster than users can follow, so approving each action is not realistic. OP 9.4 asks whether users can instead write policies that steer the agent, how to elicit those policies, and how users can maintain, edit and verify them over time (<a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=55" target="_blank" rel="noopener">OP 9.4, p. 55</a>). The report also flags an open question of how policies should be represented and how to make agents actually follow them.</p>
+  <h3>Onboarding: getting the policy out of the user's head</h3>
+  <p>Users are not necessarily technical and do not have time for long setup. The report sketches strategies with different trade-offs between usability and utility:</p>
+  <table class="kv">
+    <tr><th>Strategy</th><th>Upside</th><th>Downside</th></tr>
+    <tr><td>Walk the user through realistic scenarios, then compress their answers into policies</td><td>Policies that predict what the user would do</td><td>Cumbersome for the user</td></tr>
+    <tr><td>Learn from past behavior, by recall or from logged decisions</td><td>Little effort; matches what the user did</td><td>Past choices may reflect bad interfaces, deceptive patterns or resignation</td></tr>
+    <tr><td>Adaptive interview that models how the user decides</td><td>Listed as a further option</td><td>Not elaborated in the report</td></tr>
+  </table>
+  <p>Our reading: the second row means learning from history can launder bad consent. Clicks made from fatigue or under a dark pattern become policy.</p>
+  <h3>Maintenance: keeping the policy right</h3>
+  <p>Policies need editing for two reasons: the agent did something the user did not want, or the user's preferences changed with life events or new technology. That requires an editable representation. The report suggests the real policy could be in a formal language while users read and edit it in natural language. It names two maintenance mechanisms:</p>
+  <ul>
+    <li><b>In-the-moment disambiguation:</b> the agent pauses to ask when intent is ambiguous or contexts conflict.</li>
+    <li><b>Retrospective editing:</b> the user reviews past actions and fixes the rule behind a wrong inference.</li>
+  </ul>
+  <p>Our reading: a policy that is never revisited is the stale-permission failure of §9.1.5 in another form.</p>
+
+  <h3 id="click-consent">When a click no longer means consent</h3>
+  <p>The section ends on a point that is easy to miss and hard to fix. Automating consent may strip the user of agency, and it collides with infrastructure that assumes a human click proves intent (<a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=55" target="_blank" rel="noopener">§9.2.3, pp. 55–56</a>). The report lists three places that assumption is built in: OAuth consent screens that need a click on "Allow," payment flows where the user confirms details (reinforced in Europe by PSD2 Strong Customer Authentication), and Terms of Service where clicking "I Agree" forms a binding contract.</p>
+  <p>An agent in an authenticated browser session clicks, fills forms and navigates just as a person would. When it clicks "Buy Now," the system logs that the user consented, even if the user never explicitly did.</p>
+  <blockquote class="q"><span>"If the "click" no longer carries its consensual meaning, how does this interact with the current legal, regulatory, and security infrastructure"</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=56" target="_blank" rel="noopener">§9.2.3, p. 56</a></span></blockquote>
+  <p>Two gaps follow. Technically, most authentication protocols, browsers and APIs cannot signal whether a human or an agent is clicking. Legally, the California Consumer Privacy Act lets a user authorize an "agent" to make privacy requests, but that agent is another person or a business. The report says no framework exists for a non-human agent making security and privacy decisions such as consent.</p>
+  <p>Our reading: this is where the user-level problem turns into an identity problem. Fixing it likely needs a way to mark actions as agent-made and to tie them to a specific delegation, which is the territory of the identity and authorization page.</p>
+
+  <div class="callout">Stop treating one approval as consent for whatever an agent does next. Spend the user's attention by risk, keep consent tied to the present task, let editable policies handle the routine, and remember that every click your agent makes is recorded as the user's.</div>
+
+  <h2 id="connections">Connections</h2>
+  <p>The report ties this section to several others. Open-ended workflows are the same problem developers face in <a class="lnk" href="last-mile-developer.html">AI as the last-mile developer</a> (§7.5). Reasoning under ambiguity and abstaining on stale context are model-level questions in <a class="lnk" href="model-reasoning.html">Teaching models contextual reasoning</a> (§8.2, §8.3). "With consent" as a transmission principle comes from <a class="lnk" href="../concepts/contextual-integrity.html">Contextual Integrity, applied to agents</a> (§4). A hierarchy of policies is the input a <a class="lnk" href="policy-engines.html">contextual policy engine</a> must resolve, and the human-or-agent click gap meets <a class="lnk" href="identity-authorization.html">identity, authorization, accounting</a> (our links, not the report's). The third user-level need, trust, continues in <a class="lnk" href="trust-recourse.html">Trust, stop buttons, accountability</a>.</p>
+
+  <h2 id="reading">Further reading, verified</h2>
+  <ul class="readings">
+    <li><a href="https://doi.org/10.1145/1357054.1357219" target="_blank" rel="noopener">You've Been Warned: An Empirical Study of the Effectiveness of Web Browser Phishing Warnings</a> &mdash; Egelman, Cranor &amp; Hong (2008) &middot; cited for the finding that prompting too often undermines informed control.</li>
+    <li><a href="https://doi.org/10.1109/SP.2012.24" target="_blank" rel="noopener">User-Driven Access Control: Rethinking Permission Granting in Modern Operating Systems</a> &mdash; Roesner et al. (2012) &middot; cited on OS permission prompts and on reading implicit grants from user actions.</li>
+    <li><a href="https://doi.org/10.1109/MITP.2016.84" target="_blank" rel="noopener">Security Fatigue</a> &mdash; Stanton, Theofanos, Prettyman &amp; Furman (2016) &middot; cited for prompt and warning fatigue.</li>
+    <li><a href="https://www.yalelawjournal.org/feature/a-relational-theory-of-data-governance" target="_blank" rel="noopener">A Relational Theory of Data Governance</a> &mdash; Viljoen (2021) &middot; cited for why one person's data choices affect others.</li>
+    <li><a href="https://arxiv.org/abs/2605.10012" target="_blank" rel="noopener">Sketch-based Access Control: A Multimodal Interface for Translating User Preferences into Intent-Aligned Policies</a> &mdash; Monteiro &amp; Das (2026) &middot; cited for sketch-level visualization and eliciting user policies.</li>
+    <li><a href="https://arxiv.org/abs/2603.19791" target="_blank" rel="noopener">Text-Based Personas for Simulating User Privacy Decisions</a> &mdash; Fawaz et al. (2026) &middot; cited as preliminary work on predicting users' permission decisions.</li>
+    <li><a href="https://www.rfc-editor.org/rfc/rfc6749" target="_blank" rel="noopener">RFC 6749: The OAuth 2.0 Authorization Framework</a> &mdash; Hardt (2012) &middot; cited as the fixed-party authorization model and the "Allow" consent screen.</li>
+    <li><a href="https://oag.ca.gov/privacy/ccpa" target="_blank" rel="noopener">California Consumer Privacy Act (CCPA)</a> &mdash; California Attorney General &middot; the report notes its "authorized agent" covers people and businesses, not AI agents.</li>
+  </ul>
+
+  <div class="callout">Next: <a class="lnk" href="trust-recourse.html">Trust, stop buttons, accountability</a> &middot; Back to the <a class="lnk" href="../index.html#components">map</a>.</div>
+</main>
+<footer>Original explanation of <em>Open and Emergent Problems in Agentic Privacy and Security: A Contextual Angle</em> (Bagdasarian, Tsai et al., 2026), §9 intro and §9.1–9.2. The report is &copy; its authors; this page explains and links, it does not copy.</footer>
+</body>
+</html>

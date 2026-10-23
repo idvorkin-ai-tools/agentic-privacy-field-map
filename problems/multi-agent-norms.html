@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Shared norms, delegation, composition &mdash; Agentic privacy, mapped</title>
+<meta name="description" content="How agents agree on norms with strangers, why delegation chains lose the user's constraints, and how safe disclosures combine into harm (OP 11.1–11.5)." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../paper.css" />
+</head>
+<body>
+<header class="bar"><div class="bar-in">
+  <div class="brand"><span class="dot"></span>AGENTIC&nbsp;PRIVACY&nbsp;//&nbsp;FIELD&nbsp;MAP</div>
+  <a class="back" href="../index.html#ecosystem">&larr; field map</a>
+</div></header>
+<main>
+  <div class="eyebrow"><span class="box bb mono">PART III · ECOSYSTEM · 02 OF 04</span><span class="mono">§11 intro, §11.1–11.2 · pp. 65–68 · OP 11.1–11.5</span></div>
+  <h1>Shared norms, delegation, composition</h1>
+  <div class="authors">What changes when the other side of an information flow is another agent, and the flow keeps going.</div>
+  <div class="paperlink" style="border-left-color:var(--def)"><span class="lbl">Source</span><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=65" target="_blank" rel="noopener">§11 Towards Trustworthy Multi-Agent Ecosystems, §11.1–11.2, pp. 65–68 ↗</a></div>
+
+  <div class="tldr"><b>TL;DR &mdash;</b> Everything earlier in the report mostly assumes one agent deciding whether one flow is appropriate. Section 11 drops that assumption. Two agents that have never met must first agree on what context they are in (a "contextual handshake"), and that negotiation is itself attackable. Over many interactions, agents can collude or drift into norms nobody wrote down, possibly in channels no human can read. Once tasks are delegated down chains and fanned out in parallel, the user's constraints tend to live only in the first agent's context and quietly disappear downstream. And even if every hop behaves well, the sum of the hops can still reveal something sensitive.</div>
+
+  <p class="lead">This page covers the first half of the report's multi-agent section, the part about norms and composition. The second half (§11.3–11.4, on the <a class="lnk" href="agent-channels.html">next page</a>) is about the plumbing: protocols, attestation, side channels and simulation environments. The framing is set in the section intro (<a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=65" target="_blank" rel="noopener">§11, p. 65</a>): the contextual lens could extend to systems where agents protect user data while dealing with each other. The report gives three reasons this is harder than the single-agent case. Collaboration between agents representing different users (its example is calendar scheduling) benefits from sharing, but needs guardrails so that, say, a doctor's appointment does not leak. Information that flows through delegation chains and graphs creates compositional risk and forces agents to establish and propagate trust. And evaluating any of this needs population-level simulation, not one-conversation tests. The intro also points to de Witt et al. (2025) for a broader taxonomy of multi-agent attack vectors. The executive summary lists "Autonomy and Delegation" as one of the three dimensions that break conventional engineering; this section is where that dimension gets its own open problems.</p>
+
+  <h2 id="op-11-1">OP 11.1 · Establishing shared contextual norms</h2>
+  <p><b>What it asks.</b> Contextual Integrity judges a flow by its parameters: who is sending, who is receiving, what kind of information it is, and under what transmission principle it moves. A single agent can read those off its own situation. In an open ecosystem, though, an agent often meets a party it knows nothing about. Before either side can judge whether a flow is appropriate, they have to agree on the frame: what roles they occupy, which information types are in scope, which transmission principles apply, and even which "task language" they will speak (<a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=66" target="_blank" rel="noopener">§11.1, p. 66</a>). Only then can an agent check behavior against shared norms.</p>
+
+  <h3>Two sources of shared norms</h3>
+  <p>The report sees two ways to get there. Norms could come from a shared source of truth, but building and governing such a source is its own open problem, deferred to <a class="lnk" href="governance.html">§12</a>. Or they could be negotiated on the spot. The report calls the second option a <em>contextual handshake</em>: agree on norms first, then do the task.</p>
+  <p>A way to picture this: a TLS handshake settles which cipher both sides will use before any application data moves. A contextual handshake settles which norms both sides will honor before any personal data moves. "I am a pharmacy agent acting as a dispensing pharmacy; you are a patient's assistant; prescription history is in scope; it flows under need-to-know for this refill only."</p>
+  <p>The report adds a useful property. If a handshake succeeds, its result can outlive the exchange: the agreed transmission principles could travel with the task down a delegation chain. It is careful to separate that from compliance. Agreeing on norms says nothing about whether the other side, or anyone it hands off to, will honor them. That verification problem is pushed to attestation in <a class="lnk" href="agent-channels.html#op-11-7">§11.3</a>.</p>
+
+  <h3>Negotiating with someone you do not trust</h3>
+  <p>The hard part is that the counterparty may be adversarial, and the negotiation runs on the same kind of unstructured input that enables prompt injection. The report suggests the negotiation might be shielded the way some prior designs shield policy generation from untrusted context, citing Tsai &amp; Bagdasarian (2025), which is the Conseca line of work, and Debenedetti et al. (2025), which is CaMeL. Both keep the step that decides "what is allowed" away from data an attacker controls. It frames this as a "perhaps", not a result.</p>
+  <p>It then lists questions it would like answered: how to represent the negotiable parts of context, and what happens when the two sides do not converge. Options it names are refusing the interaction, escalating to the user, or bringing in a trusted mediator.</p>
+
+  <h3>The semantic downgrade attack</h3>
+  <p>Each of those fallbacks is a new surface. The report's sharpest observation in this subsection:</p>
+  <blockquote class="q"><span>"an adversarial counterparty could claim incompatibility to force a fallback to a compromised channel, creating a semantic downgrade attack analogous to protocol stripping on the early web."</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=66" target="_blank" rel="noopener">§11.1, p. 66</a></span></blockquote>
+  <p>Our reading: the web analogy is SSL stripping, where an attacker in the middle keeps a victim on plain HTTP by pretending the secure version is unavailable. Here, the "insecure version" might be a looser default norm set, a mediator the attacker influences, or a user prompt designed to be clicked through. The lesson carries over directly: a handshake is only as strong as what it does when it fails. A good design has to treat "we could not agree" as a reason to do less, not a reason to fall back to something weaker.</p>
+
+  <h3>What a good answer would need</h3>
+  <ul>
+    <li>A representation of negotiable context that is machine-checkable, not free text.</li>
+    <li>A negotiation procedure that stays sound when one party is lying, and that is isolated from injected content.</li>
+    <li>A failure mode that cannot be exploited to downgrade protections.</li>
+    <li>A way to carry the result downstream, paired with some way to check it was honored.</li>
+  </ul>
+
+  <h2 id="op-11-2">OP 11.2 · Preventing collusion and drifting norms</h2>
+  <p><b>What it asks.</b> Agents that interact repeatedly may settle into stable coordination patterns, form coalitions, or collude for shared goals at the expense of other agents or users. The report cites Nakamura et al. (2026) as having observed this. It also cites Ashery et al. (2025) on a related effect: populations of interacting models can develop and spread collective biases that no individual model was given, drifting away from the norms that were supposed to govern the system (<a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=66" target="_blank" rel="noopener">§11.1, p. 66</a>).</p>
+  <p><b>Why it is hard.</b> The behavior may only exist at the population level and may build slowly. Inspect any single agent, or any single conversation, and it looks compliant. This is the compositional theme of the whole page in its first form: local compliance does not imply system-level compliance. The report's conclusion is that the whole multi-agent system needs ongoing re-evaluation and control, not a one-time certification of each part.</p>
+
+  <h3>When the transcript disappears</h3>
+  <p>The report then raises a less familiar version of the problem. If agents are optimized jointly for task performance, their messages may drift from human language toward machine-efficient encodings. Some proposals go further and have agents exchange embeddings or latent states, dropping transcripts entirely; the report cites Zou et al. (2026) on latent collaboration. That breaks the basic tool of information-flow auditing. If the message is a tensor, what would it even mean to say whether it contained a diagnosis?</p>
+  <p>Even plain text may not save you. The report cites Laurito et al. (2025), who found that language models favor LLM-generated text over human-written text. From that it infers that agents built on the same base model share priors, and so may coordinate implicitly by converging on the same salient choices, with nothing suspicious visible in any transcript.</p>
+  <p>A way to picture this: two copies of the same model, asked separately to "pick a meeting point in New York", may both say Grand Central without ever talking. Scale that up to pricing, bidding or which data to share, and you get coordination with no message to audit.</p>
+
+  <h3>The report's questions</h3>
+  <table class="kv">
+    <tr><td>Readability</td><td>When must the language between agents stay human-readable?</td></tr>
+    <tr><td>Protocol drift</td><td>How do you detect that a protocol's use has drifted semantically from what it was defined to mean?</td></tr>
+    <tr><td>Diversity</td><td>How do you measure the effective diversity of a population of interacting agents?</td></tr>
+  </table>
+  <p>Our reading: the diversity question is the quiet one worth remembering. If correlated priors enable invisible coordination, then monoculture is itself a risk factor, and "how many genuinely different agents are in this market?" becomes a security metric.</p>
+
+  <h2 id="delegation">Delegation chains and the vacation example</h2>
+  <p>Section 11.2 opens with a scenario that anchors the next three problems (<a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=67" target="_blank" rel="noopener">§11.2, p. 67</a>). A user asks a personal assistant to book a vacation. The assistant contacts a flight agent, which queries an airline API; a hotel agent, which reads loyalty program data; and an insurance agent, which asks for health information. Each hop may be governed by different norms about who may send what to whom under which transmission principle.</p>
+  <pre class="code-block"><code>user
+ └─ personal assistant
+     ├─ flight agent ─────── airline API
+     ├─ hotel agent ──────── loyalty program data
+     └─ insurance agent ──── health information
+          (quotes may be solicited from several insurers in parallel)</code></pre>
+  <p>The report widens the picture in two ways. Delegation is not only a chain; it can be broadcast, for example soliciting competing quotes from several insurers at once, or coordinating with an employer, a healthcare provider and a financial advisor in parallel, or negotiating for several household members whose privacy preferences overlap but differ. And each of those concurrent relationships has its own trust level. The report's example: a user may trust the employer's HR agent with salary but not medical history, and the reverse for a healthcare agent.</p>
+
+  <h2 id="op-11-3">OP 11.3 · Preserving constraints during delegation or parallel execution</h2>
+  <p><b>What it asks.</b> When an agent hands control to another agent, or runs several actions at once, the overall system has to manage a portfolio of live trust relationships, decide disclosures per stakeholder, and account for the fact that those stakeholders may talk to each other. It also has to propagate consent and privileges correctly as it delegates. The report says plainly that how and when to do this safely is open.</p>
+
+  <h3>Open marketplaces</h3>
+  <p>The problem gets worse when downstream agents are not known in advance. The report anticipates marketplaces where agents discover and contract with previously unknown service agents at runtime. The trust topology then becomes multi-hop, multi-party and possibly adversarial. The report argues that agents will have to reason about flows across a graph of heterogeneous agents with unverified capabilities, competing incentives and conflicting obligations, while still preserving what the user expected.</p>
+  <p>It makes a pointed observation about the state of the art: applying CI to LLM agents has so far been done for <em>dyadic</em> flows between identifiable actors. One sender, one receiver, both known. Transitive, parallel and dynamically changing delegation topologies, where transmission principles can change as information crosses trust boundaries, are not yet covered. Two follow-up questions: how should the user's original constraints change, if at all, as they cross successive boundaries? And can agents be marked as acting in particular capacities or roles that make sense in a given social context?</p>
+
+  <h3>Trust attenuation and consent propagation</h3>
+  <p>This is the most practically important paragraph in the section. The report notes that the user's intent and data constraints often live only in the first agent's context window. Each further delegation risks privilege escalation, leakage of system context, or simply losing the constraints. Add runtime discovery of new tools and peers whose trustworthiness is not established, and each new counterpart may need verifying through attestation, which raises the question of whether that can be done efficiently at runtime.</p>
+  <p>Our reading: the failure is mundane. The assistant knows "do not share my diagnosis with anyone except the insurer, and only for this quote." It sends the insurance agent a task description. Whatever the task description does not say, the insurance agent does not know. Natural-language delegation is lossy by default, and constraints are the first thing lost because they do not help the subtask get done.</p>
+  <p>The report notes that CI transmission principles can already express the conditions you would want to carry along, naming reciprocity, need-to-know disclosure and legal compulsion. The missing piece is enforcement across hops. It calls for a formal model of trust attenuation: how constraints are preserved or modified at each boundary, and how compliance is enforced and audited across the ecosystem. It adds a refinement: the issue is not only that constraints fade with distance from the original prompt, but that the system must keep track of the roles or capacities in which each intermediary is acting.</p>
+  <p>A way to picture this: capability tokens in systems security can be narrowed but never widened as they are passed along. An attenuating delegation for agents would work the same way: each hop can narrow scope, purpose and recipients, and none can broaden them. The report does not prescribe this; it asks for the formal model.</p>
+
+  <h2 id="op-11-4">OP 11.4 · Orchestrating large agentic swarms</h2>
+  <p><b>What it asks.</b> As the number of spawned agents grows to hundreds or thousands, we need efficient ways to monitor and audit each one so that (1) every agent complies with contextual norms and (2) the swarm collectively does not violate them (<a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=68" target="_blank" rel="noopener">§11.2, p. 68</a>).</p>
+  <p><b>The evaluation gap.</b> The report uses this problem to point at what current benchmarks miss. They typically measure disclosure in a single interaction against CI parameters and the user's consent. They do not test how the scope of that authorization should evolve as work is delegated. The test the report wants is precise:</p>
+  <blockquote class="q"><span>"whether consent granted at hop n is inappropriately assumed at hop n + k."</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=68" target="_blank" rel="noopener">§11.2, p. 68</a></span></blockquote>
+  <p>It also suggests such benchmarks may need to model the roles the many agents in play are assuming.</p>
+
+  <h3>Heterogeneous normative regimes across hops</h3>
+  <p>Different agents in one chain may answer to different rules. The report's example: the personal assistant is governed by EU data protection norms (GDPR), a downstream provider operates under US sectoral rules (HIPAA, FERPA), and a third follows corporate-internal policy. Something one regime allows under its transmission principles, another may forbid.</p>
+  <p>The handshake from OP 11.1 can resolve a conflict for one pair of agents. But in a chain, norms can conflict across several boundaries at once, and resolving each hop pairwise does not guarantee the end-to-end result is coherent. Our reading: this mirrors a familiar distributed-systems fact, that local agreement between neighbors does not give you global consistency. The report suggests explicitly identifying roles may help, and asks for benchmarks with cross-jurisdictional and cross-institutional conflicts that test whether agents can detect, flag and resolve cases where satisfying one set of norms would mean violating another.</p>
+
+  <h2 id="op-11-5">OP 11.5 · Ensuring composed behaviors uphold privacy and security</h2>
+  <p><b>What it asks.</b> Every individual delegation step can be appropriate and the composition can still cause harm: flows that are each fine can, when aggregated across agents, reveal sensitive information or produce harm that no single agent disclosed or enacted. The report draws two analogies: linkage attacks for re-identification (citing Powar &amp; Beresford, 2023), and the way privacy loss accumulates across multiple differentially private queries on the same dataset (citing Kairouz et al., 2015 and Abadi et al., 2016). The question is how to reason about and prevent such compositional harm.</p>
+
+  <h3>Dietary restrictions plus medication schedule</h3>
+  <p>The report's example is short and memorable:</p>
+  <blockquote class="q"><span>"two individually defensible disclosures, but a third party observing both flows can infer a medical diagnosis."</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=68" target="_blank" rel="noopener">§11.2, p. 68</a></span></blockquote>
+  <p>The setup: an assistant tells a restaurant agent about the user's dietary restrictions, and tells a pharmacy agent about the medication schedule. Each disclosure fits its context. A CI check on each flow passes. The harm only appears when someone sees both.</p>
+  <p>Our reading: this is why a per-flow policy engine cannot be the whole answer. Differential privacy has a composition theorem and a budget, so you can at least add up the loss. Contextual appropriateness has no such arithmetic yet. A system that wanted to catch this would need to remember what it has disclosed, to whom, and whether those recipients might share or be the same observer.</p>
+
+  <h3>What is missing</h3>
+  <p>The report observes that current benchmarks mostly test atomic properties ("did this agent leak this datum?") and lack both the infrastructure and the agentic use cases needed to trace provenance across agent boundaries and assess composite properties. It asks for metrics and evaluation frameworks for cross-boundary aggregation risk. It also asks for analogues for harms that come from composed <em>actions</em> rather than shared information, which is easy to overlook. For the single-agent benchmarks that exist today, see the <a class="lnk" href="evaluations.html">evaluations page</a>; for one benchmark that already tests cross-context leakage from memory, see the related <a class="lnk" href="https://idvorkin-ai-tools.github.io/cimemories-field-map/" target="_blank" rel="noopener">CIMemories field map</a>.</p>
+
+  <div class="callout">If you build delegating agents, assume every constraint the user gave you is lost at the first handoff unless you carry it explicitly, let each hop only narrow it, and keep a ledger of what you have already disclosed to whom. Per-flow appropriateness is necessary; across many hops it is nowhere near sufficient.</div>
+
+  <h2 id="connections">Connections</h2>
+  <p>The handshake's hardest piece, checking that a counterparty actually honors agreed norms, is <a class="lnk" href="agent-channels.html#op-11-7">OP 11.7 on attestation</a>, and the population-level simulation the section intro calls for is <a class="lnk" href="agent-channels.html#op-11-9">OP 11.9</a>. The "shared source of truth" for norms is a governance question (<a class="lnk" href="governance.html">§12</a>). Shielding negotiation from adversarial input borrows from policy generation in the <a class="lnk" href="policy-engines.html">contextual policy engine</a> and from <a class="lnk" href="contextual-security.html">contextual security</a>. Agent identity and delegated authorization, the single-hop version of OP 11.3, are on <a class="lnk" href="identity-authorization.html">identity, authorization, accounting</a>. The benchmark gaps flagged in OP 11.4 and 11.5 extend <a class="lnk" href="evaluations.html">evaluations and benchmarks</a>.</p>
+
+  <h2 id="reading">Further reading, verified</h2>
+  <ul class="readings">
+    <li><a href="https://arxiv.org/abs/2505.02077" target="_blank" rel="noopener">Open Challenges in Multi-Agent Security: Towards Secure Systems of Interacting AI Agents</a> &mdash; Schroeder de Witt et al. (2025) &middot; cited in the §11 intro for a taxonomy of multi-agent attack vectors.</li>
+    <li><a href="https://arxiv.org/abs/2501.17070" target="_blank" rel="noopener">Contextual Agent Security: A Policy for Every Purpose</a> &mdash; Tsai &amp; Bagdasarian (2025) &middot; cited as a model for isolating policy generation from untrusted context (OP 11.1).</li>
+    <li><a href="https://arxiv.org/abs/2503.18813" target="_blank" rel="noopener">Defeating Prompt Injections by Design</a> &mdash; Debenedetti et al. (2025) &middot; the other cited example of keeping policy decisions away from adversarial input (OP 11.1).</li>
+    <li><a href="https://arxiv.org/abs/2410.08948" target="_blank" rel="noopener">Emergent social conventions and collective bias in LLM populations</a> &mdash; Ashery, Aiello &amp; Baronchelli (2025) &middot; cited for norms and biases that emerge in populations of agents (OP 11.2).</li>
+    <li><a href="https://arxiv.org/abs/2511.20639" target="_blank" rel="noopener">Latent Collaboration in Multi-Agent Systems</a> &mdash; Zou et al. (2026) &middot; cited as a proposal where agents exchange latent states instead of text (OP 11.2).</li>
+    <li><a href="https://arxiv.org/abs/2407.12856" target="_blank" rel="noopener">AI-AI Bias: large language models favor communications generated by large language models</a> &mdash; Laurito et al. (2025) &middot; cited for shared priors that could enable implicit coordination (OP 11.2).</li>
+    <li><a href="https://arxiv.org/abs/1311.0776" target="_blank" rel="noopener">The Composition Theorem for Differential Privacy</a> &mdash; Kairouz, Oh &amp; Viswanath (2015) &middot; cited as the analogy for accumulating privacy risk (OP 11.5).</li>
+    <li><a href="https://arxiv.org/abs/1607.00133" target="_blank" rel="noopener">Deep Learning with Differential Privacy</a> &mdash; Abadi et al. (2016) &middot; cited alongside Kairouz et al. for privacy loss under composition (OP 11.5).</li>
+  </ul>
+
+  <div class="callout">Next: <a class="lnk" href="agent-channels.html">Protocols, attestation, side channels</a> &middot; Back to the <a class="lnk" href="../index.html#ecosystem">map</a>.</div>
+</main>
+<footer>Original explanation of <em>Open and Emergent Problems in Agentic Privacy and Security: A Contextual Angle</em> (Bagdasarian, Tsai et al., 2026), §11 intro, §11.1–11.2. The report is &copy; its authors; this page explains and links, it does not copy.</footer>
+</body>
+</html>

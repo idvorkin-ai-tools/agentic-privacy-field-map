@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI as the last-mile developer &mdash; Agentic privacy, mapped</title>
+<meta name="description" content="Replace every LLM call with a nondeterministic choice and see what the code still guarantees: the report's §7.5 argument, OP 7.10 and 7.11." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../paper.css" />
+</head>
+<body>
+<header class="bar"><div class="bar-in">
+  <div class="brand"><span class="dot"></span>AGENTIC&nbsp;PRIVACY&nbsp;//&nbsp;FIELD&nbsp;MAP</div>
+  <a class="back" href="../index.html#components">&larr; field map</a>
+</div></header>
+<main>
+  <div class="eyebrow"><span class="box bb mono">PART II · COMPONENTS · 03 OF 06</span><span class="mono">§7.5 · pp. 39–44 · OP 7.10–7.11</span></div>
+  <h1>AI as the last-mile developer</h1>
+  <div class="authors">What makes an application agentic, and why the answer is also the security problem</div>
+  <div class="paperlink" style="border-left-color:var(--def)"><span class="lbl">Source</span><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=39" target="_blank" rel="noopener">§7.5 What makes an application agentic, and what does this mean for security?, pp. 39–44 ↗</a></div>
+
+  <div class="tldr"><b>TL;DR &mdash;</b> An agent is ordinary software in which some of the code is written by a model at run time. The more of the program the developer hands to the model, the more "agentic" the app is, and the less the developer's own code constrains what can happen. The report makes this concrete with a thought experiment: replace every LLM call with an arbitrary choice and read what is left. An email-to-calendar app still only ever creates a calendar event; a general planner becomes <span class="mono">exec(*)</span>. OP 7.10 asks how to close the gap between what the developer meant and what the program permits; OP 7.11 asks how to bring testing, review and red-teaming back to code that is generated and run in the same breath.</div>
+
+  <p class="lead">Section 7 of the report is about system-level guardrails: identity, authorization, data minimization, and the machinery around the model rather than inside it. Section 7.5 steps back and asks the prior question (<a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=39" target="_blank" rel="noopener">p. 39</a>). If an agent is just a program that calls a function named <span class="mono">llm()</span>, why do we need new security ideas at all? The report's answer is that the novelty is not the model call itself but how much of the program's control flow and specification the model is allowed to decide. This is the executive summary's "probabilistic, dynamic control flows" dimension, worked through with code. It is also the most programmer-friendly part of the report: you can reason about it the way you reason about any untrusted input.</p>
+
+  <h2 id="spectrum">The agentic spectrum, in two programs</h2>
+  <p>The report frames "agentic-ness" as how much application development the developer offloads to the model (§7.5.1). At one end, the model is a natural-language parser that pulls fields out of an email. At the other, it discovers, writes and runs new code. In a traditional app the developer enumerates every workflow by hand ("add to cart, set quantity, check out"). In an agentic app, the developer lets the model assemble a workflow for a request nobody anticipated, such as reading colleagues' emails and scheduling the meetings they mention. That is the payoff: functionality that would be too expensive to build by hand. The report points to existing definitions of agentic levels for this spectrum, citing Mitchell et al. (2025).</p>
+  <p>Two running examples anchor the rest of the section (<a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=40" target="_blank" rel="noopener">p. 40</a>):</p>
+  <table class="kv">
+    <tr><td class="mono">email-to-calendar-event</td><td>Takes an email, asks the model whether it is a scheduling request, and if so asks it for date, time and location. Then it calls one hard-coded tool: <span class="mono">calendar.create_event</span>. The model decides which branch to take and fills in parameters. It cannot pick a different tool.</td></tr>
+    <tr><td class="mono">general planner</td><td>Takes a natural-language request and loops: ask the model for the next function to call, execute it, append the output to the context, repeat until the model says "DONE". The model is writing the program one step at a time.</td></tr>
+  </table>
+  <p>The report gives both in C++-flavored pseudocode. Here is a shortened version of each. This is our simplification of the report's listings, not a copy.</p>
+<pre class="code-block"><code>// email-to-calendar (simplified from the report's pseudocode)
+bool from_email(email) {
+  if (llm("is this a scheduling request? " + email)) {
+    (date, time, place) = llm("extract date, time, place: " + email);
+    return calendar.create_event(date, time, place);   // fixed tool
+  }
+  return false;
+}
+
+// general planner (simplified)
+void handle(request) {
+  ctx = SYSTEM_PROMPT + request;
+  loop {
+    step = llm(ctx);                // model picks the next call
+    if (step == "DONE") break;
+    out  = exec(step);              // whatever it picked, run it
+    ctx += step + out;              // state now depends on model output
+  }
+}</code></pre>
+  <p>Both programs "use AI". The difference is what the developer still owns. In the first, the developer owns the control flow and the set of possible side effects; the model only chooses among them. In the second, the developer owns a loop and an <span class="mono">exec</span>.</p>
+
+  <h2 id="delegation">What goes wrong when the model finishes the code</h2>
+  <p>Section 7.5.2 names two consequences of delegation (<a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=40" target="_blank" rel="noopener">p. 40</a>). The first is a mismatch between intent and behavior. A model's only real specification is "tokens in, tokens out", so it has no formal constraints that rule out errors. The report's example: the calendar app's model might consistently read dates backward. That is a perfectly valid token transformation and a failure of the developer's intent at the same time. Nothing in the program says it is wrong.</p>
+  <p>The second is timing. Code written by a person goes through iteration and review, usually away from adversaries, before it runs. A workflow the model generates for a user request is expected to run almost immediately, with little or no human involvement, and often while reading attacker-controlled content. Those two observations become the two open problems.</p>
+
+  <h2 id="op-7-10">OP 7.10 · Closing the gap between developer intent and application specification</h2>
+  <p>In plain terms: when part of an application is generated by a model, the set of things the program <em>can</em> do grows beyond what the developer <em>meant</em> it to do, and beyond what users expect. How do we shrink that gap (§7.5.2, <a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=41" target="_blank" rel="noopener">p. 41</a>)?</p>
+  <p>In a traditional app, intent and specification line up (bugs aside). Users press buttons or type exact commands that are parsed deterministically, so the structure of the input already limits what can happen. An agentic app deliberately drops that structure so it can handle unstructured requests. The developer gains features that would be tedious or infeasible to write by hand. The user gains flexibility. And the specification now admits executions nobody intended.</p>
+
+  <h3 id="two-bad-options">The developer's two bad options</h3>
+  <p>The report lays out the choice the developer is stuck with:</p>
+  <table class="kv">
+    <tr><td class="mono">1 · Limit functionality</td><td>Constrain what form user input can take and define by hand what happens for each input. Safe, and back to traditional software.</td></tr>
+    <tr><td class="mono">2 · Accept unintended executions</td><td>Let a model interpret the input and choose what to run, and accept that some of what it runs will be unexpected or destructive.</td></tr>
+  </table>
+  <p>Applied to the examples: for the calendar app, unless the developer restricts the input format, there is no static boundary around <span class="mono">create_event</span> other than trusting the model to be right. For the planner, the developer's intent is "do whatever the user wants", so which actions are appropriate is only knowable after the request arrives. To support unconstrained requests, every possible action has to be statically allowed.</p>
+  <p>Trusting the model to translate input into a precise execution is complicated, in the report's framing, by two things: models cannot reliably reason about ambiguous, unpredictable requests (and we cannot inspect why they decide what they decide), and models can confuse trusted instructions with untrusted content such as a prompt injection, which then rewrites the application's effective specification.</p>
+
+  <h3 id="havoc">The havoc argument: replace the LLM with <span class="mono">*</span></h3>
+  <p>This is the section's central move, and it is worth internalizing. Take each program and replace every LLM call with a nondeterministic operator, written <span class="mono">*</span>. The report notes this is akin to "havoc" in programming-language semantics: the value can be anything. That models a model that interprets input in any possible way, including while an adversary is steering it (<a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=41" target="_blank" rel="noopener">pp. 41–42</a>). Then ask what the remaining code still guarantees.</p>
+<pre class="code-block"><code>// email-to-calendar with every llm() replaced by *  (simplified)
+bool from_email(email) {
+  if (*) return calendar.create_event(*);
+  return false;
+}</code></pre>
+  <p>Even with a fully adversarial model, this program can do exactly two things: return false, or create some calendar event. The developer statically downscoped the app to "calendar events from email". You can enumerate the failure modes (a missed event, a bogus event) and decide whether they are tolerable. The report calls the consequences of a wrong branch "tractable".</p>
+<pre class="code-block"><code>// general planner with every llm() replaced by *  (simplified)
+void handle(request) {
+  loop {
+    if (* == "DONE") break;
+    exec(*);
+  }
+}</code></pre>
+  <p>Here the residue is <span class="mono">exec(*)</span> in a loop. There are no static boundaries left; nearly the whole specification belongs to the model. Anything the runtime can do, this program can do.</p>
+  <blockquote class="q"><span>"the larger the portion of the application delegated to AI, the more utility and flexibility the application can offer. . . and the more risk the application poses to its users should the AI misbehave."</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=42" target="_blank" rel="noopener">§7.5.2, p. 42</a></span></blockquote>
+  <p>A way to picture this: the havoc version is the program's security perimeter. Whatever the model does, it cannot get outside what the havoc version allows. For the calendar app that perimeter is one tool call. For the planner it is everything the process has permission to do. Our reading is that this gives builders a cheap design-time test: write the havoc version of your agent and see whether you can live with every execution it permits.</p>
+  <p>The report then poses the harder questions: can the gap be closed at all, can correct or safe behavior be "guaranteed", and how would "correct" even be defined if not by a developer writing down a precise description, which may be infeasible or would just put us back in traditional code?</p>
+
+  <h3 id="directions">Three directions the report proposes</h3>
+  <p>These are framed as questions to explore, not results (<a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=42" target="_blank" rel="noopener">pp. 42–43</a>).</p>
+  <p><b>1. Security monitors for contextual correctness.</b> Traditional systems use security monitors, such as sandboxes, that enforce input and output policies based on signals from the application and environment. What does a monitor look like when "secure" depends on social context and unstructured, dynamic inputs? The strawman is the user as monitor, confirming every action; the report notes user confirmation is a common fallback for agents today. Prior work it cites (AirGapAgent, Conseca, CaMeL, f-secure LLM systems, Sapien, IsolateGPT) instead uses trusted, isolated models to generate monitors expressed in a policy language or in code, as a scalable stand-in for what a human security expert would write. The open question is whether any monitor can both reduce the human burden and give stronger guarantees than those model-generated monitors, and whether hard guarantees are possible at all when the specification itself contains model-generated, contextual execution.</p>
+  <p><b>2. How much agentic-ness do we actually need?</b> Could existing agentic apps get the same functionality with more precision by paying for more manual specification? For example, a tighter calendar workflow that reduces parsing mistakes while still delivering "event from email". More generally, can agentic apps be written in a more traditional shape, using the model only for narrow purposes rather than full planning? And for which apps is that impossible, and why?</p>
+  <p><b>3. What does each form buy you?</b> The same app can be built at different agentic levels. What does each version offer for functionality, security, or ease of building? Why do we trust a traditional implementation differently from one that routes through a model call, and can that distinction be stated formally?</p>
+  <p>A good answer to OP 7.10 would have to do something neither bad option does: keep most of the flexibility of option 2 while giving the developer a static, checkable bound on what can happen, the way the calendar app's havoc version does, without requiring the developer to enumerate every workflow by hand.</p>
+
+  <h2 id="dynamic-code">The parallel with untrusted, dynamically loaded code</h2>
+  <p>The report adds a note that makes the problem feel less exotic (<a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=43" target="_blank" rel="noopener">p. 43</a>). Letting an LLM "define" part of an application is like any traditional program that loads code or binaries at run time with complex or unknown control flow. We already handle that with sandboxes and VMs.</p>
+  <p>The web browser is the standing example. It fetches JavaScript from many sources at run time, so it cannot vet dependencies ahead of time the way a static build can. Instead it isolates sites: it sandboxes page rendering, enforces permissions, and maintains the Same-Origin Policy, so a script loaded on one site cannot read another site's data.</p>
+  <p>The catch is who sets the boundary. In those systems the developer decides statically which limited permissions the sandbox grants, and traditional apps have accepted that restriction. In the agentic world, the report observes, static restrictions are seen as too much friction or too great a cost to utility, which leaves new and perhaps more dynamic security mechanisms as the remaining path. Our reading: the browser shows that running untrusted code safely is a solved shape of problem, but only once you agree on a fixed perimeter. Agents are hard because the perimeter is supposed to move with the task. That is the bridge to the report's notion of contextual security in §5.</p>
+
+  <h2 id="op-7-11">OP 7.11 · Making agent execution as robust as traditional software</h2>
+  <p>The question: software development practice is a big part of why ordinary software is reliable and secure. How do we bring that practice back when the "software" is a workflow the agent generated a moment ago (<a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=43" target="_blank" rel="noopener">p. 43</a>)?</p>
+  <p>Why it is hard for agents specifically: the same expectation that makes agents attractive, that they generate new workflows on the fly, comes with the expectation that they act quickly and on their own. That rules out the programmer in the loop and squeezes out design exploration, iteration, testing, evaluation and red-teaming. And the need for those processes scales with agentic level. The calendar agent's limited agency already bounds what a "rogue LLM result" can do, so little extra review is needed to check its choice of event. Verifying an arbitrary execution produced by a general planner would need far more.</p>
+  <blockquote class="q"><span>"How can we bring back software development processes to agentic execution to ensure robustness?"</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=43" target="_blank" rel="noopener">OP 7.11, p. 43</a></span></blockquote>
+
+  <h3 id="considerations">Four considerations</h3>
+  <p>The report lists these as open considerations (<a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=43" target="_blank" rel="noopener">pp. 43–44</a>):</p>
+  <table class="kv">
+    <tr><td class="mono">1 · Just-in-time product management</td><td>Product management is the process that pins down what the customer actually needs. Can an agent do a fast, in-the-moment version of it, for example by asking the user to resolve ambiguity when it generates a workflow for their request?</td></tr>
+    <tr><td class="mono">2 · Security validation</td><td>If an application can take the form of AI-generated code, which existing validation tools apply? The report lists formal verification and proof systems, approximate path exploration such as fuzzing and static analysis, and red-teaming and pentesting. All of them need a precise specification of what counts as a vulnerability, such as formal invariants. So who is trusted to write that specification? Possibly a trusted security monitor of the kind described under OP 7.10.</td></tr>
+    <tr><td class="mono">3 · Cost and who does it</td><td>What time and resources would reintroducing these processes take? Do humans have to be in the loop, or could a "code review" or "formal verification" model do a sufficient job?</td></tr>
+    <tr><td class="mono">4 · Vetted artifacts</td><td>Is an agentic app that is represented by a static specification plus an analyzable code artifact more secure? And how would anyone analyze such possibly complex artifacts for embedded "time-released" attacks that only fire on a particular input?</td></tr>
+  </table>
+  <p>Our reading of how these fit together: consideration 2 and OP 7.10's first direction are the same dependency seen from two sides. Verification tools need a specification; the specification is exactly what the developer gave up writing; so someone or something trusted has to produce it per task. Consideration 4 is the hopeful version: turn the agent's plan into a fixed artifact first, then analyze it like code. The report flags that this only moves the question to whether the artifact can hide behavior that analysis misses.</p>
+  <p>A good answer to OP 7.11 would have to fit inside the agent's latency budget, scale its effort with the havoc perimeter (light for the calendar app, heavy for the planner), and say clearly where the specification it checks against comes from.</p>
+
+  <div class="callout">Before you ship an agent, write its havoc version: replace every model call with "anything" and read what the code still allows. If what is left is a bounded set of side effects you can live with, you have a perimeter. If what is left is <span class="mono">exec(*)</span>, your security rests entirely on the model and whatever monitor sits around it.</div>
+
+  <h2 id="connections">Connections</h2>
+  <p>The "trusted, isolated model generates the monitor" pattern under OP 7.10 is the contextual policy engine, treated in depth on <a class="lnk" href="policy-engines.html">Operationalizing CI: the contextual policy engine</a>. The browser note's point, that agents need permissions that move with the task, is the core of <a class="lnk" href="contextual-security.html">Contextual Security</a>. Who authorizes the actions a planner chooses is covered in <a class="lnk" href="identity-authorization.html">Identity, authorization, accounting</a>. The prompt-injection and ambiguity limits on trusting the model lead into <a class="lnk" href="model-reasoning.html">Teaching models contextual reasoning</a>, and the user-as-monitor strawman and confirmation fallback are the subject of <a class="lnk" href="mental-models-consent.html">Mental models and the end of notice-and-choice</a>. For how the report wants such systems tested, see <a class="lnk" href="evaluations.html">Evaluations and benchmarks</a>.</p>
+
+  <h2 id="reading">Further reading, verified</h2>
+  <ul class="readings">
+    <li><a href="https://arxiv.org/abs/2502.02649" target="_blank" rel="noopener">Fully Autonomous AI Agents Should Not be Developed</a> &mdash; Mitchell, Ghosh, Luccioni, Pistilli (2025) &middot; the report cites it for existing definitions of agentic levels.</li>
+    <li><a href="https://arxiv.org/abs/2405.05175" target="_blank" rel="noopener">AirGapAgent: Protecting Privacy-Conscious Conversational Agents</a> &mdash; Bagdasarian et al. (CCS 2024) &middot; cited as prior work using trusted, isolated models to generate security monitors.</li>
+    <li><a href="https://arxiv.org/abs/2501.17070" target="_blank" rel="noopener">Contextual Agent Security: A Policy for Every Purpose</a> &mdash; Tsai &amp; Bagdasarian (HotOS 2025) &middot; Conseca; cited for model-generated, context-specific policies.</li>
+    <li><a href="https://arxiv.org/abs/2503.18813" target="_blank" rel="noopener">Defeating Prompt Injections by Design</a> &mdash; Debenedetti et al. (2025) &middot; CaMeL; cited among isolated-model monitor designs.</li>
+    <li><a href="https://arxiv.org/abs/2409.19091" target="_blank" rel="noopener">System-Level Defense against Indirect Prompt Injection Attacks: An Information Flow Control Perspective</a> &mdash; Wu, Cecchetti, Xiao (2024) &middot; the "f-secure LLM system" the report cites.</li>
+    <li><a href="https://arxiv.org/abs/2403.04960" target="_blank" rel="noopener">IsolateGPT: An Execution Isolation Architecture for LLM-Based Agentic Systems</a> &mdash; Wu et al. (NDSS 2025) &middot; cited among execution-isolation approaches to agent monitors.</li>
+  </ul>
+
+  <div class="callout">Next: <a class="lnk" href="model-reasoning.html">Teaching models contextual reasoning</a> &middot; Back to the <a class="lnk" href="../index.html#components">map</a>.</div>
+</main>
+<footer>Original explanation of <em>Open and Emergent Problems in Agentic Privacy and Security: A Contextual Angle</em> (Bagdasarian, Tsai et al., 2026), §7.5. The report is &copy; its authors; this page explains and links, it does not copy.</footer>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Operationalizing CI: the contextual policy engine &mdash; Agentic privacy, mapped</title>
+<meta name="description" content="How the report turns Contextual Integrity into five reasoning steps and a policy engine that sits beside the planner: OP 6.1 to 6.7 explained." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../paper.css" />
+</head>
+<body>
+<header class="bar"><div class="bar-in">
+  <div class="brand"><span class="dot"></span>AGENTIC&nbsp;PRIVACY&nbsp;//&nbsp;FIELD&nbsp;MAP</div>
+  <a class="back" href="../index.html#framework">&larr; field map</a>
+</div></header>
+<main>
+  <div class="eyebrow"><span class="box wb mono">PART I · FRAMEWORK · 02 OF 02</span><span class="mono">§6.1–6.7 + Part II intro · pp. 23–30 · OP 6.1–6.7</span></div>
+  <h1>Operationalizing CI: the contextual policy engine</h1>
+  <div class="authors">From "is this flow appropriate?" to a component that can say allow, deny, modify or ask</div>
+  <div class="paperlink" style="border-left-color:var(--off)"><span class="lbl">Source</span><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=23" target="_blank" rel="noopener">§6 Operationalizing Contextual Integrity for Agents, pp. 23–30 ↗</a></div>
+
+  <div class="tldr"><b>TL;DR &mdash;</b> The report breaks "an agent that respects Contextual Integrity" into five steps: name the effects of an action, find the norms that apply, judge, resolve doubt, enforce. It argues that no model is reliable enough to do all five inside its own inference, and users cannot do them at agent scale, so a separate enforcement layer is needed. It names that layer the <em>contextual policy engine</em>: a policy generator that turns context and norms into a machine-checkable policy, plus a runtime enforcer that allows, denies, modifies or escalates each proposed action. Seven open problems hang off this design, from how norms are represented to how to enforce policies across billions of agent loops. The report surveys a dozen policy systems and is explicit that no standard policy language has emerged.</div>
+
+  <p class="lead">Section 6 is the hinge of the report. Part I up to this point argued that agent privacy and security are questions of appropriateness in context (<a class="lnk" href="../concepts/contextual-integrity.html">Contextual Integrity</a>) and that security, too, needs a contextual version (<a class="lnk" href="contextual-security.html">§5</a>). Section 6 asks the engineering question: if we take that seriously, what does a system have to <em>do</em>? Its answer is a decomposition into steps and an architecture that separates judging and enforcing from planning. The Part II chapters that follow (§7 systems, §8 models, §9 users) are each one leg of that architecture.</p>
+
+  <h2 id="steps">The five CI reasoning steps</h2>
+  <p>The report defines operationalizing CI as making sure no agent acts in a way that violates legitimate contextual norms, and then says that any agent that does this must, by definition, be able to perform five steps (<a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=23" target="_blank" rel="noopener">§6, p. 23</a>):</p>
+  <table class="kv">
+    <tr><td class="mono">1 · Identify</td><td>Work out which information flows or state changes an action would cause. (§6.2)</td></tr>
+    <tr><td class="mono">2 · Locate</td><td>Find the contextual norms that are relevant to those effects. (§6.3)</td></tr>
+    <tr><td class="mono">3 · Apply</td><td>Use the norms to judge whether the action is appropriate. (§6.4)</td></tr>
+    <tr><td class="mono">4 · Resolve</td><td>Deal with uncertainty: which context applies, norms that only loosely match a flow, conflicts. (§6.5–6.6)</td></tr>
+    <tr><td class="mono">5 · Enforce</td><td>Change the agent's behavior to match the judgment. (§6.7)</td></tr>
+  </table>
+  <p>The subsections follow these steps in order. Our reading: most current defenses cover one or two steps well (often step 5, a blocklist or a confirmation prompt) and quietly assume the others.</p>
+
+  <h3>Step 1 is already hard (§6.2)</h3>
+  <p>Step 1 has no numbered problem of its own, but the report flags two difficulties. First, each effect has to be described in CI terms, the standard tuple for an information flow. For effects that are not information flows (deleting a file, booking a flight) the report says the open problems of §5 must be solved before we even know which parameters define the norm. Second, effects can be internal (should this datum feed into planning? may the agent edit a file in its own workspace?) or external via tool calls, and agents meet new tools at runtime. Because agents cross application boundaries, the report treats the space of contexts and actions as practically unbounded, and it grows with every new actor, capability, tool or peer agent.</p>
+
+  <h2 id="op-6-1">OP 6.1 · How much to trust the model, how much the user</h2>
+  <p><b>The question.</b> As models improve, how far can we let them make privacy and security calls, and when we hand a decision to the user instead, how do we make that practical?</p>
+  <p><b>The two poles.</b> The report describes an ideal "oracular" model that never proposes a CI-violating action despite its own randomness, and that asks the user or other sources exactly when it needs to. If such a model existed, steps 1 to 5 could all happen inside inference. That is the goal of <a class="lnk" href="model-reasoning.html">§8</a>. The report then says plainly that no such model exists, for three reasons it gives (<a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=23" target="_blank" rel="noopener">§6.1, p. 23</a>): LLMs are stochastic and prompt-sensitive; alignment techniques reduce bad behavior rather than remove it; and commercial models already disclose information in contexts people find inappropriate (it cites the ConfAIde benchmark of Mireshghallah et al., 2024). It adds a theoretical result it cites, Wolf et al. (2024): any behavior with finite probability can be elicited, with probability rising as the adversarial prompt gets longer.</p>
+  <p>The other pole fails too. Pushing every decision to the user captures true intent but does not scale to the volume of an agent's actions, runs into attention limits and consent fatigue, and the user's own preferences may not be the last word when they clash with social norms or law (developed in <a class="lnk" href="mental-models-consent.html">§9</a>).</p>
+  <p><b>Where the report lands.</b> Neither pole works alone, so it proposes enforcement layered on top of the core model, supplementing user-level defenses. The open part is the balance point, which moves as models improve.</p>
+
+  <h2 id="op-6-2">OP 6.2 · Can models understand contextual norms?</h2>
+  <p><b>The question.</b> Can a language model efficiently pull the relevant norms out of a messy context? Older systems would match an effect against rules written in advance. LLMs open a different path: infer norms from natural language and extrapolate beyond hand-written rules (§6.3).</p>
+  <p><b>The evidence so far.</b> The report sorts existing work into three groups (<a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=24" target="_blank" rel="noopener">§6.3, p. 24</a>): benchmarks that test whether models judge CI flows correctly; privacy-aware agents that use contextual reasoning to decide what to disclose (it cites AirGapAgent among others); and training methods that try to bake norms in through fine-tuning or RL. Its conclusion is cautious. Models show at least some latent knowledge of norms: they can identify actors, infer appropriate recipients, and often agree with human judgments. This suggests norm understanding comes partly from pretraining. But the report says their competence with CI theory as a whole is still unclear.</p>
+  <p><b>Why that is not enough for agents.</b> Benchmarks mostly score one judgment on one fixed scenario. An agent has to pick which norms apply, notice when it is unsure, reconcile competing norms, generalize to unfamiliar contexts and stay consistent across long interactions. The report treats current results as encouraging but not decisive and sends the reader to <a class="lnk" href="evaluations.html">§10</a> for the richer benchmarks this needs.</p>
+
+  <h2 id="op-6-3">OP 6.3 · Representing norms</h2>
+  <p><b>The question.</b> How should norms be stored, kept current and adapted across communities and cultures?</p>
+  <p><b>The reframe.</b> The report expects a model's built-in knowledge of norms to be incomplete, incoherent in places, out of date and not universal, and it suggests treating that as a permanent feature rather than a bug to patch. The consequence is that systems need ongoing ways to extract, characterize and validate norms from many reliable sources. It criticizes current training data on this point: formal privacy policies cover only norms that someone wrote down, and synthetic scenarios cover only a constructed space. Real norms also live in community rules, organizational policies, law and observed practice.</p>
+  <p><b>Knowing norms is not reasoning with them.</b> To make a decision, an agent must handle norms that interact: hierarchies, apparent conflicts. Filling in the five CI parameters correctly is not enough. The report suggests metadata on each norm could help: where its authority comes from, how widely it is held, how bad a violation would be.</p>
+  <p><b>A direction, not a result.</b> One idea it floats is a norm <em>registry</em> carrying that metadata, which would allow explicit curation. It points to Limited Memory Language Models, which store factual knowledge in a knowledge base during pretraining and retrieve it at generation time, as a hint that this kind of split could work. A registry could fill gaps in under-specified user intent and could even hold rules for exceptional conflicts. Its example is a right to privacy about mental health colliding with the need to prevent immediate danger. The report notes that enumerating norms is itself unsolved, but that it can be done ahead of time, outside live agent operation. It names taxonomies of norms that support retrieval, conflict resolution and policy generation as the broader open direction, since most of the difficulty appears when norms are applied, not listed.</p>
+
+  <h2 id="op-6-4">OP 6.4 · Turning natural-language norms into formal policy</h2>
+  <p><b>The problem.</b> A judgment only matters if it can be expressed as specific actions to allow or block. But intents and norms arrive in natural language ("don't be creepy," "keep this between us," the report's examples), and the norms themselves sit in text or in model weights. Without an oracular model, the report argues, enforcement needs formal logic, and static rule-based translation from such phrases does not work (<a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=26" target="_blank" rel="noopener">§6.4, p. 26</a>). OP 6.4 asks how to build tools that make sure policies generated from unstructured input are accurate.</p>
+
+  <h3>The design space the report lists</h3>
+  <p>The classic route is a policy over actions (it cites Schneider, 2000). For open-ended contexts and tools found at runtime, the policy itself can be generated on the fly, with the social context as input. An earlier, non-agentic example is a use-based approach where the policy is a state machine tracking the task and limiting actions by state. The report then lists recent systems, which differ mainly in what a "policy" is:</p>
+  <table class="kv">
+    <tr><td class="mono">Predicates over tool actions</td><td>Conseca (Tsai &amp; Bagdasarian, 2025) and Progent-LLM (Shi et al., 2026). Described as a simple, practical interface to agent behavior.</td></tr>
+    <tr><td class="mono">Policies as execution plans</td><td>CaMeL (Debenedetti et al., 2025), IsolateGPT (Wu et al., 2025), and the "f-secure" LLM systems (Wu et al., 2024a).</td></tr>
+    <tr><td class="mono">Stateful policies</td><td>Sapien (Tiffany et al., 2026): dynamic policies that anticipate changes in context.</td></tr>
+    <tr><td class="mono">Datalog</td><td>Palumbo et al. (2026), chosen for expressivity and static analysis.</td></tr>
+    <tr><td class="mono">Verifiable policy functions</td><td>VeriGuard (Miculicich et al., 2025): formal constraints written in statically verifiable languages so agent-generated code can be formally verified.</td></tr>
+    <tr><td class="mono">Risk budgets</td><td>Solko-Breslin et al. (2027): policies that track overall action risk from estimated failure probabilities.</td></tr>
+    <tr><td class="mono">Existing policy languages</td><td>CEL (Google, 2021), an efficient language for predicates and authorization rules; Cedar (Cutler et al., 2024), verifiable role- and attribute-based access control, with Dogwood (AWS, 2026) adding temporal logic.</td></tr>
+  </table>
+  <blockquote class="q"><span>"No consensus has yet emerged around a standard policy language for arbitrary agents, nor even around the set of necessary or sufficient properties that such a language ought to have."</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=26" target="_blank" rel="noopener">§6.4, p. 26</a></span></blockquote>
+
+  <h3 id="engine">The contextual policy engine</h3>
+  <p>From the common pattern in several of these systems the report names a component, the <b>contextual policy engine</b>, with two jobs:</p>
+  <ol>
+    <li><b>Dynamic policy generation.</b> Map context and norms to a formal policy over (formally modeled) agent actions, in a machine-checkable language. If it cannot produce a formal policy, it may escalate to the user to clarify intent.</li>
+    <li><b>Runtime enforcement.</b> Given the policy, a proposed action and the current execution state, <em>allow</em>, <em>deny</em>, <em>modify</em> or <em>escalate</em> to the user for confirmation.</li>
+  </ol>
+  <p>Figure 2 of the report (p. 27) sketches one way to place it. A text rendering:</p>
+<pre class="code-block"><code>                ── request ──►
+  User                              Agent
+                ◄── response ──       │
+                         ┌──────────┴───────────┐
+                         │    Planning Model    │
+                         └──────────┬───────────┘
+                                    │ proposed actions
+                                    ▼
+   ┌──────────────────────── Policy Engine ──────────────────────┐
+   │                                                              │
+   │   Dynamic Policy  ── policies ──►  Enforcement ─── execute ──┼──► Tool A
+   │   Generation                          │                      │    Tool B
+   │        ▲                              │ deny / modify        │    Action C
+   │        │                              └──► back to planner   │
+   └────────┼─────────────────────────────────────────────────────┘
+            │
+     Contextual Norms   (feed policy generation)</code></pre>
+  <p>The figure's caption says this is an illustrative instantiation: other architectures are possible, and the ideal one is an open problem.</p>
+  <p><b>Why separate it from the planner.</b> The report says the split has theoretical and practical advantages. Its example is Conseca, which uses the separation to cut any link between untrusted inputs and policy generation, so even indirect prompt injection cannot shape the policy. It also notes that industry safety architectures increasingly wrap enforcement components around the model instead of relying on alignment alone. A way to picture this: the planner is a contractor who may have read a malicious note left at the job site; the policy engine is the building code, written before the contractor arrived and checked at each step.</p>
+
+  <h3>The missing "compiler"</h3>
+  <p>The deepest part of OP 6.4 is translation. How do you compile vague natural-language policy into formal, verifiable logic (temporal logic, for instance) without losing what the person meant? The report places three reference points (p. 27). Policy-as-code tools such as Open Policy Agent need rules written by hand. LLM-based "constitutional AI" (Bai et al., 2022) relies on prompting, not formal verification. ControlValve (Jha et al., 2026b) sits between them: it uses natural-language prompting to generate a context-free-grammar policy listing allowed and disallowed sub-agents and tools. Whatever wins, the report says, will need system-level enforcement abstractions that formal policies map onto. That is the question "what is the formal policy language?" again, from the other side.</p>
+
+  <h2 id="op-6-5">OP 6.5 · Keeping harmful context out of policy generation</h2>
+  <p><b>The question.</b> Can we separate trusted from untrusted data (adversarial or just misaligned) even in complex settings?</p>
+  <p><b>Why it bites.</b> The best policy generator would know the user's exact intent, all their personal information, every relevant norm, and trustworthy facts about the systems involved. It never does. On top of ordinary ambiguity, the generator faces prompt injection and misaligned context, such as the wrong set of norms for the task (<a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=27" target="_blank" rel="noopener">§6.4, pp. 27–28</a>). The generator is the most sensitive part of the engine. If an attacker can steer it, the enforcer will faithfully enforce the attacker's policy.</p>
+  <p><b>Two approaches the report cites.</b> Many systems (Conseca, CaMeL, the f-secure work and several others) have developers mark which context sources are trusted. Conseca goes furthest: its generator sees only trusted context. Other work (Hu et al., 2026; Beurer-Kellner et al., 2025) relaxes the boundary through low-entropy information bottlenecks, letting a little untrusted content through to improve utility while still guarding against hijacking. Our reading: this is the usual security-versus-utility trade. The report defers the authorization side to <a class="lnk" href="identity-authorization.html">§7</a>.</p>
+
+  <h2 id="op-6-6">OP 6.6 · Which policy wins</h2>
+  <p><b>The question.</b> How do we formalize precedence among conflicting policies so outcomes are robust, justified and understandable, and how do mutually untrusted agents negotiate toward compromise or at least progress?</p>
+  <p><b>Two kinds of conflict</b> (<a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=28" target="_blank" rel="noopener">§6.5, p. 28</a>). Inside one agent, a user preference can collide with a societal norm. The report's example is a user asking the agent to hide a reportable disease that a rule says must go to public health authorities. Between agents, policies can clash because agents have different data needs or represent communities with different norms.</p>
+  <blockquote class="q"><span>"conflicts between the user's preferences and social norms are not just errors—they are social violations."</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=28" target="_blank" rel="noopener">§6.5, p. 28</a></span></blockquote>
+  <p><b>Directions.</b> For single-agent conflicts, the report again suggests a taxonomy of norms (source of authority, epistemic certainty, severity, underlying values and purposes) to decide precedence. It warns against naive priority lists and proposes three layers: <em>preferences</em>, which can be overridden; <em>values</em>, which should be respected; and <em>requirements</em>, which must be obeyed. These layers may interact differently in different places, for example the same agent deployed in two countries. It points to earlier work on automated negotiation of user-defined privacy policies (Mosca &amp; Such, 2021) as a possible foundation. Multi-agent conflicts are left to <a class="lnk" href="multi-agent-norms.html">§11</a> and the governance questions to <a class="lnk" href="governance.html">§12</a>.</p>
+
+  <h2 id="uncertainty">Resolving uncertainty (§6.6)</h2>
+  <p>Step 4 has no numbered problem, but the report calls navigating uncertainty a major open challenge and expects different kinds to need different fixes (<a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=28" target="_blank" rel="noopener">§6.6, pp. 28–29</a>). It names four: the user's intent, the environment, the consequences of an action, and gaps or conflicts among norms. It then sketches several responses:</p>
+  <ul>
+    <li><b>Better model reasoning</b> (§8) for ambiguity in language, including exploring the environment with tools.</li>
+    <li><b>Asking the user.</b> Even an oracular model cannot recover intent that was never formed. Users may not know their own preferences. The report calls the "translation gap" between vague intent and executable code a primary failure mode, and asks how to help users see when no precise translation exists and settle on one interpretation. Frequent questions may be justified for legal requirements (it names GDPR and HIPAA) but too costly for minor preferences, risking consent fatigue or users giving up on the agent.</li>
+    <li><b>An AI delegate</b>, a model prompted or fine-tuned to reflect the user's preferences, which could take over routine calls and leave only truly ambiguous points to the human. It could live inside the policy generator or be fed to it as trusted context. The open question is how to make one users can trust across contexts.</li>
+    <li><b>Probing the environment</b> when the unknown is the setting itself (casual chat or a medical emergency?), and <b>estimating harm probabilities</b> so a framework like Solko-Breslin et al. (2027) can enforce a risk ceiling.</li>
+  </ul>
+
+  <h2 id="op-6-7">OP 6.7 · Enforcement that works at scale</h2>
+  <p><b>The question.</b> Given a judgment, the report wants the agent to comply deterministically where possible, and without an oracular model that means an explicit enforcer like the one in Figure 2 (<a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=29" target="_blank" rel="noopener">§6.7, p. 29</a>). OP 6.7 lists six axes it must scale along: users, queries, concurrent agent loops, distinct agent systems, policies and capabilities.</p>
+  <p><b>Three kinds of pressure.</b> The report groups the axes by what they demand:</p>
+  <ul>
+    <li><b>Cost.</b> Latency and compute. How do you check complex, stateful permissions for billions of concurrent agent loops?</li>
+    <li><b>Abstractions.</b> Should agent capabilities get formal semantics, and how? Its example is a long-running coding agent writing Bash or Python that can change environment variables, move files or change permissions. Every one of those effects has to be modeled before you can enforce a policy stated in higher-level terms like information flow control.</li>
+    <li><b>Architecture.</b> Is there a reference design any new agent could adopt? How do you verify or audit enforcement across many agents and instances? These tie to trust boundaries in §7 and agent-to-agent issues in §11.</li>
+  </ul>
+  <p>Finally, the enforcer must cope when the judgment is indeterminate, using the strategies of §6.6, with user escalation picked up in §9. Our reading: a good answer is an enforcer cheap enough for every tool call, rich enough for arbitrary code, and auditable by third parties.</p>
+
+  <h3>Bridge to Part II</h3>
+  <p>The short Part II introduction (<a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=30" target="_blank" rel="noopener">p. 30</a>) maps the engine onto three levels: system-level enforcement abstractions (§7), model-level ability to find and resolve uncertainty in norms, preferences and intent (§8), and user-level strategies for handling ambiguity without consent fatigue (§9).</p>
+
+  <div class="callout">If you build agents, put the policy outside the planner: generate it only from context you trust, express it in a checkable form, and check every proposed action against it, with "ask the user" as a real fourth outcome next to allow, deny and modify. The report is clear that the policy language, the norm source and the translation step are all still open.</div>
+
+  <h2 id="connections">Connections</h2>
+  <p>The non-information-flow effects in step 1 depend on <a class="lnk" href="contextual-security.html">Contextual Security (§5)</a>. The enforcement side and trusted-context boundaries continue in <a class="lnk" href="identity-authorization.html">Identity, authorization, accounting (§7)</a> and <a class="lnk" href="last-mile-developer.html">AI as the last-mile developer</a>. The oracular-model ideal is <a class="lnk" href="model-reasoning.html">Teaching models contextual reasoning (§8)</a>. Escalation and consent fatigue are <a class="lnk" href="mental-models-consent.html">Mental models and consent (§9)</a>. Benchmarks for norm understanding are in <a class="lnk" href="evaluations.html">Evaluations (§10)</a>; the sibling <a class="lnk" href="https://idvorkin-ai-tools.github.io/cimemories-field-map/" target="_blank" rel="noopener">CIMemories field map</a> covers one of them in depth. Cross-agent conflicts go to <a class="lnk" href="multi-agent-norms.html">Shared norms (§11)</a> and <a class="lnk" href="governance.html">Governance (§12)</a>.</p>
+
+  <h2 id="reading">Further reading, verified</h2>
+  <ul class="readings">
+    <li><a href="https://arxiv.org/abs/2501.17070" target="_blank" rel="noopener">Contextual Agent Security: A Policy for Every Purpose</a> &mdash; Tsai &amp; Bagdasarian (2025) &middot; Conseca, the report's main example of a policy generator isolated from untrusted input.</li>
+    <li><a href="https://arxiv.org/abs/2503.18813" target="_blank" rel="noopener">Defeating Prompt Injections by Design</a> &mdash; Debenedetti et al. (2025) &middot; CaMeL, policies expressed as execution plans.</li>
+    <li><a href="https://arxiv.org/abs/2504.11703" target="_blank" rel="noopener">Progent: Securing AI Agents with Privilege Control</a> &mdash; Shi et al. (2026) &middot; policies as predicates over tool actions.</li>
+    <li><a href="https://arxiv.org/abs/2409.19091" target="_blank" rel="noopener">System-Level Defense against Indirect Prompt Injection Attacks: An Information Flow Control Perspective</a> &mdash; Wu, Cecchetti &amp; Xiao (2024) &middot; the "f-secure" LLM system, plan-based policies and trusted/untrusted separation.</li>
+    <li><a href="https://arxiv.org/abs/2602.16708" target="_blank" rel="noopener">Formal Policy Enforcement for Agentic Systems</a> &mdash; Palumbo et al. (2026) &middot; Datalog as the policy language (the report cites it as "...for Real-World Agentic Systems").</li>
+    <li><a href="https://arxiv.org/abs/2510.05156" target="_blank" rel="noopener">VeriGuard: Enhancing LLM Agent Safety via Verified Code Generation</a> &mdash; Miculicich et al. (2025) &middot; statically verifiable policy functions.</li>
+    <li><a href="https://arxiv.org/abs/2403.04651" target="_blank" rel="noopener">Cedar: A New Language for Expressive, Fast, Safe, and Analyzable Authorization</a> &mdash; Cutler et al. (2024) &middot; verifiable RBAC/ABAC policy language.</li>
+    <li><a href="https://arxiv.org/abs/2506.08837" target="_blank" rel="noopener">Design Patterns for Securing LLM Agents against Prompt Injections</a> &mdash; Beurer-Kellner et al. (2025) &middot; relaxing isolation through low-entropy bottlenecks.</li>
+  </ul>
+
+  <div class="callout">Next: <a class="lnk" href="identity-authorization.html">Identity, authorization, accounting</a> &middot; Back to the <a class="lnk" href="../index.html#framework">map</a>.</div>
+</main>
+<footer>Original explanation of <em>Open and Emergent Problems in Agentic Privacy and Security: A Contextual Angle</em> (Bagdasarian, Tsai et al., 2026), §6 and the Part II introduction. The report is &copy; its authors; this page explains and links, it does not copy.</footer>
+</body>
+</html>

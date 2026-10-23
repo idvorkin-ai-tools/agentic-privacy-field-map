@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Contextual Integrity, applied to agents &mdash; Agentic privacy, mapped</title>
+<meta name="description" content="The report's definitions of a trustworthy agent, the four meanings of context, the five-parameter CI tuple, norm legitimacy, and where CI is still open." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../paper.css" />
+</head>
+<body>
+<header class="bar"><div class="bar-in">
+  <div class="brand"><span class="dot"></span>AGENTIC&nbsp;PRIVACY&nbsp;//&nbsp;FIELD&nbsp;MAP</div>
+  <a class="back" href="../index.html#lens">&larr; field map</a>
+</div></header>
+<main>
+  <div class="eyebrow"><span class="box wb mono">THE LENS · 01 OF 02</span><span class="mono">§1–2, §4, App. A–C · pp. 7–12, 15–19, 100–106 · concept page</span></div>
+  <h1>Contextual Integrity, applied to agents</h1>
+  <div class="authors">What "acting appropriately" means before any mechanism is built: the report's definitions, its vocabulary for context, and the theory it standardizes on.</div>
+  <div class="paperlink" style="border-left-color:var(--off)"><span class="lbl">Source</span><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=7" target="_blank" rel="noopener">§1 Introduction, §2 Background, §4 Contextual Integrity for AI Agents, App. A–C, pp. 7–19, 100–106 ↗</a></div>
+
+  <div class="tldr"><b>TL;DR &mdash;</b> The report defines a trustworthy agent by three properties (utility, privacy, security) that must hold whether or not anyone is attacking it. It measures privacy with Contextual Integrity (CI): a flow of personal information is fine when it matches the norms of the social context it happens in, not when it is hidden or when the user ticked a box. Every flow is described by five parameters &mdash; sender, recipient, subject, information type, transmission principle &mdash; and norms are only legitimate if they serve the context's purposes. The report spends real effort fixing vocabulary, because "context" means four different things in agent work and CI has been diluted in recent benchmarks. It is candid that CI itself is still an open research program.</div>
+
+  <p class="lead">This is the foundation the rest of the report builds on. Part I's job is to say what "appropriate" means so that later sections can ask how a policy engine, a model or a user interface could enforce it. §1 and §2 fix the object of study (what an agent is, what it is made of, who supplies the parts). §4 introduces CI as the yardstick and tries to standardize it. The appendices hold a glossary, the step-by-step CI decision heuristic, a disambiguation of "context", and the theory's known weak spots. §5 then stretches CI from information flows to all actions (Contextual Security), and §6 asks how to operationalize it.</p>
+
+  <h2 id="definitions">Three definitions and one design stance</h2>
+  <p>The report needs a working definition of an agent, and it gives a functional one (§1.1, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=8" target="_blank" rel="noopener">p. 8</a>). An <b>AI agent</b> is something that (i) accepts inputs and instructions in unstructured form, (ii) uses a model, usually an LLM, to generate a plan on the fly, and (iii) carries the plan out by calling tools or APIs, talking to people, or talking to other agents. Memory, custom skills and a sandbox are common but optional. An <b>agentic system</b> is any software that uses one or more such agents. The report notes in a footnote that many competing definitions exist and that it is not trying to settle the dispute (§2).</p>
+  <p>The definition that matters most is the third one.</p>
+  <blockquote class="q"><span>"A trustworthy agentic system must provide utility while acting appropriately under both benign and adversarial conditions."</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=8" target="_blank" rel="noopener">§1.1, p. 8</a></span></blockquote>
+  <p>That splits into three properties. <b>Utility</b>: do the assigned task reliably and accurately. <b>Privacy</b>: keep information-sharing actions appropriate. <b>Security</b>: make sure every action that is <em>not</em> information sharing causes no harm. Note the clean division: privacy covers what the agent discloses, security covers everything else it does. That split is why §5 later needs its own theory for non-disclosure actions.</p>
+  <p>The "benign and adversarial" clause is easy to skim past and should not be. An agent that only leaks under a crafted exfiltration attack is one failure mode; an agent that leaks because it hallucinated or misread an instruction is another, and the report counts both. Our reading: this rules out treating privacy purely as a red-teaming problem. Ordinary operation is in scope. (Wider AI safety is explicitly out of scope, per a footnote.)</p>
+  <p>The design stance follows. The report wants a principle that sits between two bad extremes: give the agent broad permissions and hope, or lock everything down and lose the point of an agent. Its answer, drawn from Nissenbaum's theory and from earlier work it cites (Bagdasarian et al., 2024), is that a trustworthy agent should <em>share data appropriately</em>. It need not keep everything secret, so utility survives. It also cannot pass on anything it happens to have access to, or something it remembered from a different task. The report positions this explicitly against privacy as secrecy and privacy as full user control (§1.1).</p>
+
+  <h2 id="anatomy">What an agent is made of, and who supplies each part</h2>
+  <p>§2 (<a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=10" target="_blank" rel="noopener">pp. 10–12</a>) is short background, but it sets up vocabulary later sections lean on. It starts with a list of agent kinds: computer-use agents, coding agents, general assistants, specialized agents (HR, customer service, research), self-evolving agents that learn from experience, and autonomous lab agents that run experiments without a human in the loop.</p>
+  <h3>Components (§2.1)</h3>
+  <p>Users send <b>queries</b>, which are unstructured instructions or data. The agent holds <b>system context</b> (memory, a knowledge base). One or more probabilistic <b>models</b> reason over the queries. A <b>harness</b>, written by developers, shuttles messages to and from the model and runs the <b>tools</b> that touch the environment. The harness may include a <b>policy engine</b>, for example input and output filters. The report's example is a browser agent asked to find and book the cheapest SFO&ndash;JFK flight next Monday, which writes a script calling several APIs. It adds that tools can themselves be sub-agents, or be created on the fly as a shell script. That last point matters for security: the set of tools is not fixed in advance.</p>
+  <h3>System context: content and lifespan (§2.2)</h3>
+  <p>The report sorts what the agent knows along two axes. By <em>content</em>: how-to knowledge (skills, the system prompt, records of how similar past queries went), which tends to be long-lived, and external knowledge bases (company documents, Wikipedia, product catalogs) pulled in with retrieval. By <em>lifespan</em>: what is in the model context right now, bounded by the context window (conversation, current instructions, scratchpad), versus long-term memory (episodic memory, summaries, knowledge bases, skills) that exists to get around that bound.</p>
+  <h3>Stakeholders (§2.3)</h3>
+  <p>Five parties have to be trusted: base model providers, agent developers, tool and API providers (increasingly behind the Model Context Protocol), platform providers who host the system, and end-users, including people indirectly affected by someone else's agent. Each can be a source of failure: a model with latent vulnerabilities, a tool that returns malicious content, an insider who misconfigures the platform. The report's conclusion is that securing an agent means securing every component, each supplied by a party that may not trust the others.</p>
+  <h3>Interactions (§2.4)</h3>
+  <p>Agents start work on a trigger: a request from a human or agent, or a built-in hook such as a counter crossing a threshold. They can work alone or in groups, with an orchestrator breaking a goal into sub-tasks for sub-agents that talk to each other and to services through protocols like MCP and Agent-to-Agent. In an open ecosystem, those other agents may represent other users or companies with independent or even conflicting goals. The report points to older multi-agent coordination research for the core tension: decide what local information goes into each message, coordinate well, and do not violate the privacy of local data.</p>
+
+  <h2 id="context">"Context" means four things; CI means one of them</h2>
+  <p>The report insists on precision here (§4.1.1, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=16" target="_blank" rel="noopener">p. 16</a>; App. B, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=103" target="_blank" rel="noopener">p. 103</a>). Agent engineers say "context" constantly and usually mean something different from what CI means. Appendix B's Figure 3 draws four nested layers, and stresses it is not a Venn diagram but a picture of components inside components:</p>
+  <div class="scroll"><table class="kv">
+    <tr><th>Sense</th><th>What it is</th><th>Where it lives</th></tr>
+    <tr><td>Model context</td><td>The unstructured material in the context window: instructions, conversation, retrieved content, tool outputs, in-context memory.</td><td>Inside the software, per model call.</td></tr>
+    <tr><td>System context</td><td>Knowledge bases, pipelines, memory and tools the agent can reach beyond the window.</td><td>Inside the software, across calls.</td></tr>
+    <tr><td>Physical context (situation)</td><td>The concrete deployment environment: devices, infrastructure, even heating and lighting in a building.</td><td>Around the software.</td></tr>
+    <tr><td>Social context (sphere)</td><td>An established domain of social life &mdash; healthcare, education, commerce, family &mdash; with purposes, roles and norms.</td><td>Outside the software, in society.</td></tr>
+  </table></div>
+  <p>Two details are worth keeping. First, the report notes that orchestration, where a controller rewrites the model context several times as the model "reasons" (sometimes called multi-agent reasoning), is a system-level fix for a model-level limit (App. B). Second, a social context is <em>abstract</em> and <em>normative</em>. It is not a platform, a scenario, a business model or an industry sector. Its actors are roles (doctor, patient, teacher), not particular people, and its norms get their authority from its purposes and values. The report quotes Nissenbaum on this:</p>
+  <blockquote class="q"><span>"abstract representations of social structures experienced in daily life"</span><span class="cite">— the report, quoting Nissenbaum (2009), <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=16" target="_blank" rel="noopener">§4.1.1, p. 16</a></span></blockquote>
+  <p>Throughout the report, plain "context" means social context; the other senses get qualifiers. The reason CI is chosen over, say, differential privacy is exactly this: differential privacy is context-agnostic by design, while CI demands that system behavior depend on contextual factors.</p>
+  <p>Appendix B then states the whole problem in one move: agentic privacy, through CI, is about aligning system behavior with the norms of the social context. One route is to represent the social context inside the system context so the agent has what it needs. The report immediately hedges. Social context can be unsettled and get established on the fly between a system and several people, so writing norms down as policies may not be enough (App. B, p. 104). Our reading: this is the report admitting that a policy file is necessary but not sufficient, and it sets up the model-level problems of §8.</p>
+
+  <h2 id="ci-tuple">The CI tuple: five parameters, every time</h2>
+  <p>CI's core claim is that privacy is <em>appropriate flow</em> of personal information, where appropriate means conforming to the information norms of the context (§4.1, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=15" target="_blank" rel="noopener">p. 15</a>). It contrasts with privacy as control over one's information (Westin, 1968) and privacy as secrecy (Warren &amp; Brandeis, 1890). The unit of analysis is the flow, and a flow is written as a tuple of five parameters (§4.1.2, p. 17):</p>
+  <ul>
+    <li><b>Sender</b>, <b>recipient</b>, and <b>subject</b> (who the information is about) &mdash; the three actor parameters, each filled with a role from the context's role ontology, not a named individual. Actors can be organizations or governments too.</li>
+    <li><b>Attribute</b>, also called information type: the semantic content, such as email address, diagnosis or browsing history, drawn from the context's information ontology.</li>
+    <li><b>Transmission principle</b> (TP): the condition on the flow. Examples the report lists: with consent, in confidence, reciprocally, securely, with notice, with a warrant, as required by law, sale, authorized.</li>
+  </ul>
+  <p>The same tuple works two ways. Descriptively it says what flow happened. Prescriptively it is a norm: this flow should (or should not) happen. The report's rule is that a well-formed description or norm gives a value for <em>all five</em> parameters, explicitly or by clear implication. "Personal information" is broad: any information about a person, regardless of whether it came from the subject, a third party, or inference (App. A.3).</p>
+  <p>The report's own illustration is healthcare: patient information can move between professionals treating the same patient, provided it stays confidential. A way to picture this for an agent (our example, not the report's):</p>
+  <div class="scroll"><table class="kv">
+    <tr><th>Parameter</th><th>Flow A: booking physical therapy</th><th>Flow B: same data, wrong place</th></tr>
+    <tr><td>Context</td><td>Healthcare</td><td>Commerce (gym class booking)</td></tr>
+    <tr><td>Sender</td><td>The patient's assistant agent, acting as the patient</td><td>The same agent</td></tr>
+    <tr><td>Recipient</td><td>Clinic scheduler</td><td>Gym's booking agent</td></tr>
+    <tr><td>Subject</td><td>The patient</td><td>The patient</td></tr>
+    <tr><td>Attribute</td><td>Knee injury description, insurance member ID</td><td>Knee injury description, insurance member ID</td></tr>
+    <tr><td>Transmission principle</td><td>In confidence, for arranging care</td><td>None stated; the agent volunteered it</td></tr>
+    <tr><td>Verdict under CI</td><td>Matches a healthcare norm</td><td>Prima facie violation; no norm covers it</td></tr>
+  </table></div>
+  <p>The point of the exercise: the attribute is identical in both rows. Nothing about the data itself is "private" or "public". The verdict changes because the roles, context and transmission principle change. A filter keyed on data type alone ("block medical data") would either break Flow A or miss the real reason Flow B is wrong.</p>
+  <p>The report also flags a hazard for anyone reading older work: a footnote warns that the 2004 law-review article that introduced CI describes an earlier version that is now superseded and incorrect (§4.1.1, p. 16). It also says some CI benchmarks for LLMs lean on secondary accounts and are only weakly grounded in the theory (citing Shvartzshnaider &amp; Duddu, 2025). That is why §4 reads like a standards document: it is trying to stop the drift.</p>
+
+  <h2 id="legitimacy">Why some norms count and others do not</h2>
+  <p>If CI only said "follow existing norms", it would just freeze the status quo. What gives it evaluative power is that norms are judged by what they are for (§4.1.2, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=18" target="_blank" rel="noopener">p. 18</a>). Every social context exists for some purpose; health care exists for health. Its roles have ends and constraints, which the report likens to the utility function of the actors. Norms are legitimate when they serve the context's ends, purposes and values, and they can be challenged by practices that serve those ends better.</p>
+  <p>The report's example: doctor-patient confidentiality is there to make patients share more with clinicians, which improves care, which is the purpose of the context. Confidentiality here <em>increases</em> flow to the right party. That is the cleanest way to see why CI is not secrecy.</p>
+  <p>An entrenched norm is only prima facie evidence that a flow is legitimate. To be morally legitimate, the practice has to pass three layers of analysis (§4.1.2; App. A.7.3):</p>
+  <table class="kv">
+    <tr><th>Layer</th><th>Question</th></tr>
+    <tr><td>1. Interests</td><td>Does it strike an acceptable balance of wellbeing among all affected parties?</td></tr>
+    <tr><td>2. Ethical and political principles</td><td>Is it compatible with central principles such as autonomy, justice, fairness, liberty, and concerns about power?</td></tr>
+    <tr><td>3. Contextual purposes</td><td>Does it promote the context's own ends, purposes and values?</td></tr>
+  </table>
+  <p>The glossary adds one disjunction worth noticing (App. A.7): contextual integrity is preserved when justifiable norms are respected, <em>or</em> when flows promote the context's ends and values without undermining them. So a novel flow with no matching norm is not automatically a violation. It goes to evaluation. The glossary also connects CI norms to the US legal idea of a "reasonable expectation of privacy", read as a commonly held view of appropriate flows (App. A.6).</p>
+
+  <h2 id="heuristic">The CI decision heuristic, as a procedure</h2>
+  <p>Appendix A.8 (<a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=102" target="_blank" rel="noopener">pp. 102–103</a>) gives the heuristic from Nissenbaum (2009) as a checklist. It is meant both for judging whether a deployed system threatens privacy and for designers comparing alternatives. In the order the report gives it:</p>
+  <pre class="code-block"><code>1. Describe each flow as a full CI tuple
+   (subject, sender, recipient, attribute, transmission principle).
+2. Identify the prevailing context(s); allow nested subcontexts
+   (healthcare &gt; teaching hospital).
+3. Find the relevant norms and compare:
+     Case 1  flow conforms        -&gt; appropriate
+     Case 2  flow breaches a norm -&gt; prima facie violation;
+                                     presumption favors the entrenched norm
+     Case 3  no norm covers it    -&gt; a gap (norm systems are incomplete)
+4. For Case 2 or Case 3, evaluate:
+     I.   impacts on stakeholders, including parties beyond the tuple
+          (benefits, costs, risks, shifts in power)
+     II.  impacts on moral and political principles
+          (autonomy, justice, fairness, liberty, democracy, hierarchy)
+     III. impacts on the context's own values, ends and purposes
+5. Clear result -&gt; accept or reject the system.
+   Ambiguous result -&gt; gather more data, deliberate,
+                       or revert to the status quo.</code></pre>
+  <p>§4.1.2 adds that a new technology can do more than break norms. It can enable better ones. The report's example is public health research, where progress from k-anonymity to differential privacy made stronger guarantees possible for statistics over health records.</p>
+  <p>Our reading, for agent builders: steps 1&ndash;3 look mechanizable, and they are roughly the "identify flows, locate norms, judge" steps that §6 asks a contextual policy engine to perform. Step 4 is where it gets hard. Evaluations I&ndash;III are moral and political judgment, and Case 3 (no norm exists) is exactly the situation a general-purpose agent improvising new flows will hit most often. The heuristic tells you what question to ask; it does not answer it.</p>
+
+  <h2 id="preferences">Where user preferences fit</h2>
+  <p>A natural objection: if CI is about social norms, does it leave room for an assistant that does what <em>its</em> user wants? §4.2 (<a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=18" target="_blank" rel="noopener">pp. 18–19</a>) says yes, within limits. Some choices are reasonably the user's to make. The report's example is a user who would rather the agent give a nickname than their legal name when booking a restaurant. Others are not, such as password strength. Personalization enters through the tuple itself, most obviously when the transmission principle is "with consent" or a variant: then the appropriate flow is the one that matches what the user wants.</p>
+  <p>The limits are the important part. The report says the scope of preferences is clearly bounded. Agents will have to respect prohibitions that come from other sources, and will sometimes make security decisions below the user's attention or expertise. In some cases the user's preference will be overridden by contextual considerations. The report frames this as straining against the legacy of privacy as control and against notice and choice, a model it calls entrenched yet unworkable.</p>
+  <p>Our reading: this gives preferences a precise address. They are values for parameters inside a norm, not a veto over the norm. An agent architecture that treats the user's settings as the whole privacy policy is, by this account, built on the wrong theory.</p>
+
+  <h2 id="critiques">What is still open in CI itself</h2>
+  <p>The report calls CI a live theory and treats its development as an open research problem in its own right (§4.3; App. C, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=104" target="_blank" rel="noopener">pp. 104–106</a>). It names the core tension directly: people want to adapt CI to new technology such as agents, but evaluations are only meaningful if the ontology stays standardized.</p>
+  <h3>Richer transmission properties (C.1)</h3>
+  <p>Some argue CI should describe more about <em>how</em> information moves. One proposal treats the medium (face-to-face, handwritten note, text message, public post) as part of the flow, possibly as an extra parameter; the report prefers to fold it into "transmission properties". Another use: CI has no native way to say a flow was aggregated across many subjects, reduced to a statistic and noised, which is what a differentially private release does. Transmission properties fill that gap, and the report cites work showing synergy between CI and differential privacy (Benthall &amp; Cummings, 2024) rather than opposition.</p>
+  <h3>Pinning down transmission principles (C.2)</h3>
+  <p>TPs carry the normative weight of CI, yet the report says they are surprisingly underdeveloped: there is no enumeration of them that you could search over. GKC-CI (Shvartzshnaider et al., 2022), which the report cites, merges CI with the institutional grammar of Governing Knowledge Commons and splits a TP into four aspects: <b>aims</b> (the receiver's intended use, e.g. personalized ads), <b>conditions</b> (a prior event, e.g. consent given), <b>modalities</b> (can, might, will: whether a condition is necessary or sufficient), and <b>consequences</b> (an effect of the flow that must be accounted for, e.g. identity verification). The report's example of why this matters: GDPR's purpose binding is not first-class in CI but can be expressed as a TP that keeps the "aims" consistent as information passes from actor to actor.</p>
+  <h3>Modeling context, inference and granularity (C.3)</h3>
+  <p>This is the critique most relevant to agents. Enforcing a rich norm may require knowing a lot about the scenario: what the recipient already knows, what they need for the context's purpose, what they could infer by combining the new information with old, and what that could do to the subject. The report contrasts telling a colleague a coworker "has been dealing with some personal issues" with naming a diagnosis; the second lets the recipient infer and act in ways the subject never authorized.</p>
+  <p>Behind this is a longstanding objection: CI's "attribute" parameter assumes information has a stable meaning, but data's meaning shifts with whatever it is combined with (Horvitz &amp; Mulligan, 2015). Granularity is a related gap. The report's example: telling an employer a patient "has a chronic condition" can be fine when requesting accommodations, while giving the exact drug, dose and diagnosis violates the norm, even though the information type has not changed. Responses it cites include defining the attribute by provenance rather than inferential use (Nissenbaum et al., 2018) and replacing semantics with "situated information flow" that models what each actor can causally infer (Benthall, 2019). The open problem as the report states it: how much modeling of social context is needed to find legitimate norms or to comply with them. It suggests CI-compliant agents may need models of the other party's knowledge and inferential ability, and multi-agent settings may need causal world models of the whole sociotechnical system.</p>
+  <h3>Beyond privacy (C.4)</h3>
+  <p>The report also notes a proposed extension of CI into a general method for evaluating technical change, not just privacy (O'Neill, 2022), and possible synthesis with other institutional-analysis frameworks.</p>
+  <blockquote class="q"><span>"privacy must be enacted through agent behavior"</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=104" target="_blank" rel="noopener">App. B, p. 104</a></span></blockquote>
+
+  <div class="callout">Judge flows, not data. Before an agent sends anything, you should be able to fill in all five slots &mdash; sender, recipient, subject, information type, transmission principle &mdash; against a named social context. If you cannot, the flow is underspecified. If you can and no norm covers it, you are in the report's "Case 3", which a filter cannot settle: it needs evaluation against interests, principles and the context's purpose.</div>
+
+  <h2 id="connections">Connections</h2>
+  <p>§1.1 points to §3 for risks and threat models: see <a class="lnk" href="three-dimensions.html">Three dimensions, four threat models</a>. §4 hands off to §5, which extends CI from information flows to every action: <a class="lnk" href="../problems/contextual-security.html">Contextual Security</a>. The heuristic's steps reappear as the reasoning pipeline of §6: <a class="lnk" href="../problems/policy-engines.html">the contextual policy engine</a>. §4 cites CI-based benchmarks and sends readers to §10 and its benchmark review in Appendix D: <a class="lnk" href="../problems/evaluations.html">Evaluations and benchmarks</a>. For the terms on this page in one place, see the <a class="lnk" href="../guide/glossary.html">Glossary</a>. Related reading on a CI benchmark for persistent memory: the sibling <a class="lnk" href="https://idvorkin-ai-tools.github.io/cimemories-field-map/" target="_blank" rel="noopener">CIMemories field map</a>.</p>
+
+  <h2 id="reading">Further reading, verified</h2>
+  <ul class="readings">
+    <li><a href="https://privaci.info/glossary" target="_blank" rel="noopener">Privacy in Context &mdash; Interactive CI Glossary</a> &mdash; Nissenbaum &amp; Shvartzshnaider &middot; the report names this as the full, up-to-date version of its Appendix A glossary.</li>
+    <li><a href="https://arxiv.org/abs/2405.05175" target="_blank" rel="noopener">AirGapAgent: Protecting Privacy-Conscious Conversational Agents</a> &mdash; Bagdasarian et al. (2024) &middot; cited for the principle that trustworthy agents should share data appropriately.</li>
+    <li><a href="https://arxiv.org/abs/2501.17070" target="_blank" rel="noopener">Contextual Agent Security: A Policy for Every Purpose</a> &mdash; Tsai &amp; Bagdasarian (2025) &middot; cited as the basis for extending CI to Contextual Security.</li>
+    <li><a href="https://arxiv.org/abs/2310.17884" target="_blank" rel="noopener">Can LLMs Keep a Secret? Testing Privacy Implications of Language Models via Contextual Integrity Theory</a> &mdash; Mireshghallah et al. (2024) &middot; cited as a CI-based benchmark and as evidence that models show some reasoning about norms.</li>
+    <li><a href="https://arxiv.org/abs/2501.19173" target="_blank" rel="noopener">Position: Contextual Integrity is Inadequately Applied to Language Models</a> &mdash; Shvartzshnaider &amp; Duddu (2025) &middot; cited for the critique that some CI benchmarks rest on diluted versions of the theory.</li>
+    <li><a href="https://arxiv.org/abs/2401.15774" target="_blank" rel="noopener">Integrating Differential Privacy and Contextual Integrity</a> &mdash; Benthall &amp; Cummings (2024) &middot; cited for synergies between CI and differential privacy and for "transmission properties".</li>
+  </ul>
+
+  <div class="callout">Next: <a class="lnk" href="three-dimensions.html">Three dimensions, four threat models</a> &middot; Back to the <a class="lnk" href="../index.html#lens">map</a>.</div>
+</main>
+<footer>Original explanation of <em>Open and Emergent Problems in Agentic Privacy and Security: A Contextual Angle</em> (Bagdasarian, Tsai et al., 2026), §1, §2, §4 and Appendices A–C. The report is &copy; its authors; this page explains and links, it does not copy.</footer>
+</body>
+</html>

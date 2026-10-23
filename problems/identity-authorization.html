@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Identity, authorization, accounting &mdash; Agentic privacy, mapped</title>
+<meta name="description" content="Why who-is-acting, what-may-it-do and what-did-it-do all wobble when the actor is a stochastic agent: OP 7.1–7.5 of the CAPS report, explained." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../paper.css" />
+</head>
+<body>
+<header class="bar"><div class="bar-in">
+  <div class="brand"><span class="dot"></span>AGENTIC&nbsp;PRIVACY&nbsp;//&nbsp;FIELD&nbsp;MAP</div>
+  <a class="back" href="../index.html#components">&larr; field map</a>
+</div></header>
+<main>
+  <div class="eyebrow"><span class="box bb mono">PART II · COMPONENTS · 01 OF 06</span><span class="mono">§7 intro, §7.1–7.3 · pp. 30–35 · OP 7.1–7.5</span></div>
+  <h1>Identity, authorization, accounting</h1>
+  <div class="authors">Who is acting, what it may do, and what it did, when the actor is neither a person nor a program</div>
+  <div class="paperlink" style="border-left-color:var(--def)"><span class="lbl">Source</span><a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=30" target="_blank" rel="noopener">§7 Challenges with Systems Security and Privacy for AI Agents, §7.1–7.3, pp. 30–35 ↗</a></div>
+
+  <div class="tldr"><b>TL;DR &mdash;</b> The three classic security pillars (authentication, authorization, accounting) were built for two kinds of actor: people who act on purpose, and programs whose behavior is fixed by code you can read. An agent is a third kind, and each pillar breaks in its own way. Services cannot tell an agent from its user or trace a sub-agent's action back to a person (OP 7.1–7.2). OAuth-style consent is one-time and scope-based, while agents discover what they need mid-task and need permissions bound to a purpose and a lifetime (OP 7.3–7.4). Audit logs record actions, but nothing ties an action to the intent behind it (OP 7.5). The report names a lot of standards work in flight; none of it is presented as a solution.</div>
+
+  <p class="lead">Section 7 opens Part II, the report's tour of what each layer of the stack can contribute. This page covers the system-level half that deals with principals and permissions: §7.1 (identity), §7.2 (authorization) and §7.3 (accounting). The report frames a fourth pillar, privacy, in §7.4, which has <a href="data-privacy.html">its own page</a>, and closes the section with §7.5, the "intent-specification gap" argument, covered on <a href="last-mile-developer.html">AI as the last-mile developer</a>. Everything below is a version of one question: what does an access-control system key on when the thing asking for access was not written by anyone?</p>
+
+  <h2 id="aaa">Why the AAA pillars assume the wrong actor</h2>
+  <p>The report organizes §7 around the textbook security mechanisms, citing Sandhu &amp; Samarati (1996) and the Generic AAA Architecture (RFC 2903): authentication establishes who is acting, authorization decides what they may do, accounting records what they did, and privacy governs where information flows (<a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=30" target="_blank" rel="noopener">§7, p. 30</a>).</p>
+  <p>Each pillar quietly leans on an assumption about the actor. If the actor is a human, you can hold them responsible because they meant to do it. If the actor is a program, you can reason about it ahead of time because its behavior is in its source. The report's point is that an agent gives you neither handle.</p>
+  <blockquote class="q"><span>"an agent is a stochastic actor whose behavior emerges from LLM inference over an unpredictable model context."</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=30" target="_blank" rel="noopener">§7, p. 30</a></span></blockquote>
+  <table class="kv">
+    <tr><th>Pillar</th><th>Built on</th><th>What an agent breaks</th></tr>
+    <tr><td>Authentication</td><td>A principal is a person or a known workload</td><td>No protocol has "agent" as an entity type, so agent actions look like the user's (§7.1)</td></tr>
+    <tr><td>Authorization</td><td>Permissions derived from a known app spec, granted once</td><td>The needed permissions are decided at runtime by the plan, and change mid-task (§7.2)</td></tr>
+    <tr><td>Accounting</td><td>Each action follows an explicit user act (a click, a form)</td><td>The agent fills in every detail the instruction left out, so the action is not the intent (§7.3)</td></tr>
+  </table>
+  <p>The section summary blames unstructured intent and context plus a shrinking role for human oversight (§7, p. 30). Our reading: that is the report's <a href="../concepts/three-dimensions.html">three dimensions</a> applied to one layer.</p>
+  <p>The report treats identity as the foundation: every downstream mechanism starts by establishing who is acting (§7.1), which is why OP 7.5 explicitly depends on OP 7.1–7.2.</p>
+
+  <h2 id="op-7-1">OP 7.1 · Distinguishing agents from humans</h2>
+  <p><b>The question.</b> When an action arrives at a service, can the service tell whether the user did it or the user's agent did it, given that current identity protocols have no notion of an agent as its own kind of principal (<a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=31" target="_blank" rel="noopener">§7.1, p. 31</a>)?</p>
+  <p><b>What already exists.</b> There is no shortage of identity machinery: the report lists OpenID Connect, X.509 certificates, SPIFFE, Decentralized Identifiers and Verifiable Credentials, and notes recent work applying these to agents (Garzon et al., 2025). The trouble is not missing plumbing. Every one of these identifies either a human or a deterministic workload, and the agent is neither.</p>
+  <h3>Why it is hard for agents specifically</h3>
+  <p>Computer-use agents are the sharpest case. They click buttons, fill forms and navigate pages exactly the way a person does, so at the HTTP layer there is nothing to distinguish them. The report adds that this indistinguishability also cuts the other way: it makes it easy for adversarial environments to mislead the agent (§7.1, citing Zhan et al., 2026b).</p>
+  <p>Then there is the incentive problem. Bot accounts exist on some services but take far more effort than handing the agent your own login, so agents get a human identity or the user's credentials. The report's examples:</p>
+  <ul>
+    <li>OpenClaw agents that are routinely given email credentials and use them to register on sites, create crypto wallets and hire human workers, with little supervision.</li>
+    <li>Moltbook, a "social network for agents," where there is no clear way to tell a human posting through the API from an agent following a prompt from an agent posting on its own.</li>
+    <li>Open-source maintainers receiving large volumes of agent-written code with no way to tell it apart from human contributions, and agents that have already published defamatory "hit pieces" about developers who rejected their pull requests.</li>
+  </ul>
+  <h3>What the report points to</h3>
+  <p>One direction: a protocol with a first-class "agent" entity whose identity binds four things together (§7.1, p. 31).</p>
+  <pre class="code-block"><code>agent identity = {
+  user:        who the agent acts for
+  software:    model, version, guardrails
+  task:        the specific task or session
+  delegation:  the chain through which authority was granted
+}</code></pre>
+  <p>Related work the report names (§7.1, p. 32): the NIST concept paper on <a href="https://csrc.nist.gov/pubs/other/2026/02/05/accelerating-the-adoption-of-software-and-ai-agent/ipd" target="_blank" rel="noopener">AI agent identity and authorization</a> (Booth et al., 2026), the OpenID Foundation's <a href="https://openid.net/wp-content/uploads/2025/10/Identity-Management-for-Agentic-AI.pdf" target="_blank" rel="noopener">Identity Management for Agentic AI</a> (South et al., 2025), <a href="https://learn.microsoft.com/en-us/entra/agent-id/what-is-microsoft-entra-agent-id" target="_blank" rel="noopener">Microsoft Entra Agent ID</a>, the IETF <a href="https://datatracker.ietf.org/doc/draft-wahl-scim-agent-schema/" target="_blank" rel="noopener">SCIM Agentic Identity Schema</a> draft, and the Linux Foundation's <a href="https://agntcy.org/" target="_blank" rel="noopener">AGNTCY</a>.</p>
+  <p><b>What a good answer would have to do.</b> Our reading: be cheaper to adopt than reusing a human account, or the incentive problem wins regardless of how good the protocol is. And it must carry the software and task fields, not just a "this is a bot" flag, because the later problems (tracing, purpose-bound permissions, intent binding) all need them.</p>
+
+  <h2 id="op-7-2">OP 7.2 · Tracing agents back to users</h2>
+  <p><b>The question.</b> Three linked sub-questions (<a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=32" target="_blank" rel="noopener">§7.1, p. 32</a>): how does an agent say "I am acting for User A right now" in a form that is cryptographically verifiable and auditable; how do you design identity for an agent serving several principals or living in several identity contexts; and how does identity flow through a delegation chain while staying traceable to the person who started it?</p>
+  <p>Where accountability for an agent's action should land (the prompting user, the developer, the deploying organization) is itself left open. What it claims is narrower: whatever the answer, you cannot assign responsibility without first being able to walk the chain. A service hit by a fraudulent purchase or a defamatory post may need to find the responsible party, or refuse further requests from agents run by the same organization.</p>
+  <h3>Shared agents</h3>
+  <p>A team's group-chat bot or an agent in a shared repository takes instructions from several people at once. Today it authenticates as one service account or one set of client credentials, and there is no standard way to say which user it is acting for at this moment. So an action in a shared context cannot be traced to the person who asked for it.</p>
+  <h3>Multi-hop chains</h3>
+  <p>Agents call remote tools over MCP and hand sub-tasks to other agents over protocols like A2A. In a chain such as user → root agent → sub-agent → remote MCP tool, every hop is an independent decision-maker. The report's core question is what identity the downstream service actually sees. If a deeply nested sub-agent does damage, there is currently no mechanism to walk back up to the originating user and find the hop where things went wrong.</p>
+  <p>A way to picture this: today's chain usually collapses into "service account of whoever made the last call." What OP 7.2 asks for is closer to a signed stack trace, where each hop appends who it is and on whose behalf it is acting, and the bottom frame is a human.</p>
+  <p>Related work the report names: <a href="https://github.com/a2aproject/A2A" target="_blank" rel="noopener">Google A2A</a> Agent Cards for advertising capability and identity, and OWASP Agent Naming Service proposals for discovery with identity verification. It also defers intent binding to §7.3, which is <a href="#op-7-5">OP 7.5</a> below.</p>
+
+  <h2 id="authz-limits">Why OAuth, sandboxes and the trust-management classics fall short</h2>
+  <p>Before its two authorization problems, §7.2 lays out why delegation is different for agents (<a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=32" target="_blank" rel="noopener">§7.2, pp. 32–33</a>). A classic app asks once for a well-defined, understandable set of actions ("save photos to cloud storage"). An agent asked to plan a trip may read your calendar, search flights, book hotels and look at your bank balance, and that sequence is chosen at runtime. No upfront consent screen can list it. The report notes this is also called the "intent-execution separation problem" in an IETF draft, and says better authorization would give least privilege via context-aware decisions, plus just-in-time grants that are issued when needed and revoked when the task ends.</p>
+  <p>Two more pressures: long-running, multi-purpose agents can reuse a grant for another task, and prompt injection often drives agents beyond the intended scope (citing Rehberger, 2025).</p>
+  <table class="kv">
+    <tr><th>Mechanism</th><th>What it gets right</th><th>Gap the report notes</th></tr>
+    <tr><td>OAuth 2.1</td><td>The standard for delegated, scoped access; becoming the norm for MCP</td><td>Coarse scopes, static one-time consent, no attenuation: sub-agents inherit the parent's full scope (citing Chopra, 2025)</td></tr>
+    <tr><td>GNAP (RFC 9635)</td><td>Separates requester from resource owner; dynamic grant negotiation</td><td>Addresses some rigidity; not applied to agents</td></tr>
+    <tr><td>Macaroons</td><td>Chained HMAC caveats that can only narrow permissions along a delegation chain</td><td>Not applied to agents</td></tr>
+    <tr><td>SPKI/SDSI</td><td>Authorizations bound to public keys, transitive delegation</td><td>Not applied to agents</td></tr>
+    <tr><td>PolicyMaker / KeyNote</td><td>Authorization as logical deduction over signed policy statements</td><td>Not applied to agents</td></tr>
+    <tr><td>Sandboxes (containers, VMs)</td><td>Hard boundary on what the agent can touch</td><td>Same static, manual problem: someone sets binary, coarse permissions and approves each increase</td></tr>
+  </table>
+  <p>The report also mentions trusted execution environments as a possible route to client-side sandboxing (Abdollahi et al., 2026). Our reading of the table: attenuation, the one property agents most obviously need for sub-agent delegation, already exists in the literature (Macaroons, SPKI). The gap the report identifies is that nobody has carried it over, and that none of these systems can express purpose.</p>
+
+  <h2 id="op-7-3">OP 7.3 · Enabling context-aware authorization</h2>
+  <p><b>The question.</b> Can authorization enforce least privilege for agents by granting access not just to a resource, but only under the right conditions and for the right purpose, while staying aware of consent fatigue and of how vague an agent's stated purpose can be? And how is authority delegated between parties, including from a parent agent to its sub-agents (<a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=33" target="_blank" rel="noopener">§7.2, p. 33</a>)?</p>
+  <h3>Why it is hard</h3>
+  <p>In classic authorization, permissions come from an app specification. For an agent, they come from a natural-language instruction plus a plan that is still being written. And the same permission can be right or badly wrong depending on why it is used: read access to medical records is fine when finding a doctor and a serious violation when drafting a social media post. That is Contextual Integrity reasoning showing up inside an access-control decision.</p>
+  <blockquote class="q"><span>"Traditional mechanisms can express conditions like “read-only” or “valid only on weekdays,” but they cannot express “only when helping the user find a doctor.”"</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=33" target="_blank" rel="noopener">§7.2, p. 33</a></span></blockquote>
+  <p>The same gap applies to natural-language sub-tasks passed between agents.</p>
+  <p>Permissions also grow during a task. The report's example is an agent resolving a customer complaint that starts with email access, then discovers it needs the billing system and internal monitoring logs (pp. 33–34). So authorization has to be an ongoing process run by the authorization infrastructure, not one decision at the start.</p>
+  <h3>The two obvious answers, and their catches</h3>
+  <ul>
+    <li><b>Human approves each request.</b> At agent speed this produces consent fatigue: people start approving everything, which defeats the purpose of asking (p. 34).</li>
+    <li><b>The model writes the policy.</b> Possible, but the report warns that untrusted policy inputs open the door to model manipulation attacks. This is the same separation <a href="policy-engines.html">§6's policy-engine design</a> insists on.</li>
+  </ul>
+  <h3>What the report points to</h3>
+  <p>A list of research systems, all framed as related work rather than answers (p. 34): <a href="https://arxiv.org/abs/2503.18813" target="_blank" rel="noopener">CaMeL</a> (a trusted planner isolated from an untrusted data processor), <a href="https://arxiv.org/abs/2501.17070" target="_blank" rel="noopener">Conseca</a> (policies generated from system context), Sapien (stateful policies generated in context), <a href="https://arxiv.org/abs/2504.21034" target="_blank" rel="noopener">SAGA</a> (centralized agent access control), <a href="https://arxiv.org/abs/2504.11703" target="_blank" rel="noopener">Progent</a> (fine-grained tool policies), <a href="https://arxiv.org/abs/2602.16708" target="_blank" rel="noopener">FORGE</a> (Datalog-based policies), <a href="https://arxiv.org/abs/2512.11147" target="_blank" rel="noopener">MiniScope</a> (computes minimal OAuth scopes and asks the user to approve them), and Siu et al. (2026a) on formalizing what authorization based on system context requires.</p>
+  <p><b>What a good answer would have to do.</b> Our reading: represent purpose in a form a machine can check, keep the inputs that set purpose out of reach of untrusted data, attenuate on every delegation hop, and ask the human rarely enough that the asks still mean something.</p>
+
+  <h2 id="op-7-4">OP 7.4 · Managing the authorization lifecycle</h2>
+  <p><b>The question.</b> How long should a credential live (<a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=34" target="_blank" rel="noopener">§7.2, p. 34</a>)? The sub-questions: can task length be predicted, how does the system know to revoke on completion or failure, what if a self-reporting agent crashes or lies, and can an agent get extra permissions mid-task without full re-authorization or a fresh round of consent fatigue?</p>
+  <h3>Why it is hard</h3>
+  <p>OAuth-style tokens have a fixed time-to-live chosen at provisioning. Agent tasks range from seconds (an email lookup) to days (a research project), and their length is often unknowable up front.</p>
+  <blockquote class="q"><span>"no current system ties the credential lifecycle to the task lifecycle."</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=34" target="_blank" rel="noopener">§7.2, p. 34</a></span></blockquote>
+  <p>The authorization server does not know when a task starts or ends. So a fixed TTL fails in one of two directions. Too short, and the token expires mid-task and interrupts the work for re-authorization. Too long, and a stale token keeps live permissions after the task is over. The report notes that stale credentials have enabled large-scale attacks before, citing the U.S. Department of Energy's account of the Colonial Pipeline incident. Agents make it worse by volume: they can pile up hundreds of stale tokens before a human looks, so yesterday's social-media permission is still sitting there during today's medical task.</p>
+  <h3>What counts as "a task"</h3>
+  <p>Even defining the unit is open. Is "plan my trip to Europe" one task, or three ("book flight," "book hotel," "arrange transport") with three credential scopes? And who announces completion? The obvious signal, the agent saying "done," is exactly the signal you cannot rely on from a component that can crash, be confused or be injected.</p>
+  <p>A way to picture this: a token that behaves like a lease on a task rather than a timer on a clock. It would be issued against a task id, narrowed to that task's purpose, renewed by some liveness signal that does not come only from the agent, and revoked when the task closes or the signal stops. The report does not propose this design; it is one shape an answer to OP 7.4 might take.</p>
+  <p>Related work the report names (p. 34): <a href="https://www.rfc-editor.org/rfc/rfc9635" target="_blank" rel="noopener">GNAP</a> for dynamic grant negotiation, the IETF Agentic JWT draft for workflow-bound tokens, and the IETF <a href="https://datatracker.ietf.org/doc/draft-chen-agent-decoupled-authorization-model/" target="_blank" rel="noopener">Decoupled Authorization Model for Agent2Agent</a> for intent-based just-in-time permissions. A note on the citation: the report's reference list resolves "Agentic JWT" to the draft titled <a href="https://datatracker.ietf.org/doc/draft-goswami-agentic-jwt/" target="_blank" rel="noopener">Secure Intent Protocol: JWT Compatible Agentic Identity and Workflow Management</a>, the same document it cites for the "intent-execution separation problem" above and as the Secure Intent Protocol under OP 7.5.</p>
+
+  <h2 id="op-7-5">OP 7.5 · Ensuring that an agent's action is intended by the user</h2>
+  <p><b>The question.</b> Can we produce verifiable artifacts that bind what an agent did to what the user originally asked for ("Buy groceries under $50"), when the model's probabilistic nature makes "faithful execution" a slippery idea? And can we standardize forensic observability so a failure can be attributed to the user (a bad prompt), the developer (a software bug) or the model (a hallucination) (<a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=35" target="_blank" rel="noopener">§7.3, p. 35</a>)? The report notes this depends on §7.1: you cannot account for an action you cannot first attribute to an agent and trace to a user.</p>
+  <h3>Why accounting breaks</h3>
+  <p>In a classic system, every action traces to an explicit user act, and the link between what the user wanted and what the system did is direct (§7.3, p. 34). An agent inserts an interpreter. The instruction is high-level and necessarily underspecified; the actions are concrete. Every detail the user did not specify (which store, which brand, which delivery slot) was decided by the agent on its own.</p>
+  <p>This produces a non-repudiation problem the report calls qualitatively different, and it cuts both ways. A user whose agent bought something after a hallucination or prompt injection wants to disown it; a merchant or bank needs to catch a user falsely blaming "agent error" to reverse a real purchase. After an incident (a fraudulent purchase, leaked data, a deleted production server) someone must reconstruct what happened, why, and who is responsible.</p>
+  <h3>The intent-binding artifact</h3>
+  <p>Traditional non-repudiation uses digital signatures to bind a principal to an action, and append-only signed logs such as <a href="https://www.rfc-editor.org/rfc/rfc6962" target="_blank" rel="noopener">Certificate Transparency</a> and Trillian/Tessera give tamper-evident, publicly checkable trails. The report asks whether agents can get an equivalent that covers the whole path from instruction to action. It lists what such an artifact would need to contain, all bound together so that a third party can verify it:</p>
+  <pre class="code-block"><code>intent-binding artifact
+  1. user's original instruction    (authenticated by the user)
+  2. agent's interpretation         (the plan or reasoning trace)
+  3. the specific actions taken
+  -- bound so a third party can verify all three together</code></pre>
+  <p>Our reading of why this is hard: items 1 and 3 are ordinary signed records. Item 2 is the hard one. A reasoning trace is model output, so proving it is the reasoning that actually produced the action, rather than a plausible story written afterward, is not something a signature gives you. That is presumably why the report's related work includes zero-knowledge proofs of model inference.</p>
+  <p>Related work the report names (p. 35): <a href="https://arxiv.org/abs/2602.10465" target="_blank" rel="noopener">Authenticated Workflows</a> (Rajagopalan &amp; Rao, 2026), zkML (Chen et al., 2024), zkLLM (Sun et al., 2024), the IETF Decoupled Authorization draft, the Secure Intent Protocol draft, and the <a href="https://agentpaymentsprotocol.info/" target="_blank" rel="noopener">Agent Payments Protocol (AP2)</a>.</p>
+  <p><b>What a good answer would have to do.</b> Settle disputes in both directions and assign a failure to prompt, code or model. A log that only says "the agent called <span class="mono">checkout()</span>" does neither.</p>
+
+  <div class="callout">Carry this away: identity, permission and audit for agents have to be about the <em>task</em>, not just the principal. Who the agent acts for, what it is for right now, how long that lasts, and what the user actually asked for are four fields today's tokens and logs mostly do not carry. The standards drafts the report lists are early attempts at adding them, not settled answers.</div>
+
+  <h2 id="connections">Connections</h2>
+  <p>The fourth pillar, privacy, continues on <a href="data-privacy.html">PII, minimization, deletion, anonymity</a> (§7.4). The reason the report gives for why all of §7 needs rethinking, the intent-specification gap, is on <a href="last-mile-developer.html">AI as the last-mile developer</a> (§7.5). Model-generated policies and the rule that untrusted inputs stay away from the policy generator come from <a href="policy-engines.html">the contextual policy engine</a>. Delegation chains where constraints get lost after the first hop return in <a href="multi-agent-norms.html">Shared norms, delegation, composition</a>, and MCP and A2A as channels in <a href="agent-channels.html">Protocols, attestation, side channels</a>. Consent fatigue and audit paths for users sit on <a href="mental-models-consent.html">Mental models and the end of notice-and-choice</a> and <a href="trust-recourse.html">Trust, stop buttons, accountability</a>.</p>
+
+  <h2 id="reading">Further reading, verified</h2>
+  <ul class="readings">
+    <li><a href="https://datatracker.ietf.org/doc/draft-ietf-oauth-v2-1/" target="_blank" rel="noopener">The OAuth 2.1 Authorization Framework</a> &mdash; IETF draft (2026) &middot; the delegated-access baseline whose coarse scopes, static consent and lack of attenuation the report critiques</li>
+    <li><a href="https://www.ndss-symposium.org/ndss2014/programme/macaroons-cookies-contextual-caveats-decentralized-authorization-cloud/" target="_blank" rel="noopener">Macaroons: Cookies with Contextual Caveats for Decentralized Authorization in the Cloud</a> &mdash; Birgisson et al. (NDSS 2014) &middot; attenuation by construction, cited as trust-management prior art not yet applied to agents</li>
+    <li><a href="https://www.rfc-editor.org/rfc/rfc9635" target="_blank" rel="noopener">RFC 9635: Grant Negotiation and Authorization Protocol (GNAP)</a> &mdash; IETF (2024) &middot; dynamic grant negotiation, cited under OP 7.3 and OP 7.4</li>
+    <li><a href="https://arxiv.org/abs/2501.17070" target="_blank" rel="noopener">Contextual Agent Security: A Policy for Every Purpose</a> &mdash; Tsai &amp; Bagdasarian (HotOS 2025) &middot; Conseca, policies generated from system context (OP 7.3)</li>
+    <li><a href="https://arxiv.org/abs/2503.18813" target="_blank" rel="noopener">Defeating Prompt Injections by Design</a> &mdash; Debenedetti et al. (2025) &middot; CaMeL, isolating a trusted planner from untrusted data (OP 7.3)</li>
+    <li><a href="https://arxiv.org/abs/2512.11147" target="_blank" rel="noopener">MiniScope</a> &mdash; Zhu et al. (2025) &middot; computing minimal OAuth scopes for the user to approve (OP 7.3)</li>
+    <li><a href="https://openid.net/wp-content/uploads/2025/10/Identity-Management-for-Agentic-AI.pdf" target="_blank" rel="noopener">Identity Management for Agentic AI</a> &mdash; South et al., OpenID Foundation (2025) &middot; related work for a first-class agent identity (OP 7.1)</li>
+    <li><a href="https://arxiv.org/abs/2602.10465" target="_blank" rel="noopener">Authenticated Workflows: A Systems Approach to Protecting Agentic AI</a> &mdash; Rajagopalan &amp; Rao (2026) &middot; related work for intent-binding (OP 7.5)</li>
+  </ul>
+
+  <div class="callout">Next: <a class="lnk" href="data-privacy.html">PII, minimization, deletion, anonymity</a> &middot; Back to the <a class="lnk" href="../index.html#components">map</a>.</div>
+</main>
+<footer>Original explanation of <em>Open and Emergent Problems in Agentic Privacy and Security: A Contextual Angle</em> (Bagdasarian, Tsai et al., 2026), §7 intro and §7.1–7.3. The report is &copy; its authors; this page explains and links, it does not copy.</footer>
+</body>
+</html>

@@ -15,6 +15,8 @@ Seventeen pages plus a spine:
   dimensions and the four threat models.
 - **The open problems** (`problems/`): one page per problem area, §5 through §12, covering all 51
   numbered open problems. Each problem has an anchor, e.g. `problems/model-reasoning.html#op-8-3`.
+- **Explore** (`explore/leak-paths.html`): an interactive data-flow graph of one agent; toggle
+  capabilities and defenses and watch attack paths open or close.
 - **Guides** (`guide/`): read it in 10 minutes, for builders, glossary.
 
 Original explanation, grounded in the report. Section, page and open-problem numbers are the

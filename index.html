@@ -77,6 +77,7 @@
       <div class="fact"><div class="k">Building agents</div><div class="v"><a class="lnk" href="guide/for-builders.html">what to do Monday</a></div></div>
       <div class="fact"><div class="k">Every problem</div><div class="v"><a class="lnk" href="#all-problems">all 51, indexed</a></div></div>
       <div class="fact"><div class="k">The words</div><div class="v"><a class="lnk" href="guide/glossary.html">glossary</a></div></div>
+      <div class="fact"><div class="k">Interactive</div><div class="v"><a class="lnk" href="explore/leak-paths.html">where leaks come from</a></div></div>
     </div>
     <p class="progress" id="progress">Tick a page when you have read it; this browser remembers.</p>
   </div>
@@ -118,6 +119,12 @@
     <div class="row"><div class="num"><span class="check" data-p="p10"></span>12</div><div><div class="name"><a href="problems/multi-agent-norms.html">Shared norms, delegation, composition</a></div><div class="meta"><span>&sect;11.1&ndash;11.2</span><span>OP 11.1&ndash;11.5</span><span>multi-agent</span></div><div class="desc">A contextual handshake between strangers, collusion and norm drift, constraints that evaporate after hop one, swarms of thousands, and disclosures that are each fine until someone sees both.</div></div></div>
     <div class="row"><div class="num"><span class="check" data-p="p11"></span>13</div><div><div class="name"><a href="problems/agent-channels.html">Protocols, attestation, side channels</a></div><div class="meta"><span>&sect;11.3&ndash;11.4</span><span>OP 11.6&ndash;11.9</span><span>multi-agent</span></div><div class="desc">Free-form language over MCP and A2A, firewalled task-scoped protocols, why remote attestation of code does not attest behavior, how expressive an inter-agent language should be, timing leaks, and simulated societies for training and evaluation.</div></div></div>
     <div class="row"><div class="num"><span class="check" data-p="p12"></span>14</div><div><div class="name"><a href="problems/governance.html">Governance: whose norms, and who checks</a></div><div class="meta"><span>&sect;12&ndash;13</span><span>OP 12.1&ndash;12.4</span><span>norm repository</span></div><div class="desc">Preconditions for a norm-respecting ecosystem, liability placed where capability sits (the credit-card and ADA precedents), three ways to source norms, conflicting jurisdictions, and compliance records produced at the moment an agent acts.</div></div></div>
+  </section>
+
+  <section id="explore" class="cyan">
+    <div class="arc-head"><span class="idx">EXPLORE</span><h2>Where leaks come from</h2></div>
+    <p class="arc-sub">The mechanism, to manipulate rather than read.</p>
+    <div class="row"><div class="num">&#9654;</div><div><div class="name"><a href="explore/leak-paths.html">An agent's data-flow graph, with toggles</a></div><div class="meta"><span>interactive</span><span>6 attack paths</span><span>6 defenses</span></div><div class="desc">User data, the agent, its tools, recipients and untrusted inputs as one graph. Switch capabilities (browsing, inbox, email, memory) and defenses (minimization, untrusted tool output, contextual flow checks, confirmation, task-scoped credentials, scoped memory) and watch injection, over-sharing, contamination and exfiltration paths open or close. One path survives every defense: composition.</div></div></div>
   </section>
 
   <section id="guides" class="amber">

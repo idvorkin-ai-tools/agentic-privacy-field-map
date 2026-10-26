@@ -62,7 +62,7 @@
 </div></header>
 <main>
   <div class="hero">
-    <div class="eyebrow"><span class="box wb mono">BAGDASARIAN, TSAI ET AL. &middot; CAPS WORKSHOP REPORT &middot; 2026</span><span class="mono">116 pages &middot; 14 sections &middot; 51 open problems &middot; 17 pages here</span></div>
+    <div class="eyebrow"><span class="box wb mono">BAGDASARIAN, TSAI ET AL. &middot; CAPS WORKSHOP REPORT &middot; 2026</span><span class="mono">116 pages &middot; 14 sections &middot; 51 open problems &middot; 18 pages here</span></div>
 
   <figure class="fig hero-fig bare"><button type="button" class="media" aria-label="Enlarge figure: A plush raccoon mail courier in a CONTEXT t-shirt holds up an envelope in front of three small doors marked with a medical cross, a dumbbell and a house, deciding which envelope belongs at which door."><img src="img/raccoon-ci-courier.webp" alt="A plush raccoon mail courier in a CONTEXT t-shirt holds up an envelope in front of three small doors marked with a medical cross, a dumbbell and a house, deciding which envelope belongs at which door." width="640" height="640" loading="lazy"></button><figcaption>Contextual Integrity in one picture: the same envelope is fine at one door and wrong at the next.</figcaption></figure>
     <h1>Agentic privacy, mapped</h1>
@@ -78,6 +78,7 @@
       <div class="fact"><div class="k">Every problem</div><div class="v"><a class="lnk" href="#all-problems">all 51, indexed</a></div></div>
       <div class="fact"><div class="k">The words</div><div class="v"><a class="lnk" href="guide/glossary.html">glossary</a></div></div>
       <div class="fact"><div class="k">Interactive</div><div class="v"><a class="lnk" href="explore/leak-paths.html">where leaks come from</a></div></div>
+      <div class="fact"><div class="k">Across to CIMemories</div><div class="v"><a class="lnk" href="guide/bridge.html">two maps, one model</a></div></div>
     </div>
     <p class="progress" id="progress">Tick a page when you have read it; this browser remembers.</p>
   </div>
@@ -96,7 +97,14 @@
 
   <section id="framework" class="amber">
     <div class="arc-head"><span class="idx">02 &middot; PART I &middot; THE FRAMEWORK</span><h2>From a theory of privacy to a machine that enforces it</h2></div>
-    <p class="arc-sub">Part I closes with two moves: extend Contextual Integrity from information flows to all behavior, and decompose "operationalize CI" into five steps an agent would have to perform. Ten open problems live here.</p>
+    <p class="arc-sub">Part I closes with two moves: extend Contextual Integrity from information flows to all behavior, and decompose "operationalize CI" into five steps an agent would have to perform. Ten open problems live here. The five steps are also the spine of this map; each box below hangs the pages that cover that step.</p>
+    <div class="spine" aria-label="The five reasoning steps, with the pages of this map hung off each step">
+    <div class="sp"><div class="k">1 &middot; Identify</div><p>the flows and state changes an action causes</p><ul><li><a href="concepts/contextual-integrity.html">the CI tuple</a></li><li><a href="problems/contextual-security.html">effects beyond flows (&sect;5)</a></li><li><a href="problems/last-mile-developer.html">what exec(*) can cause (&sect;7.5)</a></li></ul></div>
+    <div class="sp"><div class="k">2 &middot; Locate</div><p>the norms that apply</p><ul><li><a href="problems/policy-engines.html#op-6-3">representing norms (OP 6.3)</a></li><li><a href="problems/governance.html#op-12-2">whose norms (OP 12.2)</a></li><li><a href="problems/multi-agent-norms.html#op-11-1">shared norms (OP 11.1)</a></li></ul></div>
+    <div class="sp"><div class="k">3 &middot; Apply</div><p>judge: is this action appropriate?</p><ul><li><a href="problems/model-reasoning.html">models that reason about it (&sect;8)</a></li><li><a href="problems/policy-engines.html#op-6-4">norms to formal policy (OP 6.4)</a></li><li><a href="problems/evaluations.html">measuring it (&sect;10)</a></li></ul></div>
+    <div class="sp"><div class="k">4 &middot; Resolve</div><p>uncertainty, conflicts, whom to ask</p><ul><li><a href="problems/policy-engines.html#uncertainty">resolving uncertainty (&sect;6.6)</a></li><li><a href="problems/mental-models-consent.html">asking the user (&sect;9.1&ndash;9.2)</a></li><li><a href="problems/model-reasoning.html#op-8-2">ambiguity (OP 8.2)</a></li></ul></div>
+    <div class="sp"><div class="k">5 &middot; Enforce</div><p>make behavior match the judgment</p><ul><li><a href="problems/policy-engines.html#op-6-7">enforcement at scale (OP 6.7)</a></li><li><a href="problems/identity-authorization.html">credentials and intent (&sect;7.1&ndash;7.3)</a></li><li><a href="problems/data-privacy.html">minimization, revocation (&sect;7.4)</a></li><li><a href="problems/trust-recourse.html">stop, undo, audit (&sect;9.3)</a></li><li><a href="problems/agent-channels.html">channels (&sect;11.3)</a></li></ul></div>
+  </div>
     <div class="row"><div class="num"><span class="check" data-p="p01"></span>03</div><div><div class="name"><a href="problems/contextual-security.html">Contextual Security</a></div><div class="meta"><span>&sect;5</span><span>OP 5.1&ndash;5.3</span><span>security defined by society, not the spec</span></div><div class="desc">Why a system that perfectly enforces its own specification can still be insecure in context, from the gym-booking agent to the serial killers' self-destructing filesystem. Threat models that fit the setting, and security norms as a pair of functionality and security goal.</div></div></div>
     <div class="row"><div class="num"><span class="check" data-p="p02"></span>04</div><div><div class="name"><a href="problems/policy-engines.html">Operationalizing CI: the contextual policy engine</a></div><div class="meta"><span>&sect;6</span><span>OP 6.1&ndash;6.7</span><span>five reasoning steps</span></div><div class="desc">Identify flows, locate norms, judge, resolve uncertainty, enforce. Why no oracle model exists, how a policy generator plus a runtime enforcer splits the job, why untrusted text must not reach the generator, and how preferences, values and requirements rank when they collide.</div></div></div>
   </section>
@@ -124,7 +132,7 @@
   <section id="explore" class="cyan">
     <div class="arc-head"><span class="idx">EXPLORE</span><h2>Where leaks come from</h2></div>
     <p class="arc-sub">The mechanism, to manipulate rather than read.</p>
-    <div class="row"><div class="num">&#9654;</div><div><div class="name"><a href="explore/leak-paths.html">An agent's data-flow graph, with toggles</a></div><div class="meta"><span>interactive</span><span>6 attack paths</span><span>6 defenses</span></div><div class="desc">User data, the agent, its tools, recipients and untrusted inputs as one graph. Switch capabilities (browsing, inbox, email, memory) and defenses (minimization, untrusted tool output, contextual flow checks, confirmation, task-scoped credentials, scoped memory) and watch injection, over-sharing, contamination and exfiltration paths open or close. One path survives every defense: composition.</div></div></div>
+    <div class="row"><div class="num">&#9654;</div><div><div class="name"><a href="explore/leak-paths.html">An agent's data-flow graph, with toggles</a></div><div class="meta"><span>interactive</span><span>7 leak paths</span><span>6 defenses</span></div><div class="desc">User data, the agent, its tools, recipients and untrusted inputs as one graph. Switch capabilities (browsing, inbox, email, memory) and defenses (minimization, untrusted tool output, contextual flow checks, confirmation, task-scoped credentials, scoped memory) and watch injection, over-sharing, contamination, memory and exfiltration paths open or close. One path needs no attacker at all and comes with measured numbers from CIMemories; one path survives every defense: composition.</div></div></div>
   </section>
 
   <section id="guides" class="amber">
@@ -132,6 +140,7 @@
     <div class="row"><div class="num"><span class="check" data-p="g01"></span>15</div><div><div class="name"><a href="guide/ten-minutes.html">Read it in 10 minutes</a></div><div class="meta"><span>the whole report, compressed</span></div><div class="desc">The argument end to end: definitions, the three dimensions, the five reasoning steps, the seven headline problem areas, and what the report does not claim.</div></div></div>
     <div class="row"><div class="num"><span class="check" data-p="g02"></span>16</div><div><div class="name"><a href="guide/for-builders.html">For builders</a></div><div class="meta"><span>what the report implies for an agent you ship</span></div><div class="desc">The patterns the report points to that exist today, such as a separate policy engine, trusted-only policy inputs and task-scoped credentials, each tied to the section and open problem it comes from, with the caveats the authors attach.</div></div></div>
     <div class="row"><div class="num"><span class="check" data-p="g03"></span>17</div><div><div class="name"><a href="guide/glossary.html">Glossary</a></div><div class="meta"><span>App. A&ndash;B plus the report's own coinages</span></div><div class="desc">CI terms as the report standardizes them (context, norm, CI tuple, transmission principle, the CI heuristic) and the new vocabulary: contextual security, contextual policy engine, intent-binding artifact, functional revocation, contextual handshake.</div></div></div>
+    <div class="row"><div class="num"><span class="check" data-p="g04"></span>18</div><div><div class="name"><a href="guide/bridge.html">Two maps, one model</a></div><div class="meta"><span>bridge to the CIMemories map</span><span>App. D row 12</span></div><div class="desc">Where the CIMemories benchmark sits inside this report's five steps and four threat models, its vocabulary translated into the report's (task, label, judge, Violation@n), the Appendix D coding explained, and which map to read for what.</div></div></div>
   </section>
 
   <section id="all-problems">
@@ -202,10 +211,25 @@
       <a href="https://privaci.info/glossary" target="_blank" rel="noopener"><b>The full CI glossary</b><span>The up-to-date version of the report's Appendix A, maintained by the Contextual Integrity community</span></a>
     </div>
   </section>
+  <section id="next">
+    <div class="arc-head"><span class="idx">07b</span><h2>What came next (as of 2026-10-26)</h2></div>
+    <p class="arc-sub">Work after the report that bears on its open problems, each checked against its source on 2026-10-26. The report itself still has no arXiv version. This is the map's reading list, not the report's; the per-page "Further reading" lists carry the rest, sorted by problem.</p>
+    <div class="links">
+      <a href="https://arxiv.org/abs/2605.17634" target="_blank" rel="noopener"><b>AI Agents May Always Fall for Prompt Injections</b><span>Abdelnabi &amp; Bagdasarian, arXiv:2605.17634, 17 May 2026. The paper the report cites as "In NeurIPS, 2026": data-instruction separation both misses attacks through contextual manipulation and degrades appropriate behavior, so injection is recast through CI (§3.2 here)</span></a>
+      <a href="https://arxiv.org/abs/2607.05318" target="_blank" rel="noopener"><b>PiSAs: CI in multi-user agentic systems</b><span>Gupta et al., with Bagdasarian, arXiv:2607.05318, v2 19 Oct 2026. Spillage between users of a shared agent through inter-agent messages, shared memory and user-agent interaction (OP 11.3, 11.5)</span></a>
+      <a href="https://arxiv.org/abs/2512.05065" target="_blank" rel="noopener"><b>Personalizing agent privacy decisions (ARIEL)</b><span>Flemings, Yi, Suciu, Fawaz, Annavaram, Gruteser, arXiv:2512.05065, v3 16 Mar 2026. General norms in a prompt miss individual preferences; a personalised decision layer for the policy engine (OP 6.1, 6.6)</span></a>
+      <a href="https://arxiv.org/abs/2512.01295" target="_blank" rel="noopener"><b>Systems Security Foundations for Agentic Computing</b><span>Christodorescu et al., 14 authors, arXiv:2512.01295, v2 19 Feb 2026. The systems-security counterpart to the report's system level (§7)</span></a>
+      <a href="https://arxiv.org/abs/2610.19158" target="_blank" rel="noopener"><b>AgentCIScope</b><span>Guo, Chen, Lin, Liu, Li, arXiv:2610.19158, 13 Oct 2026. Grounded CI evaluation of agents acting through tool calls in application environments (OP 10.6)</span></a>
+      <a href="https://arxiv.org/abs/2607.06608" target="_blank" rel="noopener"><b>Security and Privacy in Agentic AI: Grand Challenges</b><span>Jenkins et al., 25 authors, arXiv:2607.06608, v2 28 Jul 2026. A parallel horizon-scanning exercise with thirty experts; a second list of open problems to set beside this one</span></a>
+      <a href="https://securityboulevard.com/2026/08/llms-and-contextual-integrity/" target="_blank" rel="noopener"><b>LLMs and Contextual Integrity</b><span>Bruce Schneier, 18 Aug 2026. A short essay for a general audience, summarising CIMemories and a reinforcement-learning approach to contextual integrity</span></a>
+      <a href="https://idvorkin-ai-tools.github.io/cimemories-field-map/parts/p08-limitations.html#next" target="_blank" rel="noopener"><b>Memory benchmarks after CIMemories</b><span>The sibling map's dated list: multi-turn memory, tools, multi-party, enterprise, human-labelled ground truth (OP 10.2&ndash;10.4)</span></a>
+    </div>
+  </section>
   <section id="related">
     <div class="arc-head"><span class="idx">08</span><h2>Related maps</h2></div>
     <p class="arc-sub">Sibling maps on safety and alignment that link into each other. Also browse <a href="https://idvorkin-ai-tools.github.io/">all the field maps</a>.</p>
     <div class="links">
+      <a href="guide/bridge.html"><b>Two maps, one model</b><span>The bridge: the CIMemories benchmark placed inside this report's five steps and four threat models, with its words translated into the report's</span></a>
       <a href="https://idvorkin-ai-tools.github.io/cimemories-field-map/" target="_blank" rel="noopener"><b>CIMemories, mapped</b><span>A benchmark for contextual integrity in a model's persistent memory: which remembered facts reach which recipients</span></a>
       <a href="https://idvorkin-ai-tools.github.io/constitutional-ai-field-map/" target="_blank" rel="noopener"><b>Constitutional AI, mapped</b><span>The 2022 Constitutional AI paper and Claude's 2026 constitution, including the principal hierarchy</span></a>
       <a href="https://idvorkin-ai-tools.github.io/instruction-hierarchy-field-map/" target="_blank" rel="noopener"><b>Instruction hierarchy, mapped</b><span>Who gets to give a model orders: Wallace et al. 2024, ISE, VerIH, ManyIH, with bridges into these maps</span></a>
@@ -213,7 +237,7 @@
   </section>
 </main>
 <footer>
-  An unofficial field map of <em>Open and Emergent Problems in Agentic Privacy and Security: A Contextual Angle</em> (Bagdasarian, Tsai et al., CAPS Workshop report, 2026), compiled 2026-10-23 from the 116-page PDF on the Google Research publication page. Section and open-problem numbers are the report's own. The report is &copy; its authors; this map explains and links, it does not copy. Part of <a href="https://idvorkin-ai-tools.github.io/">the field maps</a>.
+  An unofficial field map of <em>Open and Emergent Problems in Agentic Privacy and Security: A Contextual Angle</em> (Bagdasarian, Tsai et al., CAPS Workshop report, 2026), compiled 2026-10-23 from the 116-page PDF on the Google Research publication page, with follow-up reading added 2026-10-26. Section and open-problem numbers are the report's own. The report is &copy; its authors; this map explains and links, it does not copy. Part of <a href="https://idvorkin-ai-tools.github.io/">the field maps</a>.
 </footer>
 <script>
 (function(){

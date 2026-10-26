@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Where leaks come from &mdash; Agentic privacy, mapped</title>
-<meta name="description" content="An explorable data-flow graph of an AI agent. Toggle capabilities and defenses and watch which edges can leak what, and which attack paths open or close." />
+<meta name="description" content="An explorable data-flow graph of an AI agent. Toggle capabilities and defenses and watch which edges can leak what, and which of seven leak paths open or close." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -45,11 +45,11 @@
   <div class="lp-paths" id="pathlist"></div>
 
   <h2 id="reading-it">How to read it</h2>
-  <p>Three things fall out of playing with the graph. First, the dangerous capabilities are the ones that put untrusted text and an outbound channel in the same context: browsing alone is both, which is why the report treats a malicious environment as its own threat model (<a class="lnk" href="../concepts/three-dimensions.html#threats">§3.2</a>). Second, defenses work at different places. Minimization shrinks what the agent holds; untrusted-input handling stops text from steering it; a contextual flow check judges each edge out; scoped credentials shrink what any hijack can do. Each one closes some paths and leaves others. Third, with every defense on, one path stays open: two flows that each pass every check, combined by one observer (<a class="lnk" href="../problems/multi-agent-norms.html#op-11-5">OP 11.5</a>). That is not a missing toggle; it is the report's point that per-flow appropriateness has no composition rule yet.</p>
+  <p>Three things fall out of playing with the graph. First, the dangerous capabilities are the ones that put untrusted text and an outbound channel in the same context: browsing alone is both, which is why the report treats a malicious environment as its own threat model (<a class="lnk" href="../concepts/three-dimensions.html#threats">§3.2</a>). Second, defenses work at different places. Minimization shrinks what the agent holds; untrusted-input handling stops text from steering it; a contextual flow check judges each edge out; scoped credentials shrink what any hijack can do. Each one closes some paths and leaves others. Third, with every defense on, one path stays open: two flows that each pass every check, combined by one observer (<a class="lnk" href="../problems/multi-agent-norms.html#op-11-5">OP 11.5</a>). That is not a missing toggle; it is the report's point that per-flow appropriateness has no composition rule yet. A seventh path needs no attacker and no injection: a remembered fact reaching a recipient it was never meant for. It is the one path here with measured numbers, from the CIMemories benchmark, and the <a class="lnk" href="../guide/bridge.html">bridge page</a> says how that benchmark and this report fit together.</p>
   <p>The graph is a teaching model, not a threat model of any real product. Statuses are curated from the report's framing, and the honest version of every "closed" is "closed if the defense works as designed", which the report repeatedly says today's systems do not guarantee. For the patterns behind each toggle, see <a class="lnk" href="../guide/for-builders.html">For builders</a>.</p>
 </main>
 <footer>
-  An interactive page of <a href="../index.html">Agentic privacy, mapped</a>, a field map of <em>Open and Emergent Problems in Agentic Privacy and Security: A Contextual Angle</em> (Bagdasarian, Tsai et al., CAPS Workshop report, 2026). The user, recipients and data are fictional. Part of <a href="https://idvorkin-ai-tools.github.io/">the field maps</a>.
+  An interactive page of <a href="../index.html">Agentic privacy, mapped</a>, a field map of <em>Open and Emergent Problems in Agentic Privacy and Security: A Contextual Angle</em> (Bagdasarian, Tsai et al., CAPS Workshop report, 2026). The user, recipients and data are fictional. Sibling explorables: the CIMemories map's <a href="https://idvorkin-ai-tools.github.io/cimemories-field-map/flow-explorer.html">flow explorer</a> and <a href="https://idvorkin-ai-tools.github.io/cimemories-field-map/composition-explorer.html">composition explorer</a>; the <a href="../guide/bridge.html">bridge page</a>. Part of <a href="https://idvorkin-ai-tools.github.io/">the field maps</a>.
 </footer>
 <script>
 (function(){
@@ -64,7 +64,7 @@
   var DEFS=[
     {id:'min',l:'Data minimization',d:'Pick the data a step needs from trusted context only, then hand the outward-facing step just that.',ref:[DP+'#op-7-7','OP 7.7, AirGapAgent, Dual LLM']},
     {id:'untr',l:'Tool output is untrusted',d:'Text from pages and emails is data. It never reaches the planner or the policy generator as instructions.',ref:[PE+'#op-6-5','OP 6.5, Conseca, CaMeL']},
-    {id:'ci',l:'Contextual flow check',d:'A policy engine judges each outgoing flow against the norms of the context (the CI tuple).',ref:[PE+'#steps','§6 policy engine']},
+    {id:'ci',l:'Contextual flow check',d:'A policy engine judges each outgoing flow against the norms of the context (the CI tuple).',ref:[PE+'#steps','§6 policy engine'],ref2:['https://idvorkin-ai-tools.github.io/cimemories-field-map/flow-explorer.html','watch a norm set decide one flow']},
     {id:'confirm',l:'User confirmation',d:'Ask the user before sending. Risk-scaled when a flow check can tell which sends are risky.',ref:[FB+'#confirmation','OP 9.4, risk-scaled consent']},
     {id:'scoped',l:'Task-scoped credentials',d:'A capped single-use card and an allowlist of recipients that live as long as the task.',ref:[FB+'#task-credentials','OP 7.3–7.4']},
     {id:'memscope',l:'Memory scoped to context',d:'Memories carry where they came from and only return in a matching context; injected rules cannot persist.',ref:[FB+'#memory','OP 7.8, OP 8.3']}];
@@ -131,6 +131,15 @@
       if(S.ci||S.min) return ['mit','Per-flow checks catch some of it, but a memory looks like trusted context, and an injected "always BCC" from months ago passes as the user\'s own rule.'];
       return ['open','A detail from a private past task resurfaces in this booking, or an injected standing instruction keeps exfiltrating for months.'];},
      ref:[MR+'#op-8-3','OP 8.3 stale assumptions']},
+    {id:'memleak',t:'Memory prefix to a legitimate recipient',k:'no adversary',
+     edges:function(){return ['e_mem','e_book','e_gym'].concat(S.send?['e_send']:[])},
+     st:function(){
+      if(!S.mem) return ['off','Nothing from past tasks comes back, so nothing remembered can be over-shared.'];
+      if(S.min) return ['closed','The gym step receives only the facts selected for it; the rest of memory never reaches the draft. A whole memory in front of every message, the CIMemories setting, is exactly what minimization removes.'];
+      if(S.ci) return ['mit','A per-fact check on the outgoing message catches a remembered detail that does not belong, if a norm for this recipient exists to check against. CIMemories runs such a judge after the fact and finds 14.8% to 69.1% of should-be-private facts leaking at least once (Table 1).'];
+      if(S.memscope) return ['mit','Scoping by origin helps when the memory came from another context. A fact from this one, the knee injury remembered from last month\'s booking, can still be wrong for this recipient.'];
+      return ['open','No attacker, no injection. The agent writes to the gym with months of remembered facts in front of it and reaches for whichever fit the story. CIMemories measures this case: every model tested leaks, from 14.8% (GPT-4o) to 69.1% (Qwen-3 32B) of a user\'s at-risk facts over about 46 recipients.'];},
+     ref:['https://idvorkin-ai-tools.github.io/cimemories-field-map/parts/p06-results.html','CIMemories Table 1, measured']},
     {id:'hijack',t:'Hijacked action with standing credentials',k:'malicious environment',
      edges:function(){return inputs().concat(['e_ids','e_book'])},
      st:function(){
@@ -190,7 +199,8 @@
     $('g').innerHTML='<title id="g-t">Agent data-flow graph</title>'+h;
 
     var cnt={open:0,mit:0,closed:0,off:0,research:0};PATHS.forEach(function(p){cnt[st[p.id][0]]++});
-    var prompts=S.confirm?(S.ci?'about 1 approval prompt per task':'about '+(2+(S.browse?3:0)+(S.send?2:0))+' approval prompts per task'):'';
+    var outs=1+(S.browse?1:0)+(S.send?1:0);
+    var prompts=S.confirm?(S.ci?'user asked only on sends the flow check flags':'user asked before each use of '+outs+' outbound tool'+(outs>1?'s':'')):'';
     $('sum').textContent=(cnt.open+cnt.research)+' open · '+cnt.mit+' mitigated · '+cnt.closed+' closed'+(cnt.off?' · '+cnt.off+' not reachable':'')+(prompts?' · '+prompts:'');
 
     var LAB={open:'Open',mit:'Mitigated',closed:'Closed',off:'Not reachable',research:'Open problem'};
@@ -200,7 +210,7 @@
   }
 
   function toggles(list,el){
-    el.innerHTML=list.map(function(t){return '<label class="lp-t"><input type="checkbox" data-k="'+t.id+'"'+(S[t.id]?' checked':'')+'><span><b>'+esc(t.l)+'</b><span class="lp-td">'+esc(t.d)+(t.ref?' <a class="lnk" href="'+t.ref[0]+'">'+esc(t.ref[1])+'</a>':'')+'</span></span></label>'}).join('');
+    el.innerHTML=list.map(function(t){return '<label class="lp-t"><input type="checkbox" data-k="'+t.id+'"'+(S[t.id]?' checked':'')+'><span><b>'+esc(t.l)+'</b><span class="lp-td">'+esc(t.d)+(t.ref?' <a class="lnk" href="'+t.ref[0]+'">'+esc(t.ref[1])+'</a>':'')+(t.ref2?' &middot; <a class="lnk" href="'+t.ref2[0]+'">'+esc(t.ref2[1])+'</a>':'')+'</span></span></label>'}).join('');
     el.querySelectorAll('input').forEach(function(i){i.addEventListener('change',function(){S[i.dataset.k]=i.checked;render()})});
   }
   function sync(){document.querySelectorAll('.lp-t input').forEach(function(i){i.checked=!!S[i.dataset.k]})}

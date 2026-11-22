@@ -54,6 +54,8 @@
   .ops td a:hover{color:var(--def)}
   @media (max-width:560px){.row{grid-template-columns:34px 1fr;gap:10px}}
 </style>
+<script>try{var m=localStorage.getItem('aitools-mode')||localStorage.getItem('llm-judges-mode');if(m==='tech'||m==='eli5')document.documentElement.setAttribute('data-'+m,'on')}catch(e){}</script>
+<style>html:is([data-tech="on"],[data-eli5="on"]) .plain-only,html:not([data-tech="on"]) .tech-only,html:not([data-eli5="on"]) .eli5-only,html[data-tech="on"] .no-tech{display:none!important}</style>
 </head>
 <body>
 <header class="bar"><div class="bar-in">
@@ -66,10 +68,10 @@
 
   <figure class="fig hero-fig bare"><button type="button" class="media" aria-label="Enlarge figure: A plush raccoon mail courier in a CONTEXT t-shirt holds up an envelope in front of three small doors marked with a medical cross, a dumbbell and a house, deciding which envelope belongs at which door."><img src="img/raccoon-ci-courier.webp" alt="A plush raccoon mail courier in a CONTEXT t-shirt holds up an envelope in front of three small doors marked with a medical cross, a dumbbell and a house, deciding which envelope belongs at which door." width="640" height="640" loading="lazy"></button><figcaption>Contextual Integrity in one picture: the same envelope is fine at one door and wrong at the next.</figcaption></figure>
     <h1>Agentic privacy, mapped</h1>
-    <p class="sub">A long workshop report from the Google Contextual Agent Privacy and Security (CAPS) Workshop, New York City, November 2025, argues that the usual toolkit of least privilege, consent prompts and static filters breaks once software plans its own steps. Its replacement is an old idea from privacy philosophy: an agent should do what is <em>appropriate in context</em>. This map walks the framework, then every open problem the authors list, one area per page.</p>
+    <p class="sub">A long workshop report from the Google Contextual Agent Privacy and Security (CAPS) Workshop, New York City, November 2025, argues that the usual toolkit of <span class="term" data-term="least-privilege">least privilege</span>, consent prompts and static filters breaks once software plans its own steps. Its replacement is an old idea from privacy philosophy: an agent should do what is <em>appropriate in context</em>. This map walks the framework, then every open problem the authors list, one area per page.</p>
 
     <div class="answer">
-      <b>The one-sentence version:</b> an agent needs broad access to be useful, and broad access is exactly what security engineering tells you not to grant, so the report proposes replacing "who may see what" with "which flows and actions fit the norms of this context". It calls that <b>Contextual Integrity</b> for information and <b>Contextual Security</b> for every other action, then spends most of its pages on what nobody yet knows how to build: norms a machine can look up, policies compiled from natural language, credentials that live exactly as long as a task, consent that does not fatigue, benchmarks that run for years, and governance that decides whose norms win.
+      <b>The one-sentence version:</b> an agent needs broad access to be useful, and broad access is exactly what security engineering tells you not to grant, so the report proposes replacing "who may see what" with "which flows and actions fit the <span class="term" data-term="norm">norms</span> of this context". It calls that <b><span class="term" data-term="contextual-integrity">Contextual Integrity</span></b> for information and <b><span class="term" data-term="contextual-security">Contextual Security</span></b> for every other action, then spends most of its pages on what nobody yet knows how to build: norms a machine can look up, policies compiled from natural language, credentials that live exactly as long as a task, consent that does not fatigue, benchmarks that run for years, and governance that decides whose norms win.
     </div>
 
     <div class="facts">
@@ -87,7 +89,7 @@
     <div class="arc-head"><span class="idx">01 &middot; THE LENS</span><h2>Why "appropriate in context" and not "allowed or denied"</h2></div>
     <p class="arc-sub">The executive summary blames three properties of agents for breaking conventional security and privacy engineering. Part I then brings in Helen Nissenbaum's theory of Contextual Integrity as the yardstick for what "acting appropriately" means.</p>
     <div class="dims">
-      <div class="dim"><div class="k">Dimension 1</div><b>Unstructured interfaces, ambiguous input</b><p>Instructions and data arrive as natural language and images, so expected behavior is hard to define and adversarial text (prompt injection) looks like any other input.</p></div>
+      <div class="dim"><div class="k">Dimension 1</div><b>Unstructured interfaces, ambiguous input</b><p>Instructions and data arrive as natural language and images, so expected behavior is hard to define and adversarial text (<span class="term" data-term="prompt-injection">prompt injection</span>) looks like any other input.</p></div>
       <div class="dim"><div class="k">Dimension 2</div><b>Probabilistic, dynamic control flow</b><p>Plans and code are generated at run time with "jagged" model performance, so the execution path is new each time and resists ordinary testing.</p></div>
       <div class="dim"><div class="k">Dimension 3</div><b>Autonomy and delegation</b><p>Long tasks, sub-agents and abstract goals outrun oversight that leans on confirmation prompts, which ends in consent fatigue.</p></div>
     </div>
@@ -202,6 +204,11 @@
     </table></div>
   </section>
 
+  <section id="definitions">
+    <div class="arc-head"><span class="idx">TERMS</span><h2>Definitions</h2></div>
+    <div data-terms-list></div>
+  </section>
+
   <section id="refs">
     <div class="arc-head"><span class="idx">07</span><h2>Source and related reading</h2></div>
     <div class="links">
@@ -266,6 +273,7 @@
 })();
 </script>
 <script src="fig.js" defer></script>
+<script src="https://idvorkin-ai-tools.github.io/assets/terms.js" defer></script>
 <!-- Private comments mode, inert unless ?annotate=1 (see assets/annotate.js in idvorkin-ai-tools.github.io) -->
 <script src="https://idvorkin-ai-tools.github.io/assets/annotate.js" data-branch="site" defer></script>
 </body>

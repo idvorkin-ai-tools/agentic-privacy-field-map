@@ -9,6 +9,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="../paper.css" />
+<script>try{var m=localStorage.getItem('aitools-mode')||localStorage.getItem('llm-judges-mode');if(m==='tech'||m==='eli5')document.documentElement.setAttribute('data-'+m,'on')}catch(e){}</script>
+<style>html:is([data-tech="on"],[data-eli5="on"]) .plain-only,html:not([data-tech="on"]) .tech-only,html:not([data-eli5="on"]) .eli5-only,html[data-tech="on"] .no-tech{display:none!important}</style>
 </head>
 <body>
 <header class="bar"><div class="bar-in">
@@ -94,7 +96,7 @@
   <p><b>The starting observation.</b> No domain is error-free, and society already has machinery for that. Software has SLAs, liability frameworks and incident-response protocols that define acceptable error and remediation. The physical world has tort law, insurance and professional licensing, which compensate victims and hold operators accountable. The question is how much of that carries over.</p>
 
   <h3>The contractor analogy</h3>
-  <p>The report finds the closest fit in legal agency and human contractors. Like a contractor, an agent is given a goal by a principal and the freedom to pick the means. Principal-agent theory, which the report cites via Prause (2026), describes the problems that come with handing over decision authority: misaligned objectives, information asymmetry, incentives and accountability. With human contractors, law constrains the relationship through four instruments. The report walks through how each one breaks for an AI agent:</p>
+  <p>The report finds the closest fit in legal agency and human contractors. Like a contractor, an agent is given a goal by a <span class="term" data-term="principal">principal</span> and the freedom to pick the means. Principal-agent theory, which the report cites via Prause (2026), describes the problems that come with handing over decision authority: misaligned objectives, information asymmetry, incentives and accountability. With human contractors, law constrains the relationship through four instruments. The report walks through how each one breaks for an AI agent:</p>
   <table class="kv">
     <thead><tr><th>Instrument</th><th>What it does for a human contractor</th><th>Where it breaks for an AI agent</th></tr></thead>
     <tbody>
@@ -114,6 +116,8 @@
   <h2 id="connections">Connections</h2>
   <p>The confirmation-fatigue and consent arguments that make these backstops necessary are on <a class="lnk" href="mental-models-consent.html">Mental models and the end of notice-and-choice</a>. Immutable action records and hardware-backed isolation overlap with accounting and sandboxing on <a class="lnk" href="identity-authorization.html">Identity, authorization, accounting</a>. The worry that models behave differently under test carries straight into <a class="lnk" href="evaluations.html">Evaluations and benchmarks</a>. Unfaithful reasoning traces come up again for model training on <a class="lnk" href="model-reasoning.html">Teaching models contextual reasoning</a>. Platform-level circuit breakers for many agents belong with <a class="lnk" href="multi-agent-norms.html">Shared norms, delegation, composition</a>, and who sets and enforces accountability rules is the subject of <a class="lnk" href="governance.html">Governance</a>.</p>
 
+  <section id="definitions"><h2>Definitions</h2><div data-terms-list></div></section>
+
   <h2 id="reading">Further reading, verified</h2>
   <ul class="readings">
     <li><a href="https://arxiv.org/abs/2604.18231" target="_blank" rel="noopener">AgenTEE: Confidential LLM Agent Execution on Edge Devices</a> &mdash; Abdollahi et al. (2026) &middot; the report's example of a trusted path: agent, inference and apps in separate confidential VMs with mediated channels.</li>
@@ -127,6 +131,7 @@
   <div class="callout">Next: <a class="lnk" href="evaluations.html">Evaluations and benchmarks</a> &middot; Back to the <a class="lnk" href="../index.html#components">map</a>.</div>
 </main>
 <footer>Original explanation of <em>Open and Emergent Problems in Agentic Privacy and Security: A Contextual Angle</em> (Bagdasarian, Tsai et al., 2026), §9.3. The report is &copy; its authors; this page explains and links, it does not copy.</footer>
+<script src="https://idvorkin-ai-tools.github.io/assets/terms.js" defer></script>
 <!-- Private comments mode, inert unless ?annotate=1 (see assets/annotate.js in idvorkin-ai-tools.github.io) -->
 <script src="https://idvorkin-ai-tools.github.io/assets/annotate.js" data-branch="site" defer></script>
 </body>

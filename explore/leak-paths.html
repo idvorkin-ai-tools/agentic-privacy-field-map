@@ -9,6 +9,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="../paper.css" />
+<script>try{var m=localStorage.getItem('aitools-mode')||localStorage.getItem('llm-judges-mode');if(m==='tech'||m==='eli5')document.documentElement.setAttribute('data-'+m,'on')}catch(e){}</script>
+<style>html:is([data-tech="on"],[data-eli5="on"]) .plain-only,html:not([data-tech="on"]) .tech-only,html:not([data-eli5="on"]) .eli5-only,html[data-tech="on"] .no-tech{display:none!important}</style>
 </head>
 <body class="lp-page">
 <header class="bar"><div class="bar-in">
@@ -45,9 +47,11 @@
   <div class="lp-paths" id="pathlist"></div>
 
   <h2 id="reading-it">How to read it</h2>
-  <p>Three things fall out of playing with the graph. First, the dangerous capabilities are the ones that put untrusted text and an outbound channel in the same context: browsing alone is both, which is why the report treats a malicious environment as its own threat model (<a class="lnk" href="../concepts/three-dimensions.html#threats">§3.2</a>). Second, defenses work at different places. Minimization shrinks what the agent holds; untrusted-input handling stops text from steering it; a contextual flow check judges each edge out; scoped credentials shrink what any hijack can do. Each one closes some paths and leaves others. Third, with every defense on, one path stays open: two flows that each pass every check, combined by one observer (<a class="lnk" href="../problems/multi-agent-norms.html#op-11-5">OP 11.5</a>). That is not a missing toggle; it is the report's point that per-flow appropriateness has no composition rule yet. A seventh path needs no attacker and no injection: a remembered fact reaching a recipient it was never meant for. It is the one path here with measured numbers, from the CIMemories benchmark, and the <a class="lnk" href="../guide/bridge.html">bridge page</a> says how that benchmark and this report fit together.</p>
+  <p>Three things fall out of playing with the graph. First, the dangerous capabilities are the ones that put untrusted text and an outbound channel in the same context: browsing alone is both, which is why the report treats a malicious environment as its own threat model (<a class="lnk" href="../concepts/three-dimensions.html#threats">§3.2</a>). Second, defenses work at different places. <span class="term" data-term="data-minimization">Minimization</span> shrinks what the agent holds; untrusted-input handling stops text from steering it; a contextual flow check judges each edge out; scoped credentials shrink what any hijack can do. Each one closes some paths and leaves others. Third, with every defense on, one path stays open: two flows that each pass every check, combined by one observer (<a class="lnk" href="../problems/multi-agent-norms.html#op-11-5">OP 11.5</a>). That is not a missing toggle; it is the report's point that per-flow appropriateness has no composition rule yet. A seventh path needs no attacker and no injection: a remembered fact reaching a recipient it was never meant for. It is the one path here with measured numbers, from the CIMemories benchmark, and the <a class="lnk" href="../guide/bridge.html">bridge page</a> says how that benchmark and this report fit together.</p>
   <p>The graph is a teaching model, not a threat model of any real product. Statuses are curated from the report's framing, and the honest version of every "closed" is "closed if the defense works as designed", which the report repeatedly says today's systems do not guarantee. For the patterns behind each toggle, see <a class="lnk" href="../guide/for-builders.html">For builders</a>.</p>
-</main>
+<section id="definitions"><h2>Definitions</h2><div data-terms-list></div></section>
+
+  </main>
 <footer>
   An interactive page of <a href="../index.html">Agentic privacy, mapped</a>, a field map of <em>Open and Emergent Problems in Agentic Privacy and Security: A Contextual Angle</em> (Bagdasarian, Tsai et al., CAPS Workshop report, 2026). The user, recipients and data are fictional. Sibling explorables: the CIMemories map's <a href="https://idvorkin-ai-tools.github.io/cimemories-field-map/flow-explorer.html">flow explorer</a> and <a href="https://idvorkin-ai-tools.github.io/cimemories-field-map/composition-explorer.html">composition explorer</a>; the <a href="../guide/bridge.html">bridge page</a>. Part of <a href="https://idvorkin-ai-tools.github.io/">the field maps</a>.
 </footer>
@@ -220,6 +224,7 @@
   toggles(CAPS,$('caps')); toggles(DEFS,$('defs')); render();
 })();
 </script>
+<script src="https://idvorkin-ai-tools.github.io/assets/terms.js" defer></script>
 <!-- Private comments mode, inert unless ?annotate=1 (see assets/annotate.js in idvorkin-ai-tools.github.io) -->
 <script src="https://idvorkin-ai-tools.github.io/assets/annotate.js" data-branch="site" defer></script>
 </body>

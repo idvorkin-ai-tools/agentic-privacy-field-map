@@ -28,6 +28,9 @@
     }
     function draw() {
       var f = L.FLOWS[st.flow], v = L.verdict(st.kase, st.evals), ev = st.kase !== 1;
+      // Off the preset, the verdict is the reader's, not the page's: say so.
+      var mine = st.kase !== f.kase || st.evals.some(function (x, i) { return x !== f.evals[i]; });
+      var name = mine ? 'What-if (your choices, not the page\'s verdict on ' + f.label.split(':')[0] + ')' : f.label;
       t.innerHTML = [['Context', f.context], ['Sender', f.sender], ['Recipient', f.recipient], ['Subject', f.subject],
         ['Attribute', f.attribute], ['Transmission principle', f.tp]].map(function (r) {
         return '<dt>' + r[0] + '</dt><dd>' + r[1] + '</dd>';
@@ -44,8 +47,8 @@
         box(216, 8, 140, o === 'appropriate' ? 'Appropriate' : o === 'accept' ? 'Accept' : o === 'reject' ? 'Reject' : 'Ambiguous',
           true, o === 'reject' ? 'box-crit' : o === 'ambiguous' ? 'box-off' : 'box-ok') +
         H.t(180, 62, ev ? 'A practice must pass all three layers.' : 'Conforming flows skip step 4.', 't-dim', 'font-size="11" text-anchor="middle"') +
-        H.t(180, 82, f.label, 't-dim', 'font-size="10.5" text-anchor="middle"');
-      H.$(el, p + '-sum').textContent = f.label + ', Case ' + st.kase + '. ' + v.text;
+        H.t(180, 82, mine ? 'What-if: your choices' : f.label, 't-dim', 'font-size="10.5" text-anchor="middle"');
+      H.$(el, p + '-sum').textContent = name + ', Case ' + st.kase + '. ' + v.text;
     }
     function preset(k) { var f = L.FLOWS[k]; if (!f) return; st.flow = k; st.kase = f.kase; st.evals = f.evals.slice(); draw(); }
     el.querySelectorAll('[data-p]').forEach(function (b) { b.addEventListener('click', function () { preset(b.getAttribute('data-p')); }); });

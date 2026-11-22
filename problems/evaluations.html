@@ -59,7 +59,9 @@
     <li><b>Modality</b>: text, image, video, audio, multi-turn, tool use.</li>
   </ul>
   <p>Below are five of those columns for all 16 benchmarks, taken from Table 2 (pp. 115–116).</p>
-  <div class="scroll"><table class="kv">
+  <p class="lab-try"><b>Try this</b>Pick "Complex TPs + explicit ambiguity", then "Real data": the hard cells of §10.2 hold only a handful of benchmarks, and the table below shrinks to match.</p>
+  <div class="lab" data-widget="bench-filter" data-table="bench-table"></div>
+  <div class="scroll"><table class="kv" id="bench-table">
     <tr><th>Benchmark</th><th>Context.</th><th>Transm. principles</th><th>Ambiguity</th><th>Realism</th><th>Modality</th></tr>
     <tr><td>ConfAIde (Mireshghallah et al., 2024)</td><td>Simple</td><td>Simple</td><td>No</td><td>Grounded</td><td>Text; multi-turn</td></tr>
     <tr><td>AirGapAgent (Bagdasarian et al., 2024)</td><td>Rich</td><td>Simple</td><td>No</td><td>Grounded</td><td>Text</td></tr>
@@ -170,6 +172,9 @@
   <div class="callout">Next: <a class="lnk" href="multi-agent-norms.html">Shared norms, delegation, composition</a> &middot; Back to the <a class="lnk" href="../index.html#ecosystem">map</a>.</div>
 </main>
 <footer>Original explanation of <em>Open and Emergent Problems in Agentic Privacy and Security: A Contextual Angle</em> (Bagdasarian, Tsai et al., 2026), §10 and Appendix D. The report is &copy; its authors; this page explains and links, it does not copy.</footer>
+<script src="https://idvorkin-ai-tools.github.io/assets/widgets.js" defer></script>
+<script src="../lab/bench-filter.js" defer></script>
+<script src="../widgets/bench-filter.js" defer></script>
 <script src="https://idvorkin-ai-tools.github.io/assets/terms.js" defer></script>
 <!-- Private comments mode, inert unless ?annotate=1 (see assets/annotate.js in idvorkin-ai-tools.github.io) -->
 <script src="https://idvorkin-ai-tools.github.io/assets/annotate.js" data-branch="site" defer></script>

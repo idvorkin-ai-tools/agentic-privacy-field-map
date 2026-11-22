@@ -262,3 +262,25 @@ svg.lp-svg .lp-conf{font-size:9.5px;fill:var(--off-bright);paint-order:stroke;st
 .spine .sp:not(:last-child)::after{content:"\25B8";position:absolute;right:-9px;top:10px;color:var(--off);font-size:12px}
 @media (max-width:860px){.spine{grid-template-columns:1fr 1fr}.spine .sp:not(:last-child)::after{display:none}}
 @media (max-width:480px){.spine{grid-template-columns:1fr}}
+
+/* widgets (ci-heuristic, bench-filter): layout only; widgets.js supplies the .lab frame */
+.lab fieldset{border:1px solid var(--line-soft);border-radius:8px;margin:10px 0;padding:8px 12px 10px;min-width:0}
+.lab legend,.lab .ch-step>b{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-dim);font-weight:600;padding:0 4px}
+.lab .ch-step{margin:10px 0}
+.lab .ch-tuple{display:grid;grid-template-columns:minmax(90px,auto) 1fr;gap:3px 12px;margin:6px 0 0;font-size:13.5px}
+.lab .ch-tuple dt{color:var(--ink-dim);font-family:"IBM Plex Mono",monospace;font-size:12px}
+.lab .ch-tuple dd{margin:0;color:var(--ink)}
+.lab .ch-opt{display:block;font-size:13.5px;color:var(--ink-mid);padding:5px 0;cursor:pointer}
+.lab .ch-opt b{color:var(--ink);font-weight:600}
+.lab .ch-ev{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:4px 10px;font-size:13.5px;color:var(--ink-mid);padding:4px 0}
+.lab select{font:inherit;font-size:13px;color:var(--ink);background:var(--panel-2);border:1px solid var(--line);border-radius:6px;padding:5px 8px;min-height:32px}
+.lab .ch-off{opacity:.45}
+.lab .bf-ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px 14px;margin:8px 0}
+.lab .bf-ctl label{display:flex;flex-direction:column;gap:3px;font-size:12.5px;color:var(--ink-dim)}
+.lab .bf-mod label{display:inline-flex;align-items:center;gap:5px;margin:3px 14px 3px 0;font-size:13.5px;color:var(--ink-mid);min-height:28px}
+@media (max-width:480px){.lab .ch-tuple{grid-template-columns:1fr}.lab .ch-tuple dd{margin-bottom:4px}}
+
+/* narrow screens: the shared mode control joins the top bar, so the brand gives way; wide tables and long code scroll or wrap instead of widening the page */
+.bar .brand{flex:0 1 auto;min-width:0;overflow:hidden}
+@media (max-width:520px){.bar .brand{font-size:0;gap:0}}
+@media (max-width:600px){main table.kv{display:block;overflow-x:auto}main :not(pre)>code{overflow-wrap:anywhere}}

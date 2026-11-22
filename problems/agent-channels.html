@@ -9,6 +9,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="../paper.css" />
+<script>try{var m=localStorage.getItem('aitools-mode')||localStorage.getItem('llm-judges-mode');if(m==='tech'||m==='eli5')document.documentElement.setAttribute('data-'+m,'on')}catch(e){}</script>
+<style>html:is([data-tech="on"],[data-eli5="on"]) .plain-only,html:not([data-tech="on"]) .tech-only,html:not([data-eli5="on"]) .eli5-only,html[data-tech="on"] .no-tech{display:none!important}</style>
 </head>
 <body>
 <header class="bar"><div class="bar-in">
@@ -23,7 +25,7 @@
 
   <div class="tldr"><b>TL;DR &mdash;</b> Today's agent protocols standardize the envelope but leave the letter as free-form text, so every message is a possible injection, leak or covert signal. One way out is to make the language between agents deliberately narrower, which trades flexibility for safety in a way nobody can yet measure. A second is attestation: hardware can prove which code is running, but for an agent the code does not determine the behavior, so the report asks what "attesting behavior" could even mean. Even a perfectly narrow channel still leaks through timing, ordering and choice of partner. And to study any of this at scale, the report points to simulated social worlds and formal coordination problems as test beds.</div>
 
-  <p class="lead">Section 11 is where the report stops looking at one agent and starts looking at many. The earlier parts of §11 (§11.1–11.2) deal with shared norms, delegation and the way individually fine disclosures can add up to a harm. These two subsections drop one level lower, to the plumbing: what actually crosses between agents, how one side can trust the other side's machinery, what an observer learns without reading a single message, and where researchers can run experiments that would be unsafe or impossible in live deployments. The four open problems here are less about norms and more about mechanisms, but they come back to Contextual Integrity at the end: the channel itself can encode which flows are appropriate.</p>
+  <p class="lead">Section 11 is where the report stops looking at one agent and starts looking at many. The earlier parts of §11 (§11.1–11.2) deal with shared norms, <span class="term" data-term="delegation">delegation</span> and the way individually fine disclosures can add up to a harm. These two subsections drop one level lower, to the plumbing: what actually crosses between agents, how one side can trust the other side's machinery, what an observer learns without reading a single message, and where researchers can run experiments that would be unsafe or impossible in live deployments. The four open problems here are less about norms and more about mechanisms, but they come back to <span class="term" data-term="contextual-integrity">Contextual Integrity</span> at the end: the channel itself can encode which flows are appropriate.</p>
 
   <h2 id="op-11-6">OP 11.6 · Secure and robust agent-to-agent protocols</h2>
 
@@ -31,7 +33,7 @@
   <p>Agents that cross organizational lines need a channel they can trust. The report wants more than encryption: a good protocol should also let agents negotiate things like shared norms safely (§11.3, <a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=69" target="_blank" rel="noopener">p. 69</a>).</p>
 
   <h3>Why the current protocols do not settle it</h3>
-  <p>The report credits MCP and A2A with standardizing transport, discovery and identity. What they do not constrain is the payload. The thing inside the envelope is natural language, and neither protocol enforces policy negotiation or compliance. That one fact explains a lot. A free-text message can carry an injected instruction, can disclose more than it should, and can hide coordination between agents that a reviewer would never spot. It also hurts auditing: when syntax barely constrains meaning, a log of messages tells you little about what was actually communicated.</p>
+  <p>The report credits <span class="term" data-term="mcp">MCP</span> and A2A with standardizing transport, discovery and identity. What they do not constrain is the payload. The thing inside the envelope is natural language, and neither protocol enforces policy negotiation or compliance. That one fact explains a lot. A free-text message can carry an injected instruction, can disclose more than it should, and can hide coordination between agents that a reviewer would never spot. It also hurts auditing: when syntax barely constrains meaning, a log of messages tells you little about what was actually communicated.</p>
   <p>The report's sharper claim is that several of the risks it catalogs elsewhere, such as injection through peer messages, disclosure under persuasion, and collusion, come from the communication layer as well as from the models. Fixing the model alone leaves the channel wide open.</p>
   <p>A way to picture this: HTTP made the web interoperable, but it does nothing to stop a page from containing a phishing form. MCP and A2A are in a similar position. They solve "can these two agents talk" and leave "should this sentence have been said" to whoever is on each end.</p>
 
@@ -61,10 +63,10 @@
   <h2 id="op-11-7">OP 11.7 · Trust across agent boundaries with attestation</h2>
 
   <h3>What it asks</h3>
-  <p>Every agent interaction crosses a trust boundary. A user may trust their own agent, but does the tool provider handle the data properly? Does the peer agent apply the same security standards? Can the infrastructure operator see data in transit? The report asks whether agents can run on secure infrastructure and use attestation to build trust with the parties they deal with (§11.3, <a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=69" target="_blank" rel="noopener">p. 69</a>).</p>
+  <p>Every agent interaction crosses a trust boundary. A user may trust their own agent, but does the tool provider handle the data properly? Does the peer agent apply the same security standards? Can the infrastructure operator see data in transit? The report asks whether agents can run on secure infrastructure and use <span class="term" data-term="remote-attestation">attestation</span> to build trust with the parties they deal with (§11.3, <a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=69" target="_blank" rel="noopener">p. 69</a>).</p>
 
   <h3>The classic toolkit</h3>
-  <p>Confidential Computing is the established answer for distributed systems. Its building block is the Trusted Execution Environment (TEE), a hardware-enforced space that protects the confidentiality and integrity of code and data even from the operating system or hypervisor. The report acknowledges hardware and side-channel attacks on specific TEE implementations, then sets them aside on purpose: for this discussion it assumes TEEs will deliver what they claim as they mature.</p>
+  <p>Confidential Computing is the established answer for distributed systems. Its building block is the Trusted Execution Environment (TEE), a hardware-enforced space that protects the confidentiality and integrity of code and data even from the operating system or hypervisor. The report acknowledges hardware and <span class="term" data-term="side-channel">side-channel</span> attacks on specific TEE implementations, then sets them aside on purpose: for this discussion it assumes TEEs will deliver what they claim as they mature.</p>
   <p>A TEE enables <b>remote attestation</b>: a remote party can verify, cryptographically, which code is running inside, with a chain of trust that starts at the CPU maker's hardware. Add <b>binary transparency</b> (public, append-only logs of every binary deployed in TEEs) and reproducible builds, and a user may be able to check that the software they talk to matches reviewed, public source. For ordinary software, the report notes, that is enough: review the attested code and you know its security properties.</p>
 
   <h3>Why agents break it</h3>
@@ -73,7 +75,7 @@
   <p>So a perfectly attested TEE running a correct agent can still do harm, especially when an adversarial prompt steers it. Attestation answers "is this the code we reviewed?" and the honest reply can be "yes" while the agent is being hijacked. The report asks two questions it does not answer: how to extend attestation to behavior, and what "behavioral attestation" could even mean when behavior depends on inputs an attacker can control.</p>
 
   <h3>What can still be attested</h3>
-  <p>If behavior is out of reach, the mechanisms around it may not be. The report points to work on attesting the security mechanisms that govern an agent, its execution environment, and the results of safety evaluations. Deterministic parts, like the policy engine binary and its configuration, can be attested with standard techniques. The reason this matters is delegation: a user who hands an agent credentials needs to know the guardrails actually sit in the path of every action, not merely exist somewhere in the repository.</p>
+  <p>If behavior is out of reach, the mechanisms around it may not be. The report points to work on attesting the security mechanisms that govern an agent, its execution environment, and the results of safety evaluations. Deterministic parts, like the <span class="term" data-term="contextual-policy-engine">policy engine</span> binary and its configuration, can be attested with standard techniques. The reason this matters is delegation: a user who hands an agent credentials needs to know the guardrails actually sit in the path of every action, not merely exist somewhere in the repository.</p>
   <p>Then the harder layer. Many guardrails are themselves models: prompt-injection classifiers, safety filters, and policy generators (the report cites Tsai &amp; Bagdasarian, 2025, among others). A generated policy is produced at runtime from context, so it was never part of the audited binary. The report asks whether one can attest the policies a generator produces rather than only the generator, and which security properties are both meaningful for nondeterministic agents and feasible to check.</p>
 
   <h3>Mixed trust levels, ZKPs, and trusted third parties</h3>
@@ -105,7 +107,7 @@
   <h3 id="side-channels">Side-channel and behavioral leakage</h3>
   <p>With many agents, the room for side channels multiplies. Information can leak through observable behavior rather than message content: the timing and order of tool calls, which downstream agent gets the delegation, shared state left behind. An adversarial agent could infer something sensitive about a user just by watching which agents that user's assistant contacts, when, and in what order, even if every message is properly filtered (§11.3, <a class="lnk" href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=71" target="_blank" rel="noopener">p. 71</a>).</p>
   <blockquote class="q"><span>"No current benchmark measures these implicit information flows."</span><span class="cite">— the report, <a href="https://storage.googleapis.com/gweb-research2023-media/pubtools/1047874.pdf#page=71" target="_blank" rel="noopener">§11.3, p. 71</a></span></blockquote>
-  <p>Our reading: this is traffic analysis, a long-known problem in network security, now applied to agent orchestration. Content filters, data minimization and closed protocols all work on what a message says. None of them address the fact that a message was sent.</p>
+  <p>Our reading: this is traffic analysis, a long-known problem in network security, now applied to agent orchestration. Content filters, <span class="term" data-term="data-minimization">data minimization</span> and closed protocols all work on what a message says. None of them address the fact that a message was sent.</p>
 
   <h3>What a good answer would have to do</h3>
   <p>Quantify the expressiveness trade-off per task, so a designer can pick a point on the dial on purpose. Treat behavioral metadata as an information flow subject to the same appropriateness judgment as content. And build benchmarks that measure it.</p>
@@ -120,7 +122,7 @@
 
   <h3>Two families of test bed</h3>
   <p><b>Simulated social worlds.</b> The report traces a line of work that drops agents into scripted social scenarios where roles and sharing norms can be set and replayed at scale. Sotopia has language agents role-play rich social situations and scores them against explicit social goals, which makes emergent multi-agent behavior measurable and repeatable. Later frameworks used the same approach to study information flow between agents. Haicosystem extends it to safety: human&ndash;AI interactions sandboxed with simulated tools and adversarial users, so that operational, societal and legal risks can be drawn out and graded over thousands of runs.</p>
-  <p><b>Formal coordination problems.</b> The complementary route uses Distributed Constraint Optimization Problems (DCOPs). A DCOP spells out the agents, their local variables and constraints, and who talks to whom. That makes the knobs explicit: number of agents, network topology, local objectives, communication structure. The report notes recent work that grounded LLM multi-agent cooperation in a DCOP and audited collusion under different coalition goals, persuasion strategies and topologies. It suggests such environments could be extended to encode CI roles, information constraints and transmission principles, which would give controlled ground truth for privacy harms at scale.</p>
+  <p><b>Formal coordination problems.</b> The complementary route uses Distributed Constraint Optimization Problems (DCOPs). A DCOP spells out the agents, their local variables and constraints, and who talks to whom. That makes the knobs explicit: number of agents, network topology, local objectives, communication structure. The report notes recent work that grounded LLM multi-agent cooperation in a DCOP and audited collusion under different coalition goals, persuasion strategies and topologies. It suggests such environments could be extended to encode CI roles, information constraints and <span class="term" data-term="transmission-principle">transmission principles</span>, which would give controlled ground truth for privacy harms at scale.</p>
   <p>Our reading of the split: simulations buy realism and messiness; DCOPs buy a known right answer. A serious evaluation program probably wants both, the first to find failures and the second to measure them.</p>
 
   <h3>What the benchmarks of the future should measure</h3>
@@ -128,7 +130,7 @@
   <ul>
     <li>Environments where the provenance of information can be traced end to end across delegation boundaries.</li>
     <li>Compositional privacy metrics that add up the leakage across flows that are each compliant on their own.</li>
-    <li>Red-teaming methods built for multi-agent ecosystems, including adversarial agents that abuse delegation protocols to rebuild user profiles by watching inter-agent traffic patterns over a long time.</li>
+    <li><span class="term" data-term="red-teaming">Red-teaming</span> methods built for multi-agent ecosystems, including adversarial agents that abuse delegation protocols to rebuild user profiles by watching inter-agent traffic patterns over a long time.</li>
     <li>Measurement of both verbatim disclosure and attribute inference through behavioral leakage.</li>
   </ul>
   <p>This ties the section together. The side channels from OP 11.8 and the aggregation harms from §11.2 are exactly what single-model CI benchmarks cannot see, and these environments are where the report expects them to become measurable.</p>
@@ -140,6 +142,8 @@
 
   <h2 id="connections">Connections</h2>
   <p>The aggregation example and the composition problem this section's benchmarks are meant to measure are on <a class="lnk" href="multi-agent-norms.html">Shared norms, delegation, composition</a> (§11.1–11.2). Runtime policy generation, the thing OP 11.7 wants to attest, is the subject of <a class="lnk" href="policy-engines.html">the contextual policy engine</a> (§6). Delegated credentials and agent identity, which attestation is meant to back up, live on <a class="lnk" href="identity-authorization.html">Identity, authorization, accounting</a> (§7.1–7.3). The broader benchmark landscape, including single-model CI benchmarks the report wants to extend to many agents, is on <a class="lnk" href="evaluations.html">Evaluations and benchmarks</a> (§10). Who sets the norms these protocols should encode is the question of <a class="lnk" href="governance.html">Governance</a> (§12–13).</p>
+
+  <section id="definitions"><h2>Definitions</h2><div data-terms-list></div></section>
 
   <h2 id="reading">Further reading, verified</h2>
   <ul class="readings">
@@ -156,7 +160,8 @@
   <div class="callout">Next: <a class="lnk" href="governance.html">Governance: whose norms, and who checks</a> &middot; Back to the <a class="lnk" href="../index.html#ecosystem">map</a>.</div>
 </main>
 <footer>Original explanation of <em>Open and Emergent Problems in Agentic Privacy and Security: A Contextual Angle</em> (Bagdasarian, Tsai et al., 2026), §11.3–11.4. The report is &copy; its authors; this page explains and links, it does not copy.</footer>
+<script src="https://idvorkin-ai-tools.github.io/assets/terms.js" defer></script>
 <!-- Private comments mode, inert unless ?annotate=1 (see assets/annotate.js in idvorkin-ai-tools.github.io) -->
-<script src="https://idvorkin-ai-tools.github.io/assets/annotate.js" data-branch="site" defer></script>
+<script src="https://idvorkin-ai-tools.github.io/assets/annotate.js" defer></script>
 </body>
 </html>
